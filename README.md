@@ -1,0 +1,10 @@
+
+# wSelector [![Build Status](https://travis-ci.org/Wandalen/wSelector.svg?branch=master)](https://travis-ci.org/Wandalen/wSelector) [(https://ci.appveyor.com/api/projects/status/github/Wandalen/wselector)](https://ci.appveyor.com/project/Wandalen/wselector)
+
+Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
+
+## Try out
+```
+npm install
+node sample/Sample.s
+```
