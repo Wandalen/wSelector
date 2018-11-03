@@ -1,8 +1,6 @@
 
 let _ = require( 'wselector' )
 
-/**/
-
 let structure =
 {
   a : { name : 'name1', value : 13 },
