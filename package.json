@@ -7,7 +7,7 @@
   "main": "proto/dwtools/abase/l3/Selector.s",
   "files": [
     "proto/dwtools/abase/l3",
-    "production"
+    "proto/dwtools/Tools.s", "production"
   ],
   "scripts": {
     "test": "wtest proto",
