@@ -13,22 +13,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      toolsPath = require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
+  let _ = require( '../../Tools.s' );
 
 }
 
@@ -662,7 +647,7 @@ _.mapSupplement( Self, Proto );
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )
-delete require.cache[ module.id ];
+{ /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
