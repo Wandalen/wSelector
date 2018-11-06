@@ -122,7 +122,7 @@ function _entitySelect_pre( routine, args )
   _.assert( o.onActual === null || _.routineIs( o.onActual ) );
 
   _.assert( _.strIs( o.query ) );
-  _.assert( !_.strHas( o.query, '.' ), 'Temporary : query should not have dots' );
+  _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots' );
 
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   // _.assert( _.arrayHas( [ 'result', 'src' ], o.returning ), 'Unknown returning', o.returning );
@@ -265,7 +265,9 @@ function _entitySelect_pre( routine, args )
       if( !dit )
       errNoDownThrow( it );
 
-      // dit.iteration().look();
+      dit = dit.iteration()
+      dit.down = it;
+      dit.look();
 
     }
     else if( _.strBegins( it.query, '*' ) )

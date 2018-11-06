@@ -786,31 +786,31 @@ function selectWithDown( test )
 
   /* */
 
-  var container =
-  {
-    a : { name : 'name1', value : 13 },
-    b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
-  }
-
-  var got = _.entitySelect( container, '' );
-
-  test.identical( got, container );
-  test.is( got === container );
-
-  /* */
-
-  var container =
-  {
-    a : { name : 'name1', value : 13 },
-    b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
-  }
-
-  var got = _.entitySelect( container, '/' );
-
-  test.identical( got, container );
-  test.is( got === container );
+  // var container =
+  // {
+  //   a : { name : 'name1', value : 13 },
+  //   b : { name : 'name2', value : 77 },
+  //   c : { value : 25, date : new Date() },
+  // }
+  //
+  // var got = _.entitySelect( container, '' );
+  //
+  // test.identical( got, container );
+  // test.is( got === container );
+  //
+  // /* */
+  //
+  // var container =
+  // {
+  //   a : { name : 'name1', value : 13 },
+  //   b : { name : 'name2', value : 77 },
+  //   c : { value : 25, date : new Date() },
+  // }
+  //
+  // var got = _.entitySelect( container, '/' );
+  //
+  // test.identical( got, container );
+  // test.is( got === container );
 
   /* */
 
