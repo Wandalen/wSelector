@@ -38,7 +38,7 @@ _entitySelectOptions.defaults =
   query : null,
   set : null,
   delimeter : [ '.','/','[',']' ],
-  undefinedForMissing : 1,
+  missingAction : 'undefine',
   usingIndexedAccessToMap : 1,
   usingSet : 0,
   onElement : null,
@@ -65,7 +65,7 @@ Looker.Defaults.aquery = null;
 function errDoesNotExist( it )
 {
   let c = it.context;
-  if( c.undefinedForMissing )
+  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
   it.result = undefined
   else
   throw _.err
@@ -97,6 +97,8 @@ function _entitySelect_pre( routine, args )
 
   _.assert( _.strIs( o.query ) );
   _.assert( !_.strHas( o.query, '.' ), 'Temporary : query should not have dots' );
+
+  _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw' ], o.missingAction ), 'Unknown missing action', o.missingAction );
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
@@ -176,6 +178,8 @@ function _entitySelect_pre( routine, args )
         it.result = [];
         it.onResultWrite = function( eit )
         {
+          if( c.missingAction === 'ignore' && eit.result === undefined )
+          return;
           this.result.push( eit.result );
         }
       }
@@ -184,6 +188,8 @@ function _entitySelect_pre( routine, args )
         it.result = Object.create( null );
         it.onResultWrite = function( eit )
         {
+          if( c.missingAction === 'ignore' && eit.result === undefined )
+          return;
           this.result[ eit.key ] = eit.result;
         }
       }
@@ -317,7 +323,7 @@ _entitySelect_body.defaults =
 {
   container : null,
   query : null,
-  undefinedForMissing : 1,
+  missingAction : 'undefine',
   usingIndexedAccessToMap : 1,
   delimeter : '/',
   onTransient : null,

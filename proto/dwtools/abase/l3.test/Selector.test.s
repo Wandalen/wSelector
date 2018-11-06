@@ -82,25 +82,37 @@ function selectTrivial( test )
   /* */
 
   test.close( 'trivial' );
-  test.open( 'undefinedForMissing' );
+  test.open( 'usingIndexedAccessToMap' );
 
   /* */
 
   var structure =
   {
-    a : { name : 'name1', value : 13 },
-    b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
   }
 
   var got = _.entitySelect
   ({
     container : structure,
-    query : '*/name',
-    undefinedForMissing : 1,
+    query : '*/1',
+    usingIndexedAccessToMap : 1,
   });
 
-  test.identical( got, { a : 'name1', b : 'name2', d : undefined } );
+  test.identical( got, { a : 13, c : 53 } );
+
+  /* */
+
+  test.close( 'usingIndexedAccessToMap' );
+
+}
+
+//
+
+function selectMissing( test )
+{
+
+  test.open( 'missingAction:undefine' );
 
   /* */
 
@@ -115,28 +127,10 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'a/map/name',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   });
 
   test.identical( got, 'name1' );
-
-  /* */
-
-  var structure =
-  {
-    a : { map : { name : 'name1' }, value : 13 },
-    b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
-  }
-
-  var got = _.entitySelect
-  ({
-    container : structure,
-    query : '*/map/name',
-    undefinedForMissing : 1,
-  });
-
-  test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
 
   /* */
 
@@ -150,7 +144,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'x',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, undefined );
@@ -167,7 +161,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'x/x',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, undefined );
@@ -184,10 +178,46 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'x/x/x',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, undefined );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/name',
+    missingAction : 'undefine',
+  });
+
+  test.identical( got, { a : 'name1', b : 'name2', d : undefined } );
+
+  /* */
+
+  var structure =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { map : { name : 'name2' }, value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/map/name',
+    missingAction : 'undefine',
+  });
+
+  test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
 
   /* */
 
@@ -201,7 +231,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : '*',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, structure );
@@ -219,7 +249,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : '*/*',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, structure );
@@ -243,11 +273,234 @@ function selectTrivial( test )
   ({
     container : structure,
     query : '*/*/*',
-    undefinedForMissing : 1,
+    missingAction : 'undefine',
   })
 
   test.identical( got, expected );
   test.is( got !== structure );
+
+  /* */
+
+  var expected =
+  {
+    a : { name : undefined, value : undefined },
+    c : { value : undefined, date : undefined },
+  }
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/*/*/*',
+    missingAction : 'undefine',
+  })
+
+  test.identical( got, expected );
+  test.is( got !== structure );
+
+  /* */
+
+  test.close( 'missingAction:undefine' );
+  test.open( 'missingAction:ignore' );
+
+  /* */
+
+  var structure =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { map : { name : 'name2' }, value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : 'a/map/name',
+    missingAction : 'ignore',
+  });
+
+  test.identical( got, 'name1' );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : 'x',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, undefined );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : 'x/x',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, undefined );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : 'x/x/x',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, undefined );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/name',
+    missingAction : 'ignore',
+  });
+
+  test.identical( got, { a : 'name1', b : 'name2' } );
+
+  /* */
+
+  var structure =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { map : { name : 'name2' }, value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/map/name',
+    missingAction : 'ignore',
+  });
+
+  test.identical( got, { a : 'name1', b : 'name2' } );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, structure );
+  test.is( got !== structure );
+
+  /* */
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/*',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, structure );
+  test.is( got !== structure );
+
+  /* */
+
+  var expected =
+  {
+    a : {},
+    c : {},
+  }
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/*/*',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, expected );
+  test.is( got !== structure );
+
+  /* */
+
+  var expected =
+  {
+    a : {},
+    c : {},
+  }
+
+  var structure =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : structure,
+    query : '*/*/*/*',
+    missingAction : 'ignore',
+  })
+
+  test.identical( got, expected );
+  test.is( got !== structure );
+
+  /* */
+
+  test.close( 'missingAction:ignore' );
+  test.open( 'missingAction:throw' );
 
   /* */
 
@@ -261,7 +514,7 @@ function selectTrivial( test )
   // ({
   //   container : structure,
   //   query : 'x/*/*/*/x',
-  //   undefinedForMissing : 1,
+  //   missingAction : 'undefine',
   // })
 
   if( Config.debug )
@@ -269,7 +522,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'x',
-    undefinedForMissing : 0,
+    missingAction : 'throw',
   }));
 
   if( Config.debug )
@@ -277,7 +530,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : 'x/x',
-    undefinedForMissing : 0,
+    missingAction : 'throw',
   }));
 
   if( Config.debug )
@@ -285,7 +538,7 @@ function selectTrivial( test )
   ({
     container : structure,
     query : '*/x',
-    undefinedForMissing : 0,
+    missingAction : 'throw',
   }));
 
   if( Config.debug )
@@ -293,34 +546,47 @@ function selectTrivial( test )
   ({
     container : structure,
     query : '*/*/*',
-    undefinedForMissing : 0,
+    missingAction : 'throw',
   }));
 
   /* */
 
-  test.close( 'undefinedForMissing' );
-  test.open( 'usingIndexedAccessToMap' );
+  test.close( 'missingAction:throw' );
+}
+
+//
+
+function selectRestricted( test )
+{
 
   /* */
 
+  var expected =
+  {
+    a : { name : 'x', value : 13 },
+    b : { name : 'x', value : 77 },
+    c : { name : 'x', value : 25, date : new Date() },
+  }
+
   var structure =
   {
-    a : { map : { name : 'name1' }, value : 13 },
-    c : { value : 25, date : 53 },
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
   }
 
   var got = _.entitySelect
   ({
     container : structure,
-    query : '*/1',
-    usingIndexedAccessToMap : 1,
+    query : '*/name',
+    set : 'x',
+    missingAction : 'ignore',
   });
 
-  test.identical( got, { a : 13, c : 53 } );
+  test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
+  test.identical( structure, expected );
 
   /* */
-
-  test.close( 'usingIndexedAccessToMap' );
 
 }
 
@@ -378,6 +644,8 @@ var Self =
   tests :
   {
     selectTrivial : selectTrivial,
+    selectMissing : selectMissing,
+    selectRestricted : selectRestricted,
     selectSet : selectSet,
   }
 
