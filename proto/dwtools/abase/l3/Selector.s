@@ -116,7 +116,7 @@ function _entitySelect_pre( routine, args )
 
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 || args.length === 2 );
-  _.routineOptions( routine, o );
+  _.routineOptionsPreservingUndefines( routine, o ); /* xxx */
 
   _.assert( o.onTransient === null || _.routineIs( o.onTransient ) );
   _.assert( o.onActual === null || _.routineIs( o.onActual ) );
@@ -259,13 +259,26 @@ function _entitySelect_pre( routine, args )
     if( !it.query )
     {
     }
-    else if( it.query === '..' )
+    else if( it.query === c.downToken )
     {
+      let counter = 0;
       let dit = it.down;
+
       if( !dit )
       errNoDownThrow( it );
 
-      dit = dit.iteration()
+      while( dit.query === c.downToken || counter > 0 )
+      {
+        if( dit.query === c.downToken )
+        counter += 1;
+        else
+        counter -= 1;
+        dit = dit.down;
+        if( !dit )
+        errNoDownThrow( it );
+      }
+
+      dit = dit.iteration();
       dit.down = it;
       dit.look();
 
@@ -283,8 +296,9 @@ function _entitySelect_pre( routine, args )
     else
     {
 
-      if( !it.src )
+      if( _.primitiveIs( it.src ) )
       return errDoesNotExistThrow( it );
+
       it.iteration().select( it.query ).look();
 
     }
@@ -335,6 +349,7 @@ _entitySelect_body.defaults =
   // returning : 'result',
   usingIndexedAccessToMap : 1,
   delimeter : '/',
+  downToken : '..',
   onTransient : null,
   onActual : null,
   set : null,

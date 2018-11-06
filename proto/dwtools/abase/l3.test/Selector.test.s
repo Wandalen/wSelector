@@ -27,6 +27,20 @@ function selectTrivial( test )
 
   /* */
 
+  var got = _.entitySelect( undefined, '' );
+  test.identical( got, undefined );
+
+  var got = _.entitySelect( undefined, '/' );
+  test.identical( got, undefined );
+
+  var got = _.entitySelect( null, '' );
+  test.identical( got, null );
+
+  var got = _.entitySelect( null, '/' );
+  test.identical( got, null );
+
+  /* */
+
   var container =
   {
     a : 11,
@@ -769,6 +783,72 @@ function selectSet( test )
 
   /* */
 
+  var container = {};
+  var expected = { a : 'c' };
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '/a',
+    set : 'c',
+    setting : 1,
+  });
+
+  test.identical( got, undefined );
+  test.identical( container, expected );
+
+  /* */
+
+  var container = {};
+  var expected = {};
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '/a/b',
+    set : 'c',
+    setting : 1,
+  });
+
+  test.identical( got, undefined );
+  test.identical( container, expected );
+
+  /* */
+
+  var container = {};
+  var expected = { '1' : {} };
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '/1',
+    set : {},
+    setting : 1,
+    usingIndexedAccessToMap : 0,
+  });
+
+  test.identical( got, undefined );
+  test.identical( container, expected );
+
+  /* */
+
+  var container = {};
+  var expected = {};
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '/1',
+    set : {},
+    setting : 1,
+    usingIndexedAccessToMap : 1,
+  });
+
+  test.identical( got, undefined );
+  test.identical( container, expected );
+
+  /* */
+
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : {},
@@ -786,35 +866,33 @@ function selectWithDown( test )
 
   /* */
 
-  // var container =
-  // {
-  //   a : { name : 'name1', value : 13 },
-  //   b : { name : 'name2', value : 77 },
-  //   c : { value : 25, date : new Date() },
-  // }
-  //
-  // var got = _.entitySelect( container, '' );
-  //
-  // test.identical( got, container );
-  // test.is( got === container );
-  //
-  // /* */
-  //
-  // var container =
-  // {
-  //   a : { name : 'name1', value : 13 },
-  //   b : { name : 'name2', value : 77 },
-  //   c : { value : 25, date : new Date() },
-  // }
-  //
-  // var got = _.entitySelect( container, '/' );
-  //
-  // test.identical( got, container );
-  // test.is( got === container );
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, '' );
+
+  test.identical( got, container );
+  test.is( got === container );
 
   /* */
 
-  var expected = { name : 'name1', value : 13 }
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, '/' );
+
+  test.identical( got, container );
+  test.is( got === container );
+
+  /* */
 
   var container =
   {
@@ -825,25 +903,53 @@ function selectWithDown( test )
 
   var got = _.entitySelect( container, 'a/..' );
 
-  test.identical( got, expected );
+  test.identical( got, container );
   test.is( got === container );
 
-  // /* */
-  //
-  // var expected =
-  // {
-  //   a : { name : 'x', value : 13 },
-  //   b : { name : 'x', value : 77 },
-  //   c : { name : 'x', value : 25, date : new Date() },
-  // }
-  //
-  // var container =
-  // {
-  //   a : { name : 'name1', value : 13 },
-  //   b : { name : 'name2', value : 77 },
-  //   c : { value : 25, date : new Date() },
-  // }
-  //
+  /* */
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, 'a/name/..' );
+
+  test.identical( got, container.a );
+  test.is( got === container.a );
+
+  /* */
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, 'a/name/../..' );
+
+  test.identical( got, container );
+  test.is( got === container );
+
+  /* */
+
+  var expected =
+  {
+    a : { name : 'x', value : 13 },
+    b : { name : 'x', value : 77 },
+    c : { name : 'x', value : 25, date : new Date() },
+  }
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
   // var got = _.entitySelect
   // ({
   //   container : container,
@@ -854,8 +960,8 @@ function selectWithDown( test )
   //
   // test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
   // test.identical( container, expected );
-
-  /* */
+  //
+  // /* */
 
 }
 
