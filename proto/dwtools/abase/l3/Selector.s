@@ -62,7 +62,7 @@ Looker.Defaults.aquery = null;
 
 //
 
-function errDoesNotExist( it )
+function errDoesNotExistThrow( it )
 {
   let c = it.context;
   if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
@@ -71,6 +71,32 @@ function errDoesNotExist( it )
   throw _.err
   (
     'Cant select', _.strQuote( it.context.query ),
+    '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
+    '\nat', _.strQuote( it.path ),
+    '\nin container', _.toStr( c.container )
+  );
+}
+
+//
+
+function errCantSetThrow( it )
+{
+  let c = it.context; debugger;
+  throw _.err
+  (
+    'Cant set', _.strQuote( it.context.query ),
+    'of container', _.toStr( c.container )
+  );
+}
+
+//
+
+function errNoDownThrow( it )
+{
+  let c = it.context;
+  throw _.err
+  (
+    'Cant go down', _.strQuote( it.context.query ),
     '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
     '\nat', _.strQuote( it.path ),
     '\nin container', _.toStr( c.container )
@@ -99,12 +125,13 @@ function _entitySelect_pre( routine, args )
   _.assert( !_.strHas( o.query, '.' ), 'Temporary : query should not have dots' );
 
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw' ], o.missingAction ), 'Unknown missing action', o.missingAction );
+  // _.assert( _.arrayHas( [ 'result', 'src' ], o.returning ), 'Unknown returning', o.returning );
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
 
-  if( o.setting )
-  o.onActual = _.routinesCompose( o.onActual, handleSet );
+  // if( o.setting )
+  // o.onActual = _.routinesCompose( o.onActual, handleSet );
 
   return _.look.pre( _.look, [ optionsFor( o ) ] );
 
@@ -139,16 +166,6 @@ function _entitySelect_pre( routine, args )
 
   /* */
 
-  function handleSet()
-  {
-    let it = this;
-    let c = it.context;
-    debugger; xxx
-    it.src = c.set;
-  }
-
-  /* */
-
   function handleUp()
   {
     let it = this;
@@ -163,16 +180,13 @@ function _entitySelect_pre( routine, args )
 
     if( it.isActual )
     {
+      /* actual node */
       it.looking = false;
       it.result = it.src;
-      it.onResultWrite = function( eit )
-      {
-        debugger; xxx
-        this.result = eit.result;
-      }
     }
     else if( _.strBegins( it.query, '*' ) )
     {
+      /* all selector */
       if( _.arrayLike( it.src ) )
       {
         it.result = [];
@@ -195,27 +209,28 @@ function _entitySelect_pre( routine, args )
       }
       else
       {
-        errDoesNotExist( it );
+        errDoesNotExistThrow( it );
       }
     }
     else
     {
+      /* select single */
 
       if( _.primitiveIs( it.src ) )
       {
-        errDoesNotExist( it );
+        errDoesNotExistThrow( it );
       }
       else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
       {
         let q = _.numberFromStr( it.query );
         it.query = _.mapKeys( it.src )[ q ];
         if( it.query === undefined )
-        errDoesNotExist( it );
+        errDoesNotExistThrow( it );
         // it.result = it.src[ it.query ];
       }
       else if( it.src[ it.query ] === undefined )
       {
-        errDoesNotExist( it );
+        errDoesNotExistThrow( it );
       }
       else
       {
@@ -229,18 +244,6 @@ function _entitySelect_pre( routine, args )
       }
 
     }
-
-    // if( it.context.onTransient )
-    // it.context.onTransient( it );
-    //
-    // if( it.context.onActual && it.isActual )
-    // it.context.onActual( it );
-    //
-    // if( it.context.setting && it.isActual )
-    // it.down.src[ it.key ] = it.context.setting;
-    //
-    // if( it.down )
-    // it.down.onResultWrite( it );
 
   }
 
@@ -256,32 +259,31 @@ function _entitySelect_pre( routine, args )
     if( !it.query )
     {
     }
+    else if( it.query === '..' )
+    {
+      let dit = it.down;
+      if( !dit )
+      errNoDownThrow( it );
+
+      // dit.iteration().look();
+
+    }
     else if( _.strBegins( it.query, '*' ) )
     {
       if( it.query !== '*' )
       {
-        debugger; xxx
+        debugger;
         let number = _.numberFromStr( _.strRemoveBegin( it.query, '*' ) );
         _.sure( !isNaN( number ) && number >= 0 );
-        _.sure( _.entityLength( it.src2 ) === number );
+        _.sure( _.entityLength( it.result ) === number );
       }
     }
     else
     {
 
-      // if( it.apath.length < it.iterator.aquery.length )
-      // {
-        if( !it.src )
-        return errDoesNotExist( it );
-        it.iteration().select( it.query ).look();
-      // }
-
-      // if( it.apath.length < it.iterator.aquery.length )
-      // {
-      //   if( !it.src )
-      //   return errDoesNotExist( it );
-      //   it.iteration().select( it.query ).look();
-      // }
+      if( !it.src )
+      return errDoesNotExistThrow( it );
+      it.iteration().select( it.query ).look();
 
     }
 
@@ -293,8 +295,10 @@ function _entitySelect_pre( routine, args )
 
     if( it.context.setting && it.isActual )
     {
-      debugger;
+      if( it.down )
       it.down.src[ it.key ] = it.context.set;
+      else
+      errCantSetThrow( it );
     }
 
     if( it.down )
@@ -316,6 +320,8 @@ function _entitySelect_body( it )
 
   it.iteration = it.context.iteration = _.look.body( it );
 
+  // return it.returning === 'result' ? it.result : it.src;
+
   return it.result;
 }
 
@@ -324,6 +330,7 @@ _entitySelect_body.defaults =
   container : null,
   query : null,
   missingAction : 'undefine',
+  // returning : 'result',
   usingIndexedAccessToMap : 1,
   delimeter : '/',
   onTransient : null,
