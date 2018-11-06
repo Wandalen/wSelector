@@ -22,7 +22,9 @@
     "url": "https://github.com/Wandalen/wSelector/issues"
   },
   "dependencies": {
-    "wTools": ""
+    "wTools": "",
+    "wlooker": "",
+    "wpathfundamentals": ""
   },
   "devDependencies": {
     "wTesting": "",
