@@ -826,7 +826,7 @@ function selectWithDown( test )
   var got = _.entitySelect( container, 'a/..' );
 
   test.identical( got, expected );
-  test.is( got === container.a );
+  test.is( got === container );
 
   // /* */
   //
