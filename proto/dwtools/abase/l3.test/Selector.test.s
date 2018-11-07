@@ -697,6 +697,79 @@ function selectMissing( test )
   /* */
 
   test.close( 'missingAction:ignore + restricted selector' );
+  test.open( 'missingAction:error' );
+
+  /* */
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : 'x',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : 'x/x',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '*/x',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '*/*/*',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '..',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : 'a/../..',
+    missingAction : 'error',
+  });
+
+  test.is( got instanceof _.ErrorLooking );
+  console.log( got );
+
+  /* */
+
+  test.close( 'missingAction:error' );
   test.open( 'missingAction:throw' );
 
   /* */
@@ -707,14 +780,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  // _.entitySelect
-  // ({
-  //   container : container,
-  //   query : 'x/*/*/*/x',
-  //   missingAction : 'undefine',
-  // })
-
-  if( Config.debug )
+  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : container,
@@ -722,7 +788,7 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  if( Config.debug )
+  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : container,
@@ -730,7 +796,7 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  if( Config.debug )
+  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : container,
@@ -738,11 +804,28 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  if( Config.debug )
+  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : container,
     query : '*/*/*',
+    missingAction : 'throw',
+  }));
+
+
+  // if( Config.debug )
+  test.shouldThrowErrorSync( () => _.entitySelect
+  ({
+    container : container,
+    query : '..',
+    missingAction : 'throw',
+  }));
+
+  // if( Config.debug )
+  test.shouldThrowErrorSync( () => _.entitySelect
+  ({
+    container : container,
+    query : 'a/../..',
     missingAction : 'throw',
   }));
 
@@ -802,22 +885,6 @@ function selectSet( test )
   /* */
 
   var container = {};
-  var expected = {};
-
-  var got = _.entitySelect
-  ({
-    container : container,
-    query : '/a/b',
-    set : 'c',
-    setting : 1,
-  });
-
-  test.identical( got, undefined );
-  test.identical( container, expected );
-
-  /* */
-
-  var container = {};
   var expected = { '1' : {} };
 
   var got = _.entitySelect
@@ -851,12 +918,62 @@ function selectSet( test )
 
   /* */
 
+  var container = { a : '1', b : '1' };
+  var expected = { a : '1', b : '2' };
+
+  var got = _.entitySelect
+  ({
+    container : container,
+    query : '/1',
+    set : '2',
+    setting : 1,
+    usingIndexedAccessToMap : 1,
+  });
+
+  test.identical( got, '1' );
+  test.identical( container, expected );
+
+  /* */
+
   test.shouldThrowErrorSync( () => _.entitySelect
   ({
     container : {},
     query : '/',
     set : { a : 1 },
     setting : 1,
+  }));
+
+  /* */
+
+  test.shouldThrowErrorSync( () => _.entitySelect
+  ({
+    container : {},
+    query : '/a/b',
+    set : 'c',
+    setting : 1,
+    missingAction : 'throw',
+  }));
+
+  /* */
+
+  test.shouldThrowErrorSync( () => _.entitySelect
+  ({
+    container : {},
+    query : '/a/b',
+    set : 'c',
+    setting : 1,
+    missingAction : 'ignore',
+  }));
+
+  /* */
+
+  test.shouldThrowErrorSync( () => _.entitySelect
+  ({
+    container : {},
+    query : '/a/b',
+    set : 'c',
+    setting : 1,
+    missingAction : 'undefine',
   }));
 
 }
@@ -949,6 +1066,64 @@ function selectWithDown( test )
 
   test.identical( got, container.a.name );
   test.is( got === container.a.name );
+
+  /* */
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, 'a/../a/../a/name' );
+
+  test.identical( got, container.a.name );
+  test.is( got === container.a.name );
+
+  /* */
+
+  var container =
+  {
+    a : { b : { c : { d : 'e' } } },
+  }
+
+  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/d' );
+
+  test.is( got === container.a.b.c.d );
+
+  /* */
+
+  var container =
+  {
+    a : { b : { c : { d : 'e' } } },
+  }
+
+  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c' );
+
+  test.is( got === container.a.b.c );
+
+  /* */
+
+  var container =
+  {
+    a : { b : { c : { d : 'e' } } },
+  }
+
+  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/..' );
+
+  test.is( got === container.a.b );
+
+  /* */
+
+  var container =
+  {
+    a : { b : { c : { d : 'e' } } },
+  }
+
+  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/../../..' );
+
+  test.is( got === container );
 
   /* */
 

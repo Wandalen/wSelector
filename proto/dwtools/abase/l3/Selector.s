@@ -41,6 +41,7 @@ Looker.Iteration.apath = null;
 Looker.Iteration.query = null;
 Looker.Iteration.onResultWrite = null;
 Looker.Iteration.isActual = null;
+Looker.Iteration.isRelative = 0;
 
 // Looker.Iterator = _.mapExtend( null, Looker.Iterator );
 // Looker.Defaults = _.mapExtend( null, Looker.Defaults );
@@ -51,17 +52,56 @@ Looker.Iteration.isActual = null;
 function errDoesNotExistThrow( it )
 {
   let c = it.context;
-  debugger;
+  it.looking = false;
   if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
-  it.result = undefined
+  {
+    it.result = undefined
+  }
   else
-  throw _.err
-  (
-    'Cant select', _.strQuote( it.context.query ),
-    '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
-    '\nat', _.strQuote( it.path ),
-    '\nin container', _.toStr( c.container )
-  );
+  {
+    // debugger;
+    let err = _.ErrorLooking
+    (
+      'Cant select', _.strQuote( it.context.query ),
+      '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
+      '\nat', _.strQuote( it.path ),
+      '\nin container', _.toStr( c.container )
+    );
+    // debugger;
+    it.result = undefined;
+    it.iterator.error = err;
+    if( c.missingAction === 'throw' )
+    throw err;
+  }
+}
+
+//
+
+function errNoDownThrow( it )
+{
+  let c = it.context;
+  debugger;
+  it.looking = false;
+  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
+  {
+    it.result = undefined
+  }
+  else
+  {
+    debugger;
+    let err = _.ErrorLooking
+    (
+      'Cant go down', _.strQuote( it.context.query ),
+      '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
+      '\nat', _.strQuote( it.path ),
+      '\nin container', _.toStr( c.container )
+    );
+    debugger;
+    it.result = undefined;
+    it.iterator.error = err;
+    if( c.missingAction === 'throw' )
+    throw err;
+  }
 }
 
 //
@@ -74,21 +114,6 @@ function errCantSetThrow( it )
   (
     'Cant set', _.strQuote( it.context.query ),
     'of container', _.toStr( c.container )
-  );
-}
-
-//
-
-function errNoDownThrow( it )
-{
-  let c = it.context;
-  debugger;
-  throw _.err
-  (
-    'Cant go down', _.strQuote( it.context.query ),
-    '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
-    '\nat', _.strQuote( it.path ),
-    '\nin container', _.toStr( c.container )
   );
 }
 
@@ -114,7 +139,7 @@ function _entitySelect_pre( routine, args )
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
   _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots' );
-  _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw' ], o.missingAction ), 'Unknown missing action', o.missingAction );
+  _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   _.assert( o.aquery === undefined );
 
   o.prevContext = null;
@@ -166,7 +191,7 @@ function _entitySelect_pre( routine, args )
     o2.onDown = handleDown;
     o2.onIterate = handleIterate;
     o2.looker = Looker;
-    o2.trackingVisits = 0;
+    // o2.trackingVisits = 0;
     o2.it = o.it;
 
     _.assert( arguments.length === 1 );
@@ -188,6 +213,11 @@ function _entitySelect_pre( routine, args )
     it.isActual = it.query === undefined;
     it.result = it.src;
 
+    if( it.down && it.down.isRelative )
+    {
+      it.trackingVisits = 0;
+    }
+
     // if( it.context && it.context.prevContext )
     // debugger;
 
@@ -206,7 +236,8 @@ function _entitySelect_pre( routine, args )
     }
     else if( it.query === c.downToken )
     {
-      it.trackingVisits = 0;
+      // it.trackingVisits = 0;
+      it.isRelative = 1;
       it.onResultWrite = function( eit )
       {
         this.result = eit.result;
@@ -244,27 +275,6 @@ function _entitySelect_pre( routine, args )
     {
       /* select single */
 
-      if( _.primitiveIs( it.src ) )
-      {
-        errDoesNotExistThrow( it );
-      }
-      else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
-      {
-        let q = _.numberFromStr( it.query );
-        it.query = _.mapKeys( it.src )[ q ];
-        if( it.query === undefined )
-        errDoesNotExistThrow( it );
-        // it.result = it.src[ it.query ];
-      }
-      else if( it.src[ it.query ] === undefined )
-      {
-        errDoesNotExistThrow( it );
-      }
-      else
-      {
-        // it.result = it.src[ it.query ];
-      }
-
       // it.looking = false;
       it.onResultWrite = function( eit )
       {
@@ -292,12 +302,10 @@ function _entitySelect_pre( routine, args )
     {
       let counter = 0;
       let dit = it.down;
-
-      // if( it.context && it.context.prevContext )
-      // debugger;
+      let rit = it; /* !!! simply use down maybe? could fail maybe? */
 
       if( !dit )
-      errNoDownThrow( it );
+      return errNoDownThrow( it );
 
       while( dit.query === c.downToken || dit.isActual || counter > 0 )
       {
@@ -306,17 +314,21 @@ function _entitySelect_pre( routine, args )
         else if( !dit.isActual )
         counter -= 1;
         dit = dit.down;
+        rit = rit.down;
         if( !dit )
-        errNoDownThrow( it );
+        return errNoDownThrow( it );
       }
-
-      // if( it.context && it.context.prevContext )
-      // debugger;
 
       _.assert( _.iterationIs( dit ) );
 
+      rit.visitEndMaybe();
+
+      let src = dit.src;
       dit = dit.iteration();
+      dit.path = it.path;
       dit.down = it;
+      dit.select( it.query );
+      dit.src = src;
 
       onElement( dit, it );
 
@@ -329,7 +341,23 @@ function _entitySelect_pre( routine, args )
     {
 
       if( _.primitiveIs( it.src ) )
-      return errDoesNotExistThrow( it );
+      {
+        errDoesNotExistThrow( it );
+      }
+      else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
+      {
+        let q = _.numberFromStr( it.query );
+        it.query = _.mapKeys( it.src )[ q ];
+        if( it.query === undefined )
+        return errDoesNotExistThrow( it );
+      }
+      else if( it.src[ it.query ] === undefined )
+      {
+        errDoesNotExistThrow( it );
+      }
+      else
+      {
+      }
 
       let eit = it.iteration().select( it.query );
 
@@ -380,7 +408,7 @@ function _entitySelect_pre( routine, args )
 
     if( it.context.setting && it.isActual )
     {
-      if( it.down )
+      if( it.down && it.down.src )
       it.down.src[ it.key ] = it.context.set;
       else
       errCantSetThrow( it );
@@ -434,6 +462,8 @@ function _entitySelect_body( it )
   let it2 = _.entitySelectAct.body( it );
   _.assert( it2 === it )
   _.assert( arguments.length === 1, 'Expects single argument' );
+  if( it.context.missingAction === 'error' && it.error )
+  return it.error;
   return it.result;
 }
 
@@ -702,6 +732,10 @@ entityProbe.defaults =
 
 let Proto =
 {
+
+  errDoesNotExistThrow : errDoesNotExistThrow,
+  errNoDownThrow : errNoDownThrow,
+  errCantSetThrow : errCantSetThrow,
 
   entitySelectAct : entitySelectAct,
   entitySelect : entitySelect,
