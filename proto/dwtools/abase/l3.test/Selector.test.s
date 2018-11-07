@@ -952,13 +952,6 @@ function selectWithDown( test )
 
   /* */
 
-  var expected =
-  {
-    a : { name : 'x', value : 13 },
-    b : { name : 'x', value : 77 },
-    c : { name : 'x', value : 25, date : new Date() },
-  }
-
   var container =
   {
     a : { name : 'name1', value : 13 },
@@ -966,6 +959,37 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
+  var it = _.entitySelectAct( container, 'a/name' );
+
+  test.identical( it.result, container.a.name );
+  test.is( it.result === container.a.name );
+
+  var it = _.entitySelectAct( it.lastSelect.iteration(), '../../b/name' );
+
+  test.identical( it.result, container.b.name );
+  test.is( it.result === container.b.name );
+
+  var it = _.entitySelectAct( it.lastSelect.iteration(), '..' );
+
+  test.identical( it.result, container.b );
+  test.is( it.result === container.b );
+
+  /* */
+
+  // var expected =
+  // {
+  //   a : { name : 'x', value : 13 },
+  //   b : { name : 'x', value : 77 },
+  //   c : { name : 'x', value : 25, date : new Date() },
+  // }
+  //
+  // var container =
+  // {
+  //   a : { name : 'name1', value : 13 },
+  //   b : { name : 'name2', value : 77 },
+  //   c : { value : 25, date : new Date() },
+  // }
+  //
   // var got = _.entitySelect
   // ({
   //   container : container,
