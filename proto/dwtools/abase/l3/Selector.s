@@ -55,6 +55,8 @@ Looker.Iteration.apath = null;
 Looker.Iteration.query = null;
 Looker.Iteration.onResultWrite = null;
 Looker.Iteration.isActual = null;
+// Looker.Iteration.writingToDown = 1;
+
 Looker.Iterator = _.mapExtend( null, Looker.Iterator );
 Looker.Iterator.aquery = null;
 Looker.Defaults = _.mapExtend( null, Looker.Defaults );
@@ -147,7 +149,9 @@ function _entitySelect_pre( routine, args )
     o2.context = o;
     o2.onUp = handleUp;
     o2.onDown = handleDown;
+    o2.onIterate = handleIterate;
     o2.looker = Looker;
+    o2.trackingVisits = 0;
 
     if( _.numberIs( o.query ) )
     o2.aquery = [ o.query ];
@@ -155,7 +159,7 @@ function _entitySelect_pre( routine, args )
     o2.aquery = _.strSplit
     ({
       src : o.query,
-      delimeter : o.delimeter,
+      delimeter : o.upSymbol,
       preservingDelimeters : 0,
       preservingEmpty : 0,
       stripping : 1,
@@ -171,18 +175,27 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    debugger;
-
     it.query = it.down ? it.iterator.aquery[ it.down.apath.length ] : it.iterator.aquery[ 0 ];
     it.apath = it.down ? it.down.apath.slice() : [];
     it.apath.push( it.query );
     it.isActual = it.query === undefined;
+    it.result = it.src;
+
+    debugger;
 
     if( it.isActual )
     {
       /* actual node */
       it.looking = false;
       it.result = it.src;
+    }
+    else if( it.query === c.downSymbol )
+    {
+      it.trackingVisits = 0;
+      it.onResultWrite = function( eit )
+      {
+        this.result = eit.result;
+      }
     }
     else if( _.strBegins( it.query, '*' ) )
     {
@@ -237,11 +250,66 @@ function _entitySelect_pre( routine, args )
         // it.result = it.src[ it.query ];
       }
 
-      it.looking = false;
+      // it.looking = false;
       it.onResultWrite = function( eit )
       {
         this.result = eit.result;
       }
+
+    }
+
+  }
+
+  /* */
+
+  function handleIterate( onElement )
+  {
+    let it = this;
+    let c = it.context;
+
+    debugger;
+
+    if( !it.query )
+    {
+    }
+    else if( it.query === c.downSymbol )
+    {
+      let counter = 0;
+      let dit = it.down;
+
+      if( !dit )
+      errNoDownThrow( it );
+
+      while( dit.query === c.downSymbol || counter > 0 )
+      {
+        if( dit.query === c.downSymbol )
+        counter += 1;
+        else
+        counter -= 1;
+        dit = dit.down;
+        if( !dit )
+        errNoDownThrow( it );
+      }
+
+      dit = dit.iteration();
+      dit.down = it;
+
+      onElement( dit, it );
+
+    }
+    else if( _.strBegins( it.query, '*' ) )
+    {
+      _.Looker.Defaults.onIterate.call( this, onElement );
+    }
+    else
+    {
+
+      if( _.primitiveIs( it.src ) )
+      return errDoesNotExistThrow( it );
+
+      let eit = it.iteration().select( it.query );
+
+      onElement( eit )
 
     }
 
@@ -256,38 +324,18 @@ function _entitySelect_pre( routine, args )
 
     debugger;
 
+    /* */
+
     if( !it.query )
     {
     }
-    else if( it.query === c.downToken )
+    else if( it.query === c.downSymbol )
     {
-      let counter = 0;
-      let dit = it.down;
-
-      if( !dit )
-      errNoDownThrow( it );
-
-      while( dit.query === c.downToken || counter > 0 )
-      {
-        if( dit.query === c.downToken )
-        counter += 1;
-        else
-        counter -= 1;
-        dit = dit.down;
-        if( !dit )
-        errNoDownThrow( it );
-      }
-
-      dit = dit.iteration();
-      dit.down = it;
-      dit.look();
-
     }
     else if( _.strBegins( it.query, '*' ) )
     {
       if( it.query !== '*' )
       {
-        debugger;
         let number = _.numberFromStr( _.strRemoveBegin( it.query, '*' ) );
         _.sure( !isNaN( number ) && number >= 0 );
         _.sure( _.entityLength( it.result ) === number );
@@ -295,13 +343,9 @@ function _entitySelect_pre( routine, args )
     }
     else
     {
-
-      if( _.primitiveIs( it.src ) )
-      return errDoesNotExistThrow( it );
-
-      it.iteration().select( it.query ).look();
-
     }
+
+    /* */
 
     if( it.context.onTransient )
     it.context.onTransient( it );
@@ -347,9 +391,9 @@ _entitySelect_body.defaults =
   query : null,
   missingAction : 'undefine',
   // returning : 'result',
-  usingIndexedAccessToMap : 1,
-  delimeter : '/',
-  downToken : '..',
+  usingIndexedAccessToMap : 0,
+  upSymbol : '/',
+  downSymbol : '..',
   onTransient : null,
   onActual : null,
   set : null,
@@ -390,18 +434,18 @@ let entitySelectUnique2 = _.routineFromPreAndBody( entitySelect2.pre, _entitySel
 //
 // /**
 //  * Returns generated options object( o ) for ( entitySelect ) routine.
-//  * Query( o.query ) can be represented as string or array of strings divided by one of( o.delimeter ).
-//  * Function parses( o.query ) in to array( o.qarrey ) by splitting string using( o.delimeter ).
+//  * Query( o.query ) can be represented as string or array of strings divided by one of( o.upSymbol ).
+//  * Function parses( o.query ) in to array( o.qarrey ) by splitting string using( o.upSymbol ).
 //  *
 //  * @param {Object|Array} [ o.container=null ] - Source entity.
 //  * @param {Array|String} [ o.query=null ] - Source query.
 //  * @param {*} [ o.set=null ] - Specifies value that replaces selected.
-//  * @param {Array} [ o.delimeter=[ '.','[',']' ] ] - Specifies array of delimeters for( o.query ) values.
+//  * @param {Array} [ o.upSymbol=[ '.','[',']' ] ] - Specifies array of upSymbols for( o.query ) values.
 //  * @param {Boolean} [ o.undefinedForMissing=false ] - If true returns undefined for Atomic type of( o.container ).
 //  * @returns {Object} Returns generated options object.
 //  *
 //  * @example
-//  * //returns { container: [ 0, 1, 2, 3 ], qarrey : [ '0', '1', '2' ], query: "0.1.2", set: 1, delimeter: [ '.','[',']' ], undefinedForMissing: 1 }
+//  * //returns { container: [ 0, 1, 2, 3 ], qarrey : [ '0', '1', '2' ], query: "0.1.2", set: 1, upSymbol: [ '.','[',']' ], undefinedForMissing: 1 }
 //  * _._entitySelectOptions( { container : [ 0, 1, 2, 3 ], query : '0.1.2', set : 1 } );
 //  *
 //  * @function _entitySelectOptions

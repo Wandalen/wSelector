@@ -48,7 +48,9 @@ function selectTrivial( test )
     c : 15,
   }
 
+  debugger;
   var got = _.entitySelect( container, 'b' );
+  debugger;
 
   test.identical( got, 13 );
 
@@ -933,6 +935,20 @@ function selectWithDown( test )
 
   test.identical( got, container );
   test.is( got === container );
+
+  /* */
+
+  var container =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.entitySelect( container, 'a/name/../../a/name' );
+
+  test.identical( got, container.a.name );
+  test.is( got === container.a.name );
 
   /* */
 
