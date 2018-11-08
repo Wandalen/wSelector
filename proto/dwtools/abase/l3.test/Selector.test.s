@@ -751,7 +751,7 @@ function selectMissing( test )
   ({
     container : container,
     query : '..',
-    missingAction : 'trhow',
+    missingAction : 'error',
   });
 
   test.is( got instanceof _.ErrorLooking );
@@ -763,8 +763,6 @@ function selectMissing( test )
     query : 'a/../..',
     missingAction : 'error',
   });
-
-  debugger; return; xxx
 
   test.is( got instanceof _.ErrorLooking );
   console.log( got );

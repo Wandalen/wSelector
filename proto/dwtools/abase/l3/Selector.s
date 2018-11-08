@@ -193,7 +193,7 @@ function _select_pre( routine, args )
     o2.onDown = down;
     o2.onIterate = iterate;
     o2.looker = Looker;
-    // o2.trackingVisits = false;
+    o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
 
     _.assert( arguments.length === 1 );
@@ -212,19 +212,24 @@ function _select_pre( routine, args )
     it.apath = it.down ? it.down.apath.slice() : [];
     if( it.query !== undefined )
     it.apath.push( it.query );
-    it.isFinal = it.query === undefined;
-    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
     it.result = it.src;
 
-    if( it.down && it.down.isRelative )
-    {
-      it.trackingVisits = false;
-    }
+    it.isRelative = it.query === c.downToken;
+    it.isFinal = it.query === undefined;
+    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
+
+    // if( it.down && it.down.isRelative )
+    // {
+    //   it.trackingVisits = false;
+    // }
 
     it.writeToDown = function writeToDown( eit )
     {
       this.result = eit.result;
     }
+
+    if( c.onUp )
+    c.onUp.call( it );
 
     // debugger;
 
@@ -237,14 +242,11 @@ function _select_pre( routine, args )
     else
     upSingle.call( this );
 
-    if( c.onUp )
-    c.onUp.call( it );
-
   }
 
   /* */
 
-  function iterate( onElement )
+  function iterate( onIteration )
   {
     let it = this;
     let c = it.context;
@@ -252,13 +254,13 @@ function _select_pre( routine, args )
     // debugger;
 
     if( it.isFinal )
-    iterateFinal.call( this, onElement );
+    iterateFinal.call( this, onIteration );
     else if( it.query === c.downToken )
-    iterateDown.call( this, onElement );
+    iterateDown.call( this, onIteration );
     else if( it.isGlob )
-    iterateGlob.call( this, onElement );
+    iterateGlob.call( this, onIteration );
     else
-    iterateSingle.call( this, onElement );
+    iterateSingle.call( this, onIteration );
 
   }
 
@@ -322,7 +324,8 @@ function _select_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    it.isRelative = true;
+    // it.isRelative = true;
+    _.assert( it.isRelative === true )
     it.writeToDown = function( eit )
     {
       this.result = eit.result;
@@ -402,7 +405,7 @@ function _select_pre( routine, args )
 
   /* - */
 
-  function iterateFinal( onElement )
+  function iterateFinal( onIteration )
   {
     let it = this;
     let c = it.context;
@@ -410,7 +413,7 @@ function _select_pre( routine, args )
 
   /* */
 
-  function iterateDown( onElement )
+  function iterateDown( onIteration )
   {
     let it = this;
     let c = it.context;
@@ -447,27 +450,27 @@ function _select_pre( routine, args )
     // it.visitedManyTimes = false;
     // dit.visitedManyTimes = false;
 
-    onElement( dit, it );
+    onIteration.call( it, dit );
 
     return true;
   }
 
   /* */
 
-  function iterateGlob( onElement )
+  function iterateGlob( onIteration )
   {
     let it = this;
     let c = it.context;
 
     // let filtered = _.globFilter( it.query, it.src );
 
-    _.Looker.Defaults.onIterate.call( this, onElement );
+    _.Looker.Defaults.onIterate.call( this, onIteration );
 
   }
 
   /* */
 
-  function iterateSingle( onElement )
+  function iterateSingle( onIteration )
   {
     let it = this;
     let c = it.context;
@@ -491,9 +494,9 @@ function _select_pre( routine, args )
     {
     }
 
-    let eit = it.iteration().select( it.query );
+    let eit = it.iteration().select( it.query ).select2( it.query ); /* !!! is select2 required? */
 
-    onElement( eit )
+    onIteration.call( it, eit );
 
   }
 
@@ -559,6 +562,7 @@ _selectAct_body.defaults =
   missingAction : 'undefine',
   usingIndexedAccessToMap : 0,
   usingGlob : 1,
+  trackingVisits : 1,
   upToken : '/',
   downToken : '..',
   // assertToken : '=',
