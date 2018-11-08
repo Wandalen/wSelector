@@ -39,9 +39,11 @@ let Looker = _.mapExtend( null, _.look.defaults.looker );
 Looker.Iteration = _.mapExtend( null, Looker.Iteration );
 Looker.Iteration.apath = null;
 Looker.Iteration.query = null;
+Looker.Iteration.queryParsed = null;
 Looker.Iteration.onResultWrite = null;
-Looker.Iteration.isActual = null;
+Looker.Iteration.isFinal = null;
 Looker.Iteration.isRelative = 0;
+Looker.Iteration.isGlob = 0;
 
 // Looker.Iterator = _.mapExtend( null, Looker.Iterator );
 // Looker.Defaults = _.mapExtend( null, Looker.Defaults );
@@ -138,7 +140,7 @@ function _entitySelect_pre( routine, args )
   _.assert( o.onActual === null || _.routineIs( o.onActual ) );
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
-  _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots' );
+  _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   _.assert( o.aquery === undefined );
 
@@ -187,11 +189,11 @@ function _entitySelect_pre( routine, args )
     let o2 = Object.create( null );
     o2.src = o.container;
     o2.context = o;
-    o2.onUp = handleUp;
-    o2.onDown = handleDown;
-    o2.onIterate = handleIterate;
+    o2.onUp = up;
+    o2.onDown = down;
+    o2.onIterate = iterate;
     o2.looker = Looker;
-    // o2.trackingVisits = 0;
+    // o2.trackingVisits = false;
     o2.it = o.it;
 
     _.assert( arguments.length === 1 );
@@ -201,7 +203,7 @@ function _entitySelect_pre( routine, args )
 
   /* */
 
-  function handleUp()
+  function up()
   {
     let it = this;
     let c = it.context;
@@ -210,205 +212,80 @@ function _entitySelect_pre( routine, args )
     it.apath = it.down ? it.down.apath.slice() : [];
     if( it.query !== undefined )
     it.apath.push( it.query );
-    it.isActual = it.query === undefined;
+    it.isFinal = it.query === undefined;
+    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
     it.result = it.src;
 
     if( it.down && it.down.isRelative )
     {
-      it.trackingVisits = 0;
+      it.trackingVisits = false;
     }
 
-    debugger;
-
-    if( it.isActual )
+    it.onResultWrite = function onResultWrite( eit )
     {
-      /* actual node */
-      it.looking = false;
-      it.result = it.src;
-
-      /* help if iteration reused */
-      it.onResultWrite = function( eit )
-      {
-        this.result = eit.result;
-      }
-
+      this.result = eit.result;
     }
+
+    // debugger;
+
+    if( it.isFinal )
+    upFinal.call( this );
     else if( it.query === c.downToken )
-    {
-      // it.trackingVisits = 0;
-      it.isRelative = true;
-      it.visitedManyTimes = false;
-      it.onResultWrite = function( eit )
-      {
-        this.result = eit.result;
-      }
-    }
-    else if( _.strBegins( it.query, '*' ) )
-    {
-      /* all selector */
-      if( _.arrayLike( it.src ) )
-      {
-        it.result = [];
-        it.onResultWrite = function( eit )
-        {
-          if( c.missingAction === 'ignore' && eit.result === undefined )
-          return;
-          this.result.push( eit.result );
-        }
-      }
-      else if( _.objectLike( it.src ) )
-      {
-        it.result = Object.create( null );
-        it.onResultWrite = function( eit )
-        {
-          if( c.missingAction === 'ignore' && eit.result === undefined )
-          return;
-          this.result[ eit.key ] = eit.result;
-        }
-      }
-      else
-      {
-        errDoesNotExistThrow( it );
-      }
-    }
+    upDown.call( this );
+    else if( it.isGlob )
+    upGlob.call( this );
     else
-    {
-      /* select single */
-
-      // it.looking = false;
-      it.onResultWrite = function( eit )
-      {
-        this.result = eit.result;
-      }
-
-    }
+    upSingle.call( this );
 
   }
 
   /* */
 
-  function handleIterate( onElement )
+  function iterate( onElement )
   {
     let it = this;
     let c = it.context;
 
-    debugger;
+    // debugger;
 
-    if( !it.query )
-    {
-    }
+    if( it.isFinal )
+    iterateFinal.call( this, onElement );
     else if( it.query === c.downToken )
-    {
-      let counter = 0;
-      let dit = it.down;
-      // let rit = it; /* !!! simply use down maybe? could fail maybe? */
-
-      if( !dit )
-      return errNoDownThrow( it );
-
-      while( dit.query === c.downToken || dit.isActual || counter > 0 )
-      {
-        if( dit.query === c.downToken )
-        counter += 1;
-        else if( !dit.isActual )
-        counter -= 1;
-        dit = dit.down;
-        // rit = rit.down;
-        if( !dit )
-        return errNoDownThrow( it );
-      }
-
-      _.assert( _.iterationIs( dit ) );
-
-      it.visitEndMaybe();
-      dit.visitEndMaybe();
-
-      let src = dit.src;
-      dit = dit.iteration();
-      dit.path = it.path;
-      dit.down = it;
-      dit.select( it.query );
-      dit.src = src;
-
-      it.visitedManyTimes = false;
-      dit.visitedManyTimes = false;
-
-      onElement( dit, it );
-
-    }
-    else if( _.strBegins( it.query, '*' ) )
-    {
-      _.Looker.Defaults.onIterate.call( this, onElement );
-    }
+    iterateDown.call( this, onElement );
+    else if( it.isGlob )
+    iterateGlob.call( this, onElement );
     else
-    {
-
-      if( _.primitiveIs( it.src ) )
-      {
-        errDoesNotExistThrow( it );
-      }
-      else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
-      {
-        let q = _.numberFromStr( it.query );
-        it.query = _.mapKeys( it.src )[ q ];
-        if( it.query === undefined )
-        return errDoesNotExistThrow( it );
-      }
-      else if( it.src[ it.query ] === undefined )
-      {
-        errDoesNotExistThrow( it );
-      }
-      else
-      {
-      }
-
-      let eit = it.iteration().select( it.query );
-
-      onElement( eit )
-
-    }
+    iterateSingle.call( this, onElement );
 
   }
 
   /* */
 
-  function handleDown()
+  function down()
   {
     let it = this;
     let c = it.context;
 
-    debugger;
+    // debugger;
 
-    /* */
-
-    if( !it.query )
-    {
-    }
+    if( it.isFinal )
+    downFinal.call( this );
     else if( it.query === c.downToken )
-    {
-    }
-    else if( _.strBegins( it.query, '*' ) )
-    {
-      if( it.query !== '*' )
-      {
-        let number = _.numberFromStr( _.strRemoveBegin( it.query, '*' ) );
-        _.sure( !isNaN( number ) && number >= 0 );
-        _.sure( _.entityLength( it.result ) === number );
-      }
-    }
+    downDown.call( this );
+    else if( it.isGlob )
+    downGlob.call( this );
     else
-    {
-    }
+    downSingle.call( this );
 
     /* */
 
     if( it.context.onTransient )
     it.context.onTransient( it );
 
-    if( it.context.onActual && it.isActual )
+    if( it.context.onActual && it.isFinal )
     it.context.onActual( it );
 
-    if( it.context.setting && it.isActual )
+    if( it.context.setting && it.isFinal )
     {
       if( it.down && it.down.src )
       it.down.src[ it.key ] = it.context.set;
@@ -423,6 +300,262 @@ function _entitySelect_pre( routine, args )
     }
 
     return it.result;
+  }
+
+  /* - */
+
+  function upFinal()
+  {
+    let it = this;
+    let c = it.context;
+
+    /* actual node */
+    it.looking = false;
+    it.result = it.src;
+
+  }
+
+  /* */
+
+  function upDown()
+  {
+    let it = this;
+    let c = it.context;
+
+    it.isRelative = true;
+    it.onResultWrite = function( eit )
+    {
+      this.result = eit.result;
+    }
+
+  }
+
+  /* */
+
+  function upGlob()
+  {
+    let it = this;
+    let c = it.context;
+
+    /* qqq : teach it to parse more than single "*" */
+
+    let regexp = /(.*){?\*=(\d*)}?(.*)/;
+
+    let match = it.query.match( regexp );
+    it.queryParsed = Object.create( null );
+    if( !match )
+    {
+      it.queryParsed.glob = it.query;
+    }
+    else
+    {
+      it.queryParsed.glob = match[ 1 ] + '*' + match[ 3 ];
+      if( match[ 1 ].length > 0 )
+      {
+        it.queryParsed.limit = _.numberFromStr( match[ 1 ] );
+        _.sure( !isNaN( number ) && number >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.query ) );
+      }
+    }
+
+    // let it = this;
+    //
+    // let match = it.query.match( regexp );
+    //
+    // if( match )
+    // {
+    //   let number = _.numberFromStr( match[ 1 ] );
+    //   debugger;
+    //   let length = _.entityLength( it.result );
+    //   _.sure( !isNaN( number ) && number >= 0 );
+    //   _.sure( length === number, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
+    // }
+
+    // debugger;
+    // if( it.queryParsed.glob !== '*' )
+    // it.src = _.path.globFilter( it.query, it.src );
+    // debugger;
+
+    if( _.arrayLike( it.src ) )
+    {
+      it.result = [];
+      it.onResultWrite = function( eit )
+      {
+        if( c.missingAction === 'ignore' && eit.result === undefined )
+        return;
+        this.result.push( eit.result );
+      }
+    }
+    else if( _.objectLike( it.src ) )
+    {
+      it.result = Object.create( null );
+      it.onResultWrite = function( eit )
+      {
+        if( c.missingAction === 'ignore' && eit.result === undefined )
+        return;
+        this.result[ eit.key ] = eit.result;
+      }
+    }
+    else
+    {
+      errDoesNotExistThrow( it );
+    }
+
+  }
+
+  /* */
+
+  function upSingle()
+  {
+    let it = this;
+    let c = it.context;
+  }
+
+  /* - */
+
+  function iterateFinal( onElement )
+  {
+    let it = this;
+    let c = it.context;
+  }
+
+  /* */
+
+  function iterateDown( onElement )
+  {
+    let it = this;
+    let c = it.context;
+    let counter = 0;
+    let dit = it.down;
+
+    if( !dit )
+    return errNoDownThrow( it );
+
+    while( dit.query === c.downToken || dit.isFinal || counter > 0 )
+    {
+      if( dit.query === c.downToken )
+      counter += 1;
+      else if( !dit.isFinal )
+      counter -= 1;
+      dit = dit.down;
+      if( !dit )
+      errNoDownThrow( it );
+
+    }
+
+    _.assert( _.iterationIs( dit ) );
+
+    it.visitEndMaybe();
+    dit.visitEndMaybe();
+
+    let src = dit.src;
+    dit = dit.iteration();
+    dit.path = it.path;
+    dit.down = it;
+    dit.select( it.query );
+    dit.src = src;
+
+    // it.visitedManyTimes = false;
+    // dit.visitedManyTimes = false;
+
+    onElement( dit, it );
+
+    return true;
+  }
+
+  /* */
+
+  function iterateGlob( onElement )
+  {
+    let it = this;
+    let c = it.context;
+
+    // let filtered = _.globFilter( it.query, it.src );
+
+    _.Looker.Defaults.onIterate.call( this, onElement );
+
+  }
+
+  /* */
+
+  function iterateSingle( onElement )
+  {
+    let it = this;
+    let c = it.context;
+
+    if( _.primitiveIs( it.src ) )
+    {
+      errDoesNotExistThrow( it );
+    }
+    else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
+    {
+      let q = _.numberFromStr( it.query );
+      it.query = _.mapKeys( it.src )[ q ];
+      if( it.query === undefined )
+      return errDoesNotExistThrow( it );
+    }
+    else if( it.src[ it.query ] === undefined )
+    {
+      errDoesNotExistThrow( it );
+    }
+    else
+    {
+    }
+
+    let eit = it.iteration().select( it.query );
+
+    onElement( eit )
+
+  }
+
+  /* - */
+
+  function downFinal()
+  {
+    let it = this;
+    let c = it.context;
+  }
+
+  /* */
+
+  function downDown()
+  {
+    let it = this;
+    let c = it.context;
+  }
+
+  /* */
+
+  function downGlob()
+  {
+    let it = this;
+    let c = it.context;
+
+    if( it.queryParsed.limit !== undefined )
+    {
+      let length = _.entityLength( it.result );
+      _.sure( length === it.queryParsed.limit, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
+    }
+
+    // let regexp = /{?\*=(\d+)}?/;
+    // let match = it.query.match( regexp );
+    //
+    // if( match )
+    // {
+    //   let number = _.numberFromStr( match[ 1 ] );
+    //   debugger;
+    //   let length = _.entityLength( it.result );
+    //   _.sure( !isNaN( number ) && number >= 0 );
+    //   _.sure( length === number, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
+    // }
+
+  }
+
+  /* */
+
+  function downSingle()
+  {
+    let it = this;
+    let c = it.context;
   }
 
 }
@@ -447,6 +580,7 @@ _entitySelectAct_body.defaults =
   usingIndexedAccessToMap : 0,
   upToken : '/',
   downToken : '..',
+  assertToken : '=',
   onTransient : null,
   onActual : null,
   set : null,
@@ -756,9 +890,9 @@ _.mapSupplement( Self, Proto );
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

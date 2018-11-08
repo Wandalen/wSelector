@@ -1182,6 +1182,62 @@ function selectWithDown( test )
 
 }
 
+//
+
+function selectWithAssert( test )
+{
+
+  var container =
+  {
+    aaY : { name : 'a', value : 1 },
+    bbN : { name : 'b', value : 2 },
+    ccY : { name : 'c', value : 3 },
+    ddNx : { name : 'd', value : 4 },
+    eeYx : { name : 'e', value : 5 },
+  }
+
+  var got = _.entitySelect( container, 'a*=1' );
+  test.is( got, container.aaY );
+
+  var expected = { name : 'a' };
+  var got = _.entitySelect( container, 'aaY/n*=1e' );
+  test.identical( got, expected );
+
+  // var expected = { name : 'a', value : 1 };
+  // var got = _.entitySelect( container, 'aaY/*' );
+  // test.identical( got, expected );
+  // test.is( got !== container.aaY );
+
+  // var expected = [ 'a', 'c' ];
+  // var got = _.entitySelect( container, 'aaY/*=2' );
+  // test.identical( got, expected );
+
+}
+
+//
+
+function selectWithGlob( test )
+{
+
+  var container =
+  {
+    aaY : { name : 'a', value : 1 },
+    bbN : { name : 'b', value : 2 },
+    ccY : { name : 'c', value : 3 },
+    ddNx : { name : 'd', value : 4 },
+    eeYx : { name : 'e', value : 5 },
+  }
+
+  var expected = { aay : 'a', ccY : 'c' };
+  var got = _.entitySelect( container, '*Y/name' );
+  test.identical( got, expected );
+
+  var expected = { aay : 'a', ccY : 'c', eeYx : 'e' };
+  var got = _.entitySelect( container, '*Y*/name' );
+  test.identical( got, expected );
+
+}
+
 // --
 // declare
 // --
@@ -1200,9 +1256,11 @@ var Self =
   tests :
   {
     selectTrivial : selectTrivial,
-    selectMissing : selectMissing,
+    // selectMissing : selectMissing,
     selectSet : selectSet,
     selectWithDown : selectWithDown,
+    // selectWithAssert : selectWithAssert,
+    selectWithGlob : selectWithGlob,
   }
 
 }
