@@ -40,7 +40,7 @@ Looker.Iteration = _.mapExtend( null, Looker.Iteration );
 Looker.Iteration.apath = null;
 Looker.Iteration.query = null;
 Looker.Iteration.queryParsed = null;
-Looker.Iteration.onResultWrite = null;
+Looker.Iteration.writeToDown = null;
 Looker.Iteration.isFinal = null;
 Looker.Iteration.isRelative = 0;
 Looker.Iteration.isGlob = 0;
@@ -64,7 +64,7 @@ function errDoesNotExistThrow( it )
     // debugger;
     let err = _.ErrorLooking
     (
-      'Cant select', _.strQuote( it.context.query ),
+      'Cant select', _.strQuote( c.query ),
       '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
       '\nat', _.strQuote( it.path ),
       '\nin container', _.toStr( c.container )
@@ -93,7 +93,7 @@ function errNoDownThrow( it )
     debugger;
     let err = _.ErrorLooking
     (
-      'Cant go down', _.strQuote( it.context.query ),
+      'Cant go down', _.strQuote( c.query ),
       '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
       '\nat', _.strQuote( it.path ),
       '\nin container', _.toStr( c.container )
@@ -114,14 +114,14 @@ function errCantSetThrow( it )
   debugger;
   throw _.err
   (
-    'Cant set', _.strQuote( it.context.query ),
+    'Cant set', _.strQuote( c.query ),
     'of container', _.toStr( c.container )
   );
 }
 
 //
 
-function _entitySelect_pre( routine, args )
+function _select_pre( routine, args )
 {
 
   let o = args[ 0 ]
@@ -136,8 +136,8 @@ function _entitySelect_pre( routine, args )
   _.routineOptionsPreservingUndefines( routine, o );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 || args.length === 2 );
-  _.assert( o.onTransient === null || _.routineIs( o.onTransient ) );
-  _.assert( o.onActual === null || _.routineIs( o.onActual ) );
+  _.assert( o.onUp === null || _.routineIs( o.onUp ) );
+  _.assert( o.onDown === null || _.routineIs( o.onDown ) );
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
   // _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
@@ -221,7 +221,7 @@ function _entitySelect_pre( routine, args )
       it.trackingVisits = false;
     }
 
-    it.onResultWrite = function onResultWrite( eit )
+    it.writeToDown = function writeToDown( eit )
     {
       this.result = eit.result;
     }
@@ -236,6 +236,9 @@ function _entitySelect_pre( routine, args )
     upGlob.call( this );
     else
     upSingle.call( this );
+
+    if( c.onUp )
+    c.onUp.call( it );
 
   }
 
@@ -266,6 +269,11 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
+    /* */
+
+    if( c.onDown )
+    c.onDown.call( it );
+
     // debugger;
 
     if( it.isFinal )
@@ -277,26 +285,18 @@ function _entitySelect_pre( routine, args )
     else
     downSingle.call( this );
 
-    /* */
-
-    if( it.context.onTransient )
-    it.context.onTransient( it );
-
-    if( it.context.onActual && it.isFinal )
-    it.context.onActual( it );
-
-    if( it.context.setting && it.isFinal )
+    if( c.setting && it.isFinal )
     {
       if( it.down && it.down.src )
-      it.down.src[ it.key ] = it.context.set;
+      it.down.src[ it.key ] = c.set;
       else
       errCantSetThrow( it );
     }
 
     if( it.down )
     {
-      _.assert( _.routineIs( it.down.onResultWrite ) );
-      it.down.onResultWrite( it );
+      _.assert( _.routineIs( it.down.writeToDown ) );
+      it.down.writeToDown( it );
     }
 
     return it.result;
@@ -323,7 +323,7 @@ function _entitySelect_pre( routine, args )
     let c = it.context;
 
     it.isRelative = true;
-    it.onResultWrite = function( eit )
+    it.writeToDown = function( eit )
     {
       this.result = eit.result;
     }
@@ -339,8 +339,9 @@ function _entitySelect_pre( routine, args )
 
     /* !!! qqq : teach it to parse more than single "*=" */
 
-    let regexp = /(.*){?\*=(\d*)}?(.*)/;
+    debugger;
 
+    let regexp = /(.*){?\*=(\d*)}?(.*)/;
     let match = it.query.match( regexp );
     it.queryParsed = Object.create( null );
 
@@ -352,7 +353,7 @@ function _entitySelect_pre( routine, args )
     {
       _.sure( _.strCount( it.query, '=' ) <= 1, () => 'Does not support query with several assertions, like ' + _.strQuote( it.query ) );
       it.queryParsed.glob = match[ 1 ] + '*' + match[ 3 ];
-      if( match[ 1 ].length > 0 )
+      if( match[ 2 ].length > 0 )
       {
         it.queryParsed.limit = _.numberFromStr( match[ 2 ] );
         _.sure( !isNaN( it.queryParsed.limit ) && it.queryParsed.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.query ) );
@@ -360,14 +361,14 @@ function _entitySelect_pre( routine, args )
     }
 
     // debugger;
-    if( it.queryParsed.glob !== '*' )
+    if( it.queryParsed.glob !== '*' && c.usingGlob )
     it.src = _.path.globFilter( it.queryParsed.glob, it.src );
     // debugger;
 
     if( _.arrayLike( it.src ) )
     {
       it.result = [];
-      it.onResultWrite = function( eit )
+      it.writeToDown = function( eit )
       {
         if( c.missingAction === 'ignore' && eit.result === undefined )
         return;
@@ -377,7 +378,7 @@ function _entitySelect_pre( routine, args )
     else if( _.objectLike( it.src ) )
     {
       it.result = Object.create( null );
-      it.onResultWrite = function( eit )
+      it.writeToDown = function( eit )
       {
         if( c.missingAction === 'ignore' && eit.result === undefined )
         return;
@@ -427,7 +428,7 @@ function _entitySelect_pre( routine, args )
       counter -= 1;
       dit = dit.down;
       if( !dit )
-      errNoDownThrow( it );
+      return errNoDownThrow( it );
 
     }
 
@@ -519,23 +520,13 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
+    debugger;
+
     if( it.queryParsed.limit !== undefined )
     {
       let length = _.entityLength( it.result );
-      _.sure( length === it.queryParsed.limit, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
+      _.sure( length === it.queryParsed.limit, 'Select constraint ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
     }
-
-    // let regexp = /{?\*=(\d+)}?/;
-    // let match = it.query.match( regexp );
-    //
-    // if( match )
-    // {
-    //   let number = _.numberFromStr( match[ 1 ] );
-    //   debugger;
-    //   let length = _.entityLength( it.result );
-    //   _.sure( !isNaN( number ) && number >= 0 );
-    //   _.sure( length === number, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
-    // }
 
   }
 
@@ -551,7 +542,7 @@ function _entitySelect_pre( routine, args )
 
 //
 
-function _entitySelectAct_body( it )
+function _selectAct_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.objectIs( it.looker ) );
@@ -560,31 +551,32 @@ function _entitySelectAct_body( it )
   return it;
 }
 
-_entitySelectAct_body.defaults =
+_selectAct_body.defaults =
 {
   it : null,
   container : null,
   query : null,
   missingAction : 'undefine',
   usingIndexedAccessToMap : 0,
+  usingGlob : 1,
   upToken : '/',
   downToken : '..',
-  assertToken : '=',
-  onTransient : null,
-  onActual : null,
+  // assertToken : '=',
+  onUp : null,
+  onDown : null,
   set : null,
   setting : null,
 }
 
 //
 
-let entitySelectAct = _.routineFromPreAndBody( _entitySelect_pre, _entitySelectAct_body );
+let selectAct = _.routineFromPreAndBody( _select_pre, _selectAct_body );
 
 //
 
-function _entitySelect_body( it )
+function _select_body( it )
 {
-  let it2 = _.entitySelectAct.body( it );
+  let it2 = _.selectAct.body( it );
   _.assert( it2 === it )
   _.assert( arguments.length === 1, 'Expects single argument' );
   if( it.context.missingAction === 'error' && it.error )
@@ -592,37 +584,37 @@ function _entitySelect_body( it )
   return it.result;
 }
 
-_.routineExtend( _entitySelect_body, entitySelectAct );
+_.routineExtend( _select_body, selectAct );
 
 //
 
-let entitySelect = _.routineFromPreAndBody( _entitySelect_pre, _entitySelect_body );
+let select = _.routineFromPreAndBody( _select_pre, _select_body );
 
 //
 
-let entitySelectSet = _.routineFromPreAndBody( entitySelect.pre, entitySelect.body );
+let selectSet = _.routineFromPreAndBody( select.pre, select.body );
 
-var defaults = entitySelectSet.defaults;
+var defaults = selectSet.defaults;
 
 defaults.set = null;
 defaults.setting = 1;
 
 //
 
-function _entitySelectUnique_body( o )
+function _selectUnique_body( o )
 {
   _.assert( arguments.length === 1 );
 
-  let result = _.entitySelect.body( o );
+  let result = _.select.body( o );
   if( _.arrayHas( o.aquery, '*' ) )
   result = _.arrayUnique( result );
 
   return result;
 }
 
-_.routineExtend( _entitySelectUnique_body, entitySelect.body );
+_.routineExtend( _selectUnique_body, select.body );
 
-let entitySelectUnique2 = _.routineFromPreAndBody( entitySelect.pre, _entitySelectUnique_body );
+let selectUnique2 = _.routineFromPreAndBody( select.pre, _selectUnique_body );
 
 //
 
@@ -680,9 +672,9 @@ function entityProbeField( o )
   _.routineOptions( entityProbeField,o );
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  o.all = _entitySelect( _.mapOnly( o, _entitySelectOptions.defaults ) );
+  o.all = _select( _.mapOnly( o, _selectOptions.defaults ) );
   o.onElement = function( it ){ return it.up };
-  o.parents = _entitySelect( _.mapOnly( o, _entitySelectOptions.defaults ) );
+  o.parents = _select( _.mapOnly( o, _selectOptions.defaults ) );
   o.result = Object.create( null );
 
   /* */
@@ -732,7 +724,7 @@ function entityProbeField( o )
   return o;
 }
 
-entityProbeField.defaults = Object.create( entitySelect.defaults );
+entityProbeField.defaults = Object.create( select.defaults );
 
 entityProbeField.defaults.title = null;
 entityProbeField.defaults.report = 1;
@@ -862,10 +854,10 @@ let Proto =
   errNoDownThrow : errNoDownThrow,
   errCantSetThrow : errCantSetThrow,
 
-  entitySelectAct : entitySelectAct,
-  entitySelect : entitySelect,
-  entitySelectSet : entitySelectSet,
-  entitySelectUnique : entitySelectUnique2,
+  selectAct : selectAct,
+  select : select,
+  selectSet : selectSet,
+  selectUnique : selectUnique2,
 
   _entityProbeReport : _entityProbeReport,
   entityProbeField : entityProbeField,

@@ -27,16 +27,16 @@ function selectTrivial( test )
 
   /* */
 
-  var got = _.entitySelect( undefined, '' );
+  var got = _.select( undefined, '' );
   test.identical( got, undefined );
 
-  var got = _.entitySelect( undefined, '/' );
+  var got = _.select( undefined, '/' );
   test.identical( got, undefined );
 
-  var got = _.entitySelect( null, '' );
+  var got = _.select( null, '' );
   test.identical( got, null );
 
-  var got = _.entitySelect( null, '/' );
+  var got = _.select( null, '/' );
   test.identical( got, null );
 
   /* */
@@ -49,7 +49,7 @@ function selectTrivial( test )
   }
 
   debugger;
-  var got = _.entitySelect( container, 'b' );
+  var got = _.select( container, 'b' );
   debugger;
 
   test.identical( got, 13 );
@@ -64,7 +64,7 @@ function selectTrivial( test )
     d : { name : 'name4', value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, '*/name' );
+  var got = _.select( container, '*/name' );
 
   test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
 
@@ -78,7 +78,7 @@ function selectTrivial( test )
     { name : 'name4', value : 25, date : new Date() },
   ]
 
-  var got = _.entitySelect( container, '*/name' );
+  var got = _.select( container, '*/name' );
 
   test.identical( got, [ 'name1', 'name2', 'name3', 'name4' ] );
 
@@ -91,7 +91,7 @@ function selectTrivial( test )
     c : { c1 : 1, c2 : 'c2' },
   }
 
-  var got = _.entitySelect( container, 'b/b2' );
+  var got = _.select( container, 'b/b2' );
 
   test.identical( got, 'b2' );
 
@@ -108,7 +108,7 @@ function selectTrivial( test )
     c : { value : 25, date : 53 },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/1',
@@ -139,7 +139,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'a/map/name',
@@ -156,7 +156,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x',
@@ -173,7 +173,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x/x',
@@ -190,7 +190,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x/x/x',
@@ -208,7 +208,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/name',
@@ -226,7 +226,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/map/name',
@@ -243,7 +243,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*',
@@ -261,7 +261,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*',
@@ -285,7 +285,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*/*',
@@ -309,7 +309,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*/*/*',
@@ -333,7 +333,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'a/map/name',
@@ -350,7 +350,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x',
@@ -367,7 +367,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x/x',
@@ -384,7 +384,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x/x/x',
@@ -402,7 +402,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/name',
@@ -420,7 +420,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/map/name',
@@ -437,7 +437,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*',
@@ -455,7 +455,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*',
@@ -479,7 +479,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*/*',
@@ -503,7 +503,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*/*/*',
@@ -527,19 +527,19 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2/name',
+    query : '*=2/name',
     missingAction : 'ignore',
   });
 
   test.identical( got, { a : 'name1', b : 'name2' } );
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*1/name',
+    query : '*=1/name',
     missingAction : 'ignore',
   }));
 
@@ -552,19 +552,19 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2/map/name',
+    query : '*=2/map/name',
     missingAction : 'ignore',
   });
 
   test.identical( got, { a : 'name1', b : 'name2' } );
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*3/name',
+    query : '*=3/name',
     missingAction : 'ignore',
   }));
 
@@ -576,20 +576,20 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2',
+    query : '*=2',
     missingAction : 'ignore',
   })
 
   test.identical( got, container );
   test.is( got !== container );
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*3',
+    query : '*=3',
     missingAction : 'ignore',
   }));
 
@@ -601,27 +601,27 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2/*2',
+    query : '*=2/*=2',
     missingAction : 'ignore',
   })
 
   test.identical( got, container );
   test.is( got !== container );
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*3/*2',
+    query : '*=3/*=2',
     missingAction : 'ignore',
   }));
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*2/*3',
+    query : '*=2/*=3',
     missingAction : 'ignore',
   }));
 
@@ -639,34 +639,34 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2/*0/*0',
+    query : '*=2/*=0/*=0',
     missingAction : 'ignore',
   })
 
   test.identical( got, expected );
   test.is( got !== container );
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*1/*0/*0',
+    query : '*=1/*=0/*=0',
     missingAction : 'ignore',
   }));
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*2/*1/*0',
+    query : '*=2/*=1/*=0',
     missingAction : 'ignore',
   }));
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
-    query : '*2/*0/*1',
+    query : '*=2/*=0/*=1',
     missingAction : 'ignore',
   }));
 
@@ -684,10 +684,10 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
-    query : '*2/*0/*0/*0',
+    query : '*=2/*=0/*=0/*=0',
     missingAction : 'ignore',
   })
 
@@ -707,7 +707,7 @@ function selectMissing( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x',
@@ -717,7 +717,7 @@ function selectMissing( test )
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'x/x',
@@ -727,7 +727,7 @@ function selectMissing( test )
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/x',
@@ -737,7 +737,7 @@ function selectMissing( test )
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/*/*',
@@ -747,22 +747,24 @@ function selectMissing( test )
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '..',
-    missingAction : 'error',
+    missingAction : 'trhow',
   });
 
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : 'a/../..',
     missingAction : 'error',
   });
+
+  debugger; return; xxx
 
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
@@ -781,7 +783,7 @@ function selectMissing( test )
   }
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : 'x',
@@ -789,7 +791,7 @@ function selectMissing( test )
   }));
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : 'x/x',
@@ -797,7 +799,7 @@ function selectMissing( test )
   }));
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : '*/x',
@@ -805,7 +807,7 @@ function selectMissing( test )
   }));
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : '*/*/*',
@@ -814,7 +816,7 @@ function selectMissing( test )
 
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : '..',
@@ -822,7 +824,7 @@ function selectMissing( test )
   }));
 
   // if( Config.debug )
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : container,
     query : 'a/../..',
@@ -855,7 +857,7 @@ function selectSet( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '*/name',
@@ -871,7 +873,7 @@ function selectSet( test )
   var container = {};
   var expected = { a : 'c' };
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '/a',
@@ -887,7 +889,7 @@ function selectSet( test )
   var container = {};
   var expected = { '1' : {} };
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '/1',
@@ -904,7 +906,7 @@ function selectSet( test )
   var container = {};
   var expected = {};
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '/1',
@@ -921,7 +923,7 @@ function selectSet( test )
   var container = { a : '1', b : '1' };
   var expected = { a : '1', b : '2' };
 
-  var got = _.entitySelect
+  var got = _.select
   ({
     container : container,
     query : '/1',
@@ -935,7 +937,7 @@ function selectSet( test )
 
   /* */
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : {},
     query : '/',
@@ -945,7 +947,7 @@ function selectSet( test )
 
   /* */
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : {},
     query : '/a/b',
@@ -956,7 +958,7 @@ function selectSet( test )
 
   /* */
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : {},
     query : '/a/b',
@@ -967,7 +969,7 @@ function selectSet( test )
 
   /* */
 
-  test.shouldThrowErrorSync( () => _.entitySelect
+  test.shouldThrowErrorSync( () => _.select
   ({
     container : {},
     query : '/a/b',
@@ -992,7 +994,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, '' );
+  var got = _.select( container, '' );
 
   test.identical( got, container );
   test.is( got === container );
@@ -1006,7 +1008,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, '/' );
+  var got = _.select( container, '/' );
 
   test.identical( got, container );
   test.is( got === container );
@@ -1020,7 +1022,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, 'a/..' );
+  var got = _.select( container, 'a/..' );
 
   test.identical( got, container );
   test.is( got === container );
@@ -1035,7 +1037,7 @@ function selectWithDown( test )
   }
 
   debugger;
-  var got = _.entitySelect( container, 'a/name/..' );
+  var got = _.select( container, 'a/name/..' );
   debugger;
 
   test.identical( got, container.a );
@@ -1050,7 +1052,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, 'a/name/../..' );
+  var got = _.select( container, 'a/name/../..' );
 
   test.identical( got, container );
   test.is( got === container );
@@ -1064,7 +1066,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, 'a/name/../../a/name' );
+  var got = _.select( container, 'a/name/../../a/name' );
 
   test.identical( got, container.a.name );
   test.is( got === container.a.name );
@@ -1078,7 +1080,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var got = _.entitySelect( container, 'a/../a/../a/name' );
+  var got = _.select( container, 'a/../a/../a/name' );
 
   test.identical( got, container.a.name );
   test.is( got === container.a.name );
@@ -1090,7 +1092,7 @@ function selectWithDown( test )
     a : { b : { c : { d : 'e' } } },
   }
 
-  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/d' );
+  var got = _.select( container, 'a/b/c/../../b/../b/c/d' );
 
   test.is( got === container.a.b.c.d );
 
@@ -1101,7 +1103,7 @@ function selectWithDown( test )
     a : { b : { c : { d : 'e' } } },
   }
 
-  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c' );
+  var got = _.select( container, 'a/b/c/../../b/../b/c' );
 
   test.is( got === container.a.b.c );
 
@@ -1112,7 +1114,7 @@ function selectWithDown( test )
     a : { b : { c : { d : 'e' } } },
   }
 
-  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/..' );
+  var got = _.select( container, 'a/b/c/../../b/../b/c/..' );
 
   test.is( got === container.a.b );
 
@@ -1123,7 +1125,7 @@ function selectWithDown( test )
     a : { b : { c : { d : 'e' } } },
   }
 
-  var got = _.entitySelect( container, 'a/b/c/../../b/../b/c/../../..' );
+  var got = _.select( container, 'a/b/c/../../b/../b/c/../../..' );
 
   test.is( got === container );
 
@@ -1136,17 +1138,17 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var it = _.entitySelectAct( container, 'a/name' );
+  var it = _.selectAct( container, 'a/name' );
 
   test.identical( it.result, container.a.name );
   test.is( it.result === container.a.name );
 
-  var it = _.entitySelectAct( it.lastSelect.iteration(), '../../b/name' );
+  var it = _.selectAct( it.lastSelect.iteration(), '../../b/name' );
 
   test.identical( it.result, container.b.name );
   test.is( it.result === container.b.name );
 
-  var it = _.entitySelectAct( it.lastSelect.iteration(), '..' );
+  var it = _.selectAct( it.lastSelect.iteration(), '..' );
 
   test.identical( it.result, container.b );
   test.is( it.result === container.b );
@@ -1167,7 +1169,7 @@ function selectWithDown( test )
   //   c : { value : 25, date : new Date() },
   // }
   //
-  // var got = _.entitySelect
+  // var got = _.select
   // ({
   //   container : container,
   //   query : '*/name/^^',
@@ -1201,22 +1203,22 @@ function selectWithGlob( test )
   test.description = 'trivial';
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, 'a*' );
+  var got = _.select( container, 'a*' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
-  var got = _.entitySelect( container, '*Y' );
+  var got = _.select( container, '*Y' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY && got.ccY === container.ccY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, 'a*Y' );
+  var got = _.select( container, 'a*Y' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, '*a*' );
+  var got = _.select( container, '*a*' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
@@ -1225,11 +1227,11 @@ function selectWithGlob( test )
   test.description = 'second level';
 
   var expected = { aaY : 'a', ccY : 'c' };
-  var got = _.entitySelect( container, '*Y/name' );
+  var got = _.select( container, '*Y/name' );
   test.identical( got, expected );
 
   var expected = { aaY : 'a', ccY : 'c', eeYx : 'e' };
-  var got = _.entitySelect( container, '*Y*/name' );
+  var got = _.select( container, '*Y*/name' );
   test.identical( got, expected );
 
 }
@@ -1253,22 +1255,22 @@ function selectWithAssert( test )
   test.description = 'trivial';
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, 'a*=1' );
+  var got = _.select( container, 'a*=1' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
-  var got = _.entitySelect( container, '*=2Y' );
+  var got = _.select( container, '*=2Y' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY && got.ccY === container.ccY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, 'a*=1Y' );
+  var got = _.select( container, 'a*=1Y' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
-  var got = _.entitySelect( container, '*a*=1' );
+  var got = _.select( container, '*a*=1' );
   test.identical( got, expected );
   test.is( got.aaY === container.aaY );
 
@@ -1277,12 +1279,41 @@ function selectWithAssert( test )
   test.description = 'second level';
 
   var expected = { name : 'a' };
-  var got = _.entitySelect( container, 'aaY/n*=1e' );
+  var got = _.select( container, 'aaY/n*=1e' );
   test.identical( got, expected );
 
   var expected = {};
-  var got = _.entitySelect( container, 'aaY/n*=0x' );
+  var got = _.select( container, 'aaY/n*=0x' );
   test.identical( got, expected );
+
+  /* */
+
+  test.description = 'with callback';
+
+  {
+
+    var container =
+    {
+      aaY : { name : 'a', value : 1 },
+      bbN : { name : 'b', value : 2 },
+      ccY : { name : 'c', value : 3 },
+      ddNx : { name : 'd', value : 4 },
+      eeYx : { name : 'e', value : 5 },
+    }
+
+    function onDown()
+    {
+      let it = this;
+      if( !it.isGlob )
+      return;
+      delete it.result.aaY;
+    }
+
+    var expected = {};
+    var got = _.select({ container : container, query : 'a*=0', onDown : onDown });
+    test.identical( got, expected );
+
+  }
 
 }
 
@@ -1304,7 +1335,7 @@ var Self =
   tests :
   {
     selectTrivial : selectTrivial,
-    // selectMissing : selectMissing,
+    selectMissing : selectMissing,
     selectSet : selectSet,
     selectWithDown : selectWithDown,
     selectWithGlob : selectWithGlob,
