@@ -218,8 +218,7 @@ function _entitySelect_pre( routine, args )
       it.trackingVisits = 0;
     }
 
-    // if( it.context && it.context.prevContext )
-    // debugger;
+    debugger;
 
     if( it.isActual )
     {
@@ -237,7 +236,8 @@ function _entitySelect_pre( routine, args )
     else if( it.query === c.downToken )
     {
       // it.trackingVisits = 0;
-      it.isRelative = 1;
+      it.isRelative = true;
+      it.visitedManyTimes = false;
       it.onResultWrite = function( eit )
       {
         this.result = eit.result;
@@ -292,8 +292,7 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // if( it.context && it.context.prevContext )
-    // debugger;
+    debugger;
 
     if( !it.query )
     {
@@ -302,7 +301,7 @@ function _entitySelect_pre( routine, args )
     {
       let counter = 0;
       let dit = it.down;
-      let rit = it; /* !!! simply use down maybe? could fail maybe? */
+      // let rit = it; /* !!! simply use down maybe? could fail maybe? */
 
       if( !dit )
       return errNoDownThrow( it );
@@ -314,14 +313,15 @@ function _entitySelect_pre( routine, args )
         else if( !dit.isActual )
         counter -= 1;
         dit = dit.down;
-        rit = rit.down;
+        // rit = rit.down;
         if( !dit )
         return errNoDownThrow( it );
       }
 
       _.assert( _.iterationIs( dit ) );
 
-      rit.visitEndMaybe();
+      it.visitEndMaybe();
+      dit.visitEndMaybe();
 
       let src = dit.src;
       dit = dit.iteration();
@@ -329,6 +329,9 @@ function _entitySelect_pre( routine, args )
       dit.down = it;
       dit.select( it.query );
       dit.src = src;
+
+      it.visitedManyTimes = false;
+      dit.visitedManyTimes = false;
 
       onElement( dit, it );
 
@@ -374,8 +377,7 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // if( it.context && it.context.prevContext )
-    // debugger;
+    debugger;
 
     /* */
 

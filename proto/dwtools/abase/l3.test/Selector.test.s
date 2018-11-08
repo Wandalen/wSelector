@@ -1034,7 +1034,9 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
+  debugger;
   var got = _.entitySelect( container, 'a/name/..' );
+  debugger;
 
   test.identical( got, container.a );
   test.is( got === container.a );
