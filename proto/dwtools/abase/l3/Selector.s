@@ -140,7 +140,7 @@ function _entitySelect_pre( routine, args )
   _.assert( o.onActual === null || _.routineIs( o.onActual ) );
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
-  _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
+  // _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   _.assert( o.aquery === undefined );
 
@@ -337,42 +337,31 @@ function _entitySelect_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    /* qqq : teach it to parse more than single "*" */
+    /* !!! qqq : teach it to parse more than single "*=" */
 
     let regexp = /(.*){?\*=(\d*)}?(.*)/;
 
     let match = it.query.match( regexp );
     it.queryParsed = Object.create( null );
+
     if( !match )
     {
       it.queryParsed.glob = it.query;
     }
     else
     {
+      _.sure( _.strCount( it.query, '=' ) <= 1, () => 'Does not support query with several assertions, like ' + _.strQuote( it.query ) );
       it.queryParsed.glob = match[ 1 ] + '*' + match[ 3 ];
       if( match[ 1 ].length > 0 )
       {
-        it.queryParsed.limit = _.numberFromStr( match[ 1 ] );
-        _.sure( !isNaN( number ) && number >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.query ) );
+        it.queryParsed.limit = _.numberFromStr( match[ 2 ] );
+        _.sure( !isNaN( it.queryParsed.limit ) && it.queryParsed.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.query ) );
       }
     }
 
-    // let it = this;
-    //
-    // let match = it.query.match( regexp );
-    //
-    // if( match )
-    // {
-    //   let number = _.numberFromStr( match[ 1 ] );
-    //   debugger;
-    //   let length = _.entityLength( it.result );
-    //   _.sure( !isNaN( number ) && number >= 0 );
-    //   _.sure( length === number, 'Select assert ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
-    // }
-
     // debugger;
-    // if( it.queryParsed.glob !== '*' )
-    // it.src = _.path.globFilter( it.query, it.src );
+    if( it.queryParsed.glob !== '*' )
+    it.src = _.path.globFilter( it.queryParsed.glob, it.src );
     // debugger;
 
     if( _.arrayLike( it.src ) )
