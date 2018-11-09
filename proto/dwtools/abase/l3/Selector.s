@@ -698,9 +698,9 @@ function entityProbeField( o )
   _.routineOptions( entityProbeField,o );
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
-  o.all = _select( _.mapOnly( o, _selectOptions.defaults ) );
+  o.all = _.select( _.mapOnly( o, _.select.defaults ) );
   o.onElement = function( it ){ return it.up };
-  o.parents = _select( _.mapOnly( o, _selectOptions.defaults ) );
+  o.parents = _.select( _.mapOnly( o, _.select.defaults ) );
   o.result = Object.create( null );
 
   /* */
