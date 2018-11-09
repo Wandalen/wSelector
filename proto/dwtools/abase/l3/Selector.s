@@ -37,13 +37,14 @@ _.assert( !!_realGlobal_ );
 
 let Looker = _.mapExtend( null, _.look.defaults.looker );
 Looker.Iteration = _.mapExtend( null, Looker.Iteration );
-Looker.Iteration.apath = null;
+// Looker.Iteration.apath = null;
 Looker.Iteration.query = null;
 Looker.Iteration.queryParsed = null;
 Looker.Iteration.writeToDown = null;
 Looker.Iteration.isFinal = null;
-Looker.Iteration.isRelative = 0;
-Looker.Iteration.isGlob = 0;
+Looker.Iteration.isRelative = false;
+Looker.Iteration.isGlob = false;
+Looker.Iteration.writingDown = true;
 
 // Looker.Iterator = _.mapExtend( null, Looker.Iterator );
 // Looker.Defaults = _.mapExtend( null, Looker.Defaults );
@@ -65,7 +66,7 @@ function errDoesNotExistThrow( it )
     let err = _.ErrorLooking
     (
       'Cant select', _.strQuote( c.query ),
-      '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
+      '\nbecause', _.strQuote( it.query ), 'does not exist',
       '\nat', _.strQuote( it.path ),
       '\nin container', _.toStr( c.container )
     );
@@ -94,7 +95,7 @@ function errNoDownThrow( it )
     let err = _.ErrorLooking
     (
       'Cant go down', _.strQuote( c.query ),
-      '\nbecause', _.strQuote( _.path.join.apply( _.path, it.apath ) ), 'does not exist',
+      '\nbecause', _.strQuote( it.query ), 'does not exist',
       '\nat', _.strQuote( it.path ),
       '\nin container', _.toStr( c.container )
     );
@@ -136,8 +137,8 @@ function _select_pre( routine, args )
   _.routineOptionsPreservingUndefines( routine, o );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 || args.length === 2 );
-  _.assert( o.onUp === null || _.routineIs( o.onUp ) );
-  _.assert( o.onDown === null || _.routineIs( o.onDown ) );
+  _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
+  _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
   // _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
@@ -208,28 +209,22 @@ function _select_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    it.query = it.down ? c.aquery[ it.down.apath.length ] : c.aquery[ 0 ];
-    it.apath = it.down ? it.down.apath.slice() : [];
-    if( it.query !== undefined )
-    it.apath.push( it.query );
+    // debugger;
+
+    it.query = c.aquery[ it.logicalLevel-1 ];
     it.result = it.src;
-
-    it.isRelative = it.query === c.downToken;
-    it.isFinal = it.query === undefined;
-    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
-
-    // if( it.down && it.down.isRelative )
-    // {
-    //   it.trackingVisits = false;
-    // }
 
     it.writeToDown = function writeToDown( eit )
     {
       this.result = eit.result;
     }
 
-    if( c.onUp )
-    c.onUp.call( it );
+    if( c.onUpBegin )
+    c.onUpBegin.call( it );
+
+    it.isRelative = it.query === c.downToken;
+    it.isFinal = it.query === undefined;
+    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
 
     // debugger;
 
@@ -241,6 +236,9 @@ function _select_pre( routine, args )
     upGlob.call( this );
     else
     upSingle.call( this );
+
+    if( c.onUpEnd )
+    c.onUpEnd.call( it );
 
   }
 
@@ -273,8 +271,8 @@ function _select_pre( routine, args )
 
     /* */
 
-    if( c.onDown )
-    c.onDown.call( it );
+    if( c.onDownBegin )
+    c.onDownBegin.call( it );
 
     // debugger;
 
@@ -298,8 +296,14 @@ function _select_pre( routine, args )
     if( it.down )
     {
       _.assert( _.routineIs( it.down.writeToDown ) );
+      if( it.writingDown )
       it.down.writeToDown( it );
     }
+
+    /* */
+
+    if( c.onDownEnd )
+    c.onDownEnd.call( it );
 
     return it.result;
   }
@@ -341,8 +345,6 @@ function _select_pre( routine, args )
     let c = it.context;
 
     /* !!! qqq : teach it to parse more than single "*=" */
-
-    debugger;
 
     let regexp = /(.*){?\*=(\d*)}?(.*)/;
     let match = it.query.match( regexp );
@@ -440,17 +442,27 @@ function _select_pre( routine, args )
     it.visitEndMaybe();
     dit.visitEndMaybe();
 
-    let src = dit.src;
-    dit = dit.iteration();
-    dit.path = it.path;
-    dit.down = it;
-    dit.select( it.query );
-    dit.src = src;
+    // debugger;
+
+    let nit = it.iteration();
+    nit.select( it.query );
+    nit.src = dit.src;
+    nit.result = undefined;
+
+    // let src = dit.src;
+    // dit = dit.reiteration();
+    // dit.logicalLevel = it.logicalLevel + 1;
+    // dit.path = it.path;
+    // dit.down = it;
+    // dit.select( it.query );
+    // dit.src = src;
 
     // it.visitedManyTimes = false;
     // dit.visitedManyTimes = false;
 
-    onIteration.call( it, dit );
+    // onIteration.call( it, dit );
+
+    onIteration.call( it, nit );
 
     return true;
   }
@@ -523,12 +535,21 @@ function _select_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    debugger;
+    // debugger;
 
     if( it.queryParsed.limit !== undefined )
     {
       let length = _.entityLength( it.result );
-      _.sure( length === it.queryParsed.limit, 'Select constraint ' + _.strQuote( it.query ) + ' failed, got ' + length + ' elements' );
+      if( length !== it.queryParsed.limit )
+      {
+        debugger;
+        throw _.ErrorLooking
+        (
+          'Select constraint ' + _.strQuote( it.query ) + ' failed'
+          + ', got ' + length + ' elements'
+          + ' in query ' + _.strQuote( c.query )
+        );
+      }
     }
 
   }
@@ -565,9 +586,10 @@ _selectAct_body.defaults =
   trackingVisits : 1,
   upToken : '/',
   downToken : '..',
-  // assertToken : '=',
-  onUp : null,
-  onDown : null,
+  onUpBegin : null,
+  onUpEnd : null,
+  onDownBegin : null,
+  onDownEnd : null,
   set : null,
   setting : null,
 }

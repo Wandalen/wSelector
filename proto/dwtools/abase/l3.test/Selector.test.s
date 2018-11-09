@@ -1034,9 +1034,7 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  debugger;
   var got = _.select( container, 'a/name/..' );
-  debugger;
 
   test.identical( got, container.a );
   test.is( got === container.a );
@@ -1141,44 +1139,15 @@ function selectWithDown( test )
   test.identical( it.result, container.a.name );
   test.is( it.result === container.a.name );
 
-  var it = _.selectAct( it.lastSelect.iteration(), '../../b/name' );
+  var it = _.selectAct( it.lastSelect.reiteration(), '../../b/name' );
 
   test.identical( it.result, container.b.name );
   test.is( it.result === container.b.name );
 
-  var it = _.selectAct( it.lastSelect.iteration(), '..' );
+  var it = _.selectAct( it.lastSelect.reiteration(), '..' );
 
   test.identical( it.result, container.b );
   test.is( it.result === container.b );
-
-  /* */
-
-  // var expected =
-  // {
-  //   a : { name : 'x', value : 13 },
-  //   b : { name : 'x', value : 77 },
-  //   c : { name : 'x', value : 25, date : new Date() },
-  // }
-  //
-  // var container =
-  // {
-  //   a : { name : 'name1', value : 13 },
-  //   b : { name : 'name2', value : 77 },
-  //   c : { value : 25, date : new Date() },
-  // }
-  //
-  // var got = _.select
-  // ({
-  //   container : container,
-  //   query : '*/name/^^',
-  //   set : 'x',
-  //   missingAction : 'undefine',
-  // });
-  //
-  // test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
-  // test.identical( container, expected );
-  //
-  // /* */
 
 }
 
@@ -1284,34 +1253,35 @@ function selectWithAssert( test )
   var got = _.select( container, 'aaY/n*=0x' );
   test.identical( got, expected );
 
-  /* */
+}
+
+//
+
+function selectWithCallback( test )
+{
 
   test.description = 'with callback';
 
+  var container =
   {
-
-    var container =
-    {
-      aaY : { name : 'a', value : 1 },
-      bbN : { name : 'b', value : 2 },
-      ccY : { name : 'c', value : 3 },
-      ddNx : { name : 'd', value : 4 },
-      eeYx : { name : 'e', value : 5 },
-    }
-
-    function onDown()
-    {
-      let it = this;
-      if( !it.isGlob )
-      return;
-      delete it.result.aaY;
-    }
-
-    var expected = {};
-    var got = _.select({ container : container, query : 'a*=0', onDown : onDown });
-    test.identical( got, expected );
-
+    aaY : { name : 'a', value : 1 },
+    bbN : { name : 'b', value : 2 },
+    ccY : { name : 'c', value : 3 },
+    ddNx : { name : 'd', value : 4 },
+    eeYx : { name : 'e', value : 5 },
   }
+
+  function onDownBegin()
+  {
+    let it = this;
+    if( !it.isGlob )
+    return;
+    delete it.result.aaY;
+  }
+
+  var expected = {};
+  var got = _.select({ container : container, query : 'a*=0', onDownBegin : onDownBegin });
+  test.identical( got, expected );
 
 }
 
@@ -1338,6 +1308,7 @@ var Self =
     selectWithDown : selectWithDown,
     selectWithGlob : selectWithGlob,
     selectWithAssert : selectWithAssert,
+    selectWithCallback : selectWithCallback,
   }
 
 }
