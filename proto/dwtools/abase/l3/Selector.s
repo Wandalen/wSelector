@@ -193,9 +193,11 @@ function _select_pre( routine, args )
     o2.onUp = up;
     o2.onDown = down;
     o2.onIterate = iterate;
+    // o2.onTerminal = o.onTerminal;
     o2.looker = Looker;
     o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
+    o2._inherited = o._inherited;
 
     _.assert( arguments.length === 1 );
 
@@ -269,8 +271,6 @@ function _select_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    /* */
-
     if( c.onDownBegin )
     c.onDownBegin.call( it );
 
@@ -293,17 +293,15 @@ function _select_pre( routine, args )
       errCantSetThrow( it );
     }
 
+    if( c.onDownEnd )
+    c.onDownEnd.call( it );
+
     if( it.down )
     {
       _.assert( _.routineIs( it.down.writeToDown ) );
       if( it.writingDown )
       it.down.writeToDown( it );
     }
-
-    /* */
-
-    if( c.onDownEnd )
-    c.onDownEnd.call( it );
 
     return it.result;
   }
@@ -348,7 +346,7 @@ function _select_pre( routine, args )
 
     let regexp = /(.*){?\*=(\d*)}?(.*)/;
     let match = it.query.match( regexp );
-    it.queryParsed = Object.create( null );
+    it.queryParsed = it.queryParsed || Object.create( null );
 
     if( !match )
     {
@@ -442,25 +440,10 @@ function _select_pre( routine, args )
     it.visitEndMaybe();
     dit.visitEndMaybe();
 
-    // debugger;
-
     let nit = it.iteration();
     nit.select( it.query );
     nit.src = dit.src;
     nit.result = undefined;
-
-    // let src = dit.src;
-    // dit = dit.reiteration();
-    // dit.logicalLevel = it.logicalLevel + 1;
-    // dit.path = it.path;
-    // dit.down = it;
-    // dit.select( it.query );
-    // dit.src = src;
-
-    // it.visitedManyTimes = false;
-    // dit.visitedManyTimes = false;
-
-    // onIteration.call( it, dit );
 
     onIteration.call( it, nit );
 
@@ -590,8 +573,10 @@ _selectAct_body.defaults =
   onUpEnd : null,
   onDownBegin : null,
   onDownEnd : null,
+  // onTerminal : null,
   set : null,
   setting : null,
+  _inherited : null,
 }
 
 //
@@ -751,7 +736,6 @@ function entityProbeField( o )
 }
 
 entityProbeField.defaults = Object.create( select.defaults );
-
 entityProbeField.defaults.title = null;
 entityProbeField.defaults.report = 1;
 
