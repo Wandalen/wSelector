@@ -122,7 +122,7 @@ function errCantSetThrow( it )
 
 //
 
-function _select_pre( routine, args )
+function selectSingle_pre( routine, args )
 {
 
   let o = args[ 0 ]
@@ -157,17 +157,13 @@ function _select_pre( routine, args )
     o.prevContext = o.it.context;
   }
 
+  // if( _.strIs( o.query ) && _.strHas( o.query, 'commonDir' ) )
+  // debugger;
+
   if( _.numberIs( o.query ) )
   o.aquery = [ o.query ];
   else
-  o.aquery = _.strSplit
-  ({
-    src : o.query,
-    delimeter : o.upToken,
-    preservingDelimeters : 0,
-    preservingEmpty : 0,
-    stripping : 1,
-  });
+  o.aquery = split( o.query );
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
@@ -181,6 +177,21 @@ function _select_pre( routine, args )
   _.assert( it.context === o );
 
   return it;
+
+  /* */
+
+  function split( query )
+  {
+    return _.strSplit
+    ({
+      src : query,
+      delimeter : o.upToken,
+      preservingDelimeters : 0,
+      preservingEmpty : 0,
+      preservingQuoting : 0,
+      stripping : 1,
+    });
+  }
 
   /* */
 
@@ -432,7 +443,6 @@ function _select_pre( routine, args )
       dit = dit.down;
       if( !dit )
       return errNoDownThrow( it );
-
     }
 
     _.assert( _.iterationIs( dit ) );
@@ -581,13 +591,13 @@ _selectAct_body.defaults =
 
 //
 
-let selectAct = _.routineFromPreAndBody( _select_pre, _selectAct_body );
+let _selectAct = _.routineFromPreAndBody( selectSingle_pre, _selectAct_body );
 
 //
 
-function _select_body( it )
+function selectSingle_body( it )
 {
-  let it2 = _.selectAct.body( it );
+  let it2 = _._selectAct.body( it );
   _.assert( it2 === it )
   _.assert( arguments.length === 1, 'Expects single argument' );
   if( it.context.missingAction === 'error' && it.error )
@@ -595,15 +605,58 @@ function _select_body( it )
   return it.result;
 }
 
-_.routineExtend( _select_body, selectAct );
+_.routineExtend( selectSingle_body, _selectAct );
 
 //
 
-let select = _.routineFromPreAndBody( _select_pre, _select_body );
+let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
 
 //
 
-let selectSet = _.routineFromPreAndBody( select.pre, select.body );
+function select_pre( routine, args )
+{
+
+  let o = args[ 0 ]
+  if( args.length === 2 )
+  {
+    if( _.iterationIs( args[ 0 ] ) )
+    o = { it : args[ 0 ], query : args[ 1 ] }
+    else
+    o = { container : args[ 0 ], query : args[ 1 ] }
+  }
+
+  _.routineOptionsPreservingUndefines( routine, o );
+
+  return o;
+}
+
+//
+
+function select_body( o )
+{
+
+  if( _.arrayIs( o.query ) )
+  {
+    let result = [];
+    for( let q = 0 ; q < o.query.length ; q++ )
+    {
+      let o2 = _.mapExtend( null, o );
+      o2.query = o2.query[ q ];
+      result[ q ] = _.select.body.call( _, o2 );
+    }
+    return result;
+  }
+
+  return _.selectSingle( o );
+}
+
+_.routineExtend( select_body, selectSingle.body );
+
+let select = _.routineFromPreAndBody( select_pre, select_body );
+
+//
+
+let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
 
 var defaults = selectSet.defaults;
 
@@ -612,20 +665,20 @@ defaults.setting = 1;
 
 //
 
-function _selectUnique_body( o )
+function selectUnique_body( o )
 {
   _.assert( arguments.length === 1 );
 
-  let result = _.select.body( o );
+  let result = _.selectSingle.body( o );
   if( _.arrayHas( o.aquery, '*' ) )
   result = _.arrayUnique( result );
 
   return result;
 }
 
-_.routineExtend( _selectUnique_body, select.body );
+_.routineExtend( selectUnique_body, selectSingle.body );
 
-let selectUnique2 = _.routineFromPreAndBody( select.pre, _selectUnique_body );
+let selectUnique = _.routineFromPreAndBody( selectSingle.pre, selectUnique_body );
 
 //
 
@@ -860,18 +913,19 @@ entityProbe.defaults =
 let Proto =
 {
 
-  errDoesNotExistThrow : errDoesNotExistThrow,
-  errNoDownThrow : errNoDownThrow,
-  errCantSetThrow : errCantSetThrow,
+  errDoesNotExistThrow,
+  errNoDownThrow,
+  errCantSetThrow,
 
-  selectAct : selectAct,
-  select : select,
-  selectSet : selectSet,
-  selectUnique : selectUnique2,
+  _selectAct,
+  selectSingle,
+  select,
+  selectSet,
+  selectUnique,
 
-  _entityProbeReport : _entityProbeReport,
-  entityProbeField : entityProbeField,
-  entityProbe : entityProbe,
+  _entityProbeReport,
+  entityProbeField,
+  entityProbe,
 
 }
 
