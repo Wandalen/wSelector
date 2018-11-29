@@ -48,9 +48,7 @@ function selectTrivial( test )
     c : 15,
   }
 
-  debugger;
   var got = _.select( container, 'b' );
-  debugger;
 
   test.identical( got, 13 );
 
@@ -120,6 +118,25 @@ function selectTrivial( test )
   /* */
 
   test.close( 'usingIndexedAccessToMap' );
+
+}
+
+//
+
+function selectMultiple( test )
+{
+
+  var container =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { b1 : 1, b2 : 'b2' },
+    c : { c1 : 1, c2 : 'c2' },
+  }
+
+  var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
+  var got = _.select( container, [ 'b', 'c' ] );
+
+  test.identical( got, expected );
 
 }
 
@@ -1303,6 +1320,7 @@ var Self =
   tests :
   {
     selectTrivial : selectTrivial,
+    selectMultiple : selectMultiple,
     selectMissing : selectMissing,
     selectSet : selectSet,
     selectWithDown : selectWithDown,
