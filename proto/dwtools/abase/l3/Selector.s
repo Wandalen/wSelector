@@ -559,7 +559,7 @@ function selectSingle_pre( routine, args )
 
 //
 
-function _selectAct_body( it )
+function selectAct_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.objectIs( it.looker ) );
@@ -568,7 +568,7 @@ function _selectAct_body( it )
   return it;
 }
 
-_selectAct_body.defaults =
+selectAct_body.defaults =
 {
   it : null,
   container : null,
@@ -591,13 +591,13 @@ _selectAct_body.defaults =
 
 //
 
-let _selectAct = _.routineFromPreAndBody( selectSingle_pre, _selectAct_body );
+let selectAct = _.routineFromPreAndBody( selectSingle_pre, selectAct_body );
 
 //
 
 function selectSingle_body( it )
 {
-  let it2 = _._selectAct.body( it );
+  let it2 = _.selectAct.body( it );
   _.assert( it2 === it )
   _.assert( arguments.length === 1, 'Expects single argument' );
   if( it.context.missingAction === 'error' && it.error )
@@ -605,7 +605,7 @@ function selectSingle_body( it )
   return it.result;
 }
 
-_.routineExtend( selectSingle_body, _selectAct );
+_.routineExtend( selectSingle_body, selectAct );
 
 //
 
@@ -917,7 +917,7 @@ let Proto =
   errNoDownThrow,
   errCantSetThrow,
 
-  _selectAct,
+  selectAct,
   selectSingle,
   select,
   selectSet,
