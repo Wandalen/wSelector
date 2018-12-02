@@ -68,7 +68,7 @@ function errDoesNotExistThrow( it )
       'Cant select', _.strQuote( c.query ),
       '\nbecause', _.strQuote( it.query ), 'does not exist',
       '\nat', _.strQuote( it.path ),
-      '\nin container', _.toStr( c.container )
+      '\nin container\n', _.toStr( c.container )
     );
     // debugger;
     it.result = undefined;
@@ -97,7 +97,7 @@ function errNoDownThrow( it )
       'Cant go down', _.strQuote( c.query ),
       '\nbecause', _.strQuote( it.query ), 'does not exist',
       '\nat', _.strQuote( it.path ),
-      '\nin container', _.toStr( c.container )
+      '\nin container\n', _.toStr( c.container )
     );
     debugger;
     it.result = undefined;
