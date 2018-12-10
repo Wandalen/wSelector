@@ -109,14 +109,13 @@ function errNoDownThrow( it )
 
 //
 
-function errCantSetThrow( it )
+function errCantSetThrow( container, query )
 {
-  let c = it.context;
   debugger;
   throw _.err
   (
-    'Cant set', _.strQuote( c.query ),
-    'of container', _.toStr( c.container )
+    'Cant set', _.strQuote( query ),
+    'of container', _.toStrShort( container )
   );
 }
 
@@ -298,10 +297,10 @@ function selectSingle_pre( routine, args )
 
     if( c.setting && it.isFinal )
     {
-      if( it.down && it.down.src )
+      if( it.down && !_.primitiveIs( it.down.src ) )
       it.down.src[ it.key ] = c.set;
       else
-      errCantSetThrow( it );
+      errCantSetThrow( it.down.src, it.key );
     }
 
     if( c.onDownEnd )
