@@ -27,8 +27,7 @@
     "wpathfundamentals": ""
   },
   "devDependencies": {
-    "wTesting": "",
-    "wselector": "."
+    "wTesting": ""
   },
   "keywords": [
     "wTools"
