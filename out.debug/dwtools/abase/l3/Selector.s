@@ -3,7 +3,8 @@
 'use strict';
 
 /**
-  @module Tools/base/Selector - Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
+ * Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
+  @module Tools/base/Selector
 */
 
 /**
