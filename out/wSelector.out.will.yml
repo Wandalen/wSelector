@@ -58,8 +58,6 @@ path:
       - ./dwtools/abase/l3/Selector.s
       - ./dwtools/abase/l3.test
       - ./dwtools/abase/l3.test/Selector.test.s
-      - ./dwtools/amid
-      - ./dwtools/atop
     criterion:
       default: 1
       debug: 1
