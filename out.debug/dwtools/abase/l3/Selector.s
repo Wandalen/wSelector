@@ -374,15 +374,17 @@ function selectSingle_pre( routine, args )
       }
     }
 
-    // debugger;
     if( it.queryParsed.glob !== '*' && c.usingGlob )
-    it.src = _.path.globFilter
-    ({
-      src : it.src,
-      selector : it.queryParsed.glob,
-      onEvaluate : ( e, k ) => k,
-    });
-    // debugger;
+    {
+      debugger;
+      it.src = _.path.globFilter
+      ({
+        src : it.src,
+        selector : it.queryParsed.glob,
+        onEvaluate : ( e, k ) => k,
+      });
+      debugger;
+    }
 
     if( _.arrayLike( it.src ) )
     {
