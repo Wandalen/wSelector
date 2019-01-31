@@ -376,14 +376,12 @@ function selectSingle_pre( routine, args )
 
     if( it.queryParsed.glob !== '*' && c.usingGlob )
     {
-      debugger;
       it.src = _.path.globFilter
       ({
         src : it.src,
         selector : it.queryParsed.glob,
         onEvaluate : ( e, k ) => k,
       });
-      debugger;
     }
 
     if( _.arrayLike( it.src ) )
