@@ -839,7 +839,7 @@ function entityProbe( o )
       else if( _.objectIs( src[ s ] ) )
       extend( o.result, src );
       else
-      throw _.err( 'array should have only maps' );
+      throw _.err( 'Array should have only maps' );
     }
 
     return src;
