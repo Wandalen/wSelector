@@ -204,11 +204,11 @@ function selectSingle_pre( routine, args )
     o2.onUp = up;
     o2.onDown = down;
     o2.onIterate = iterate;
-    // o2.onTerminal = o.onTerminal;
     o2.looker = Looker;
     o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
-    o2._inherited = o._inherited;
+    o2._current = o._current;
+    o2._extend = o._extend;
 
     _.assert( arguments.length === 1 );
 
@@ -221,8 +221,6 @@ function selectSingle_pre( routine, args )
   {
     let it = this;
     let c = it.context;
-
-    // debugger;
 
     it.query = c.aquery[ it.logicalLevel-1 ];
     it.result = it.src;
@@ -535,19 +533,23 @@ function selectSingle_pre( routine, args )
 
     // debugger;
 
-    if( it.queryParsed.limit !== undefined )
+    if( !it.writingDown )
+    return;
+
+    if( it.queryParsed.limit === undefined )
+    return;
+
+    let length = _.entityLength( it.result );
+    if( length !== it.queryParsed.limit )
     {
-      let length = _.entityLength( it.result );
-      if( length !== it.queryParsed.limit )
-      {
-        debugger;
-        throw _.ErrorLooking
-        (
-          'Select constraint ' + _.strQuote( it.query ) + ' failed'
-          + ', got ' + length + ' elements'
-          + ' in query ' + _.strQuote( c.query )
-        );
-      }
+      debugger;
+      throw _.ErrorLooking
+      (
+        'Select constraint ' + _.strQuote( it.query ) + ' failed'
+        + ', got ' + length + ' elements'
+        + ' in query ' + _.strQuote( c.query )
+        + '\nPath : ' + _.strQuote( it.path )
+      );
     }
 
   }
@@ -588,10 +590,10 @@ selectAct_body.defaults =
   onUpEnd : null,
   onDownBegin : null,
   onDownEnd : null,
-  // onTerminal : null,
   set : null,
   setting : null,
-  _inherited : null,
+  _current : null,
+  _extend : null,
 }
 
 //
