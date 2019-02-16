@@ -84,7 +84,7 @@ function errDoesNotExistThrow( it )
 function errNoDownThrow( it )
 {
   let c = it.context;
-  debugger;
+
   it.looking = false;
   if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
   {
@@ -92,7 +92,6 @@ function errNoDownThrow( it )
   }
   else
   {
-    debugger;
     let err = _.ErrorLooking
     (
       'Cant go down', _.strQuote( c.query ),
@@ -100,7 +99,6 @@ function errNoDownThrow( it )
       '\nat', _.strQuote( it.path ),
       '\nin container\n', _.toStr( c.container )
     );
-    debugger;
     it.result = undefined;
     it.iterator.error = err;
     if( c.missingAction === 'throw' )
@@ -112,7 +110,6 @@ function errNoDownThrow( it )
 
 function errCantSetThrow( container, query )
 {
-  debugger;
   throw _.err
   (
     'Cant set', _.strQuote( query ),
@@ -141,7 +138,6 @@ function selectSingle_pre( routine, args )
   _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
   _.assert( _.strIs( o.query ) );
   _.assert( _.strIs( o.downToken ) );
-  // _.assert( !_.strHas( o.query, '.' ) || _.strHas( o.query, '..' ), 'Temporary : query should not have dots', o.query );
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   _.assert( o.aquery === undefined );
 
@@ -153,12 +149,10 @@ function selectSingle_pre( routine, args )
     _.assert( _.iterationIs( o.it ) );
     _.assert( _.strIs( o.it.context.query ) );
     o.container = o.it.src;
+    debugger;
     o.query = o.it.context.query + _.strsShortest( o.it.iterator.upToken ) + o.query;
     o.prevContext = o.it.context;
   }
-
-  // if( _.strIs( o.query ) && _.strHas( o.query, 'commonDir' ) )
-  // debugger;
 
   if( _.numberIs( o.query ) )
   o.aquery = [ o.query ];
@@ -169,9 +163,9 @@ function selectSingle_pre( routine, args )
   o.setting = 1;
 
   let o2 = optionsFor( o );
-
   let it = _.look.pre( _.look, [ o2 ] );
 
+  _.assert( o.it === it || o.it === null );
   _.assert( it.context === o.prevContext || it.context === o );
   it.iterator.context = o;
   _.assert( it.context === o );
@@ -540,7 +534,7 @@ function selectSingle_pre( routine, args )
     let length = _.entityLength( it.result );
     if( length !== it.queryParsed.limit )
     {
-      debugger;
+      // debugger;
       let err = _.ErrorLooking
       (
         'Select constraint ' + _.strQuote( it.query ) + ' failed'
@@ -548,7 +542,7 @@ function selectSingle_pre( routine, args )
         + ' in query ' + _.strQuote( c.query )
         + '\nPath : ' + _.strQuote( it.path )
       );
-      debugger;
+      // debugger;
       if( c.onQuantitativeFail )
       c.onQuantitativeFail.call( it, err );
       else
@@ -580,6 +574,7 @@ function selectAct_body( it )
 
 selectAct_body.defaults =
 {
+
   it : null,
   container : null,
   query : null,
@@ -589,15 +584,21 @@ selectAct_body.defaults =
   trackingVisits : 1,
   upToken : '/',
   downToken : '..',
+
+  multiple : null,
+  set : null,
+  setting : null,
+  _current : null,
+  _extend : null,
+
+  // onSelectBegin : null,
+  // onSelectEnd : null,
   onUpBegin : null,
   onUpEnd : null,
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
-  set : null,
-  setting : null,
-  _current : null,
-  _extend : null,
+
 }
 
 //
@@ -658,10 +659,30 @@ function select_body( o )
     return result;
   }
 
-  return _.selectSingle( o );
+  if( o.onSelectBegin )
+  o = o.onSelectBegin( o );
+
+  o.single = _.mapExtend( null, o );
+  o.single.multiple = o;
+  delete o.single.onSelectBegin;
+  delete o.single.onSelectEnd;
+  delete o.single.selecting;
+  delete o.single.result;
+  o.result = _.selectSingle( o.single );
+
+  if( o.onSelectEnd )
+  o.onSelectEnd( o );
+
+  return o.result;
 }
 
 _.routineExtend( select_body, selectSingle.body );
+
+var defaults = select_body.defaults;
+defaults.onSelectBegin = null;
+defaults.onSelectEnd = null;
+defaults.selecting = 1;
+defaults.result = null;
 
 let select = _.routineFromPreAndBody( select_pre, select_body );
 
