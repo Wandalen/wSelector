@@ -531,8 +531,6 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // debugger;
-
     if( !it.writingDown )
     return;
 
@@ -543,13 +541,18 @@ function selectSingle_pre( routine, args )
     if( length !== it.queryParsed.limit )
     {
       debugger;
-      throw _.ErrorLooking
+      let err = _.ErrorLooking
       (
         'Select constraint ' + _.strQuote( it.query ) + ' failed'
         + ', got ' + length + ' elements'
         + ' in query ' + _.strQuote( c.query )
         + '\nPath : ' + _.strQuote( it.path )
       );
+      debugger;
+      if( c.onQuantitativeFail )
+      c.onQuantitativeFail.call( it, err );
+      else
+      throw err;
     }
 
   }
@@ -590,6 +593,7 @@ selectAct_body.defaults =
   onUpEnd : null,
   onDownBegin : null,
   onDownEnd : null,
+  onQuantitativeFail : null,
   set : null,
   setting : null,
   _current : null,
