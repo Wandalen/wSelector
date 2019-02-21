@@ -664,7 +664,7 @@ defaults.root = null;
 defaults.onSingleBegin = null;
 defaults.onSingleEnd = null;
 defaults.onIsSelector = null;
-defaults.onSelectorSplitNormalize = null;
+// defaults.onSelectorSplitNormalize = null;
 defaults.recursive = 0;
 // defaults.dst = null;
 
