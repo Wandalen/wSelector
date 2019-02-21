@@ -26,11 +26,6 @@ let _global = _global_;
 let Self = _global_.wTools;
 let _ = _global_.wTools;
 
-let _ArraySlice = Array.prototype.slice;
-let _FunctionBind = Function.prototype.bind;
-let _ObjectToString = Object.prototype.toString;
-let _ObjectHasOwnProperty = Object.hasOwnProperty;
-
 _.assert( !!_realGlobal_ );
 
 // --
@@ -147,10 +142,10 @@ function selectSingle_pre( routine, args )
       this.dst = eit.dst;
     }
 
-    if( c.onSelectorNormalize )
-    debugger;
-    if( c.onSelectorNormalize )
-    c.onSelectorNormalize.call( it );
+    // if( c.onSelectorSplitNormalize )
+    // debugger;
+    // if( c.onSelectorSplitNormalize )
+    c.onSelectorSplitNormalize.call( it );
 
     if( c.onUpBegin )
     c.onUpBegin.call( it );
@@ -517,7 +512,7 @@ selectAct_body.defaults =
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
-  onSelectorNormalize : null,
+  onSelectorSplitNormalize : onSelectorSplitNormalize,
   onWhichIterable : onWhichIterable,
   // onWhichIterable : _.look.defaults.onWhichIterable,
 
@@ -669,7 +664,7 @@ defaults.root = null;
 defaults.onSingleBegin = null;
 defaults.onSingleEnd = null;
 defaults.onIsSelector = null;
-defaults.onSelectorNormalize = null;
+defaults.onSelectorSplitNormalize = null;
 defaults.recursive = 0;
 // defaults.dst = null;
 
@@ -764,6 +759,20 @@ function errCantSetThrow( src, selector )
     'Cant set', _.strQuote( selector ),
     'of container', _.toStrShort( src )
   );
+}
+
+//
+
+function onSelectorNormalize( src )
+{
+  let it = this;
+}
+
+//
+
+function onSelectorSplitNormalize()
+{
+  let it = this;
 }
 
 //

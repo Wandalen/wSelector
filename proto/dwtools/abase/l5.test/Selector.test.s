@@ -208,6 +208,87 @@ function selectMultiple( test )
 
 //
 
+function selectWithSpecialSelector( test )
+{
+
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { b1 : 1, b2 : 'b2' },
+    c : { c1 : 1, c2 : 'c2' },
+  }
+
+  function onIsSelector( selector )
+  {
+    return _.strBegins( selector, '{' ) && _.strEnds( selector, '}' );
+  }
+
+  function onSelectorNormalize()
+  {
+    let it = this;
+    it.selector = _.strUnjoin( it.selector, [ '{', _.any, '}' ] )
+  }
+
+  /* */
+
+  test.open( 'array' );
+
+  test.case = 'first level selector'; /* */
+  var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
+  var got = _.select( src, [ 'b', 'c' ] );
+  test.identical( got, expected );
+  test.is( got[ 0 ] === src.b );
+  test.is( got[ 1 ] === src.c );
+
+  test.case = 'second level selector'; /* */
+  var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
+  var got = _.select( src, [ 'b/b2', 'c' ] );
+  test.identical( got, expected );
+  test.is( got[ 0 ] === src.b.b2 );
+  test.is( got[ 1 ] === src.c );
+
+  test.case = 'complex selector'; /* */
+  var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
+  var got = _.select( src, [ 'b/b2', { a : 'c', b : 'a/map' } ] );
+  test.identical( got, expected );
+  test.is( got[ 0 ] === src.b.b2 );
+  test.is( got[ 1 ][ 'a' ] === src.c );
+  test.is( got[ 1 ][ 'b' ] === src.a.map );
+
+  test.close( 'array' );
+
+  /* */
+
+  test.open( 'map' );
+
+  test.case = 'first level selector'; /* */
+  var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
+  var got = _.select( src, { b : 'b', c : 'c' } );
+  test.identical( got, expected );
+  test.is( got.b === src.b );
+  test.is( got.c === src.c );
+
+  test.case = 'second level selector'; /* */
+  var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
+  var got = _.select( src, { b2 : 'b/b2', c : 'c' } );
+  test.identical( got, expected );
+  test.is( got.b2 === src.b.b2 );
+  test.is( got.c === src.c );
+
+  test.case = 'complex selector'; /* */
+  var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
+  var got = _.select( src, { b : 'b/b2', array : [ 'c', 'a/map' ] } );
+  test.identical( got, expected );
+  test.is( got[ 'b' ] === src.b.b2 );
+  test.is( got[ 'array' ][ 0 ] === src.c );
+  test.is( got[ 'array' ][ 1 ] === src.a.map );
+
+  test.close( 'map' );
+
+}
+
+//
+
 function selectMissing( test )
 {
 
