@@ -54,10 +54,10 @@ path:
       - proto/dwtools
       - proto/dwtools/Tools.s
       - proto/dwtools/abase
-      - proto/dwtools/abase/l3
-      - proto/dwtools/abase/l3/Selector.s
-      - proto/dwtools/abase/l3.test
-      - proto/dwtools/abase/l3.test/Selector.test.s
+      - proto/dwtools/abase/l5
+      - proto/dwtools/abase/l5/Selector.s
+      - proto/dwtools/abase/l5.test
+      - proto/dwtools/abase/l5.test/Selector.test.s
       - proto/dwtools/amid
       - proto/dwtools/atop
     criterion:
@@ -148,10 +148,10 @@ reflector:
         dwtools: true
         dwtools/Tools.s: true
         dwtools/abase: true
-        dwtools/abase/l3: true
-        dwtools/abase/l3/Selector.s: true
-        dwtools/abase/l3.test: true
-        dwtools/abase/l3.test/Selector.test.s: true
+        dwtools/abase/l5: true
+        dwtools/abase/l5/Selector.s: true
+        dwtools/abase/l5.test: true
+        dwtools/abase/l5.test/Selector.test.s: true
         dwtools/amid: true
         dwtools/atop: true
       basePath: .
