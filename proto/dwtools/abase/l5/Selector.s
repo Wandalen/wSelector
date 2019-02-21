@@ -3,12 +3,12 @@
 'use strict';
 
 /**
- * Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
+ * Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short selector string.
   @module Tools/base/Selector
 */
 
 /**
- * @file Selector.s.
+ * @file l5/Selector.s.
  */
 
 if( typeof module !== 'undefined' )
@@ -17,6 +17,7 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../Tools.s' );
 
   _.include( 'wLooker' );
+  _.include( 'wReplicator' );
   _.include( 'wPathFundamentals' );
 
 }
@@ -33,91 +34,8 @@ let _ObjectHasOwnProperty = Object.hasOwnProperty;
 _.assert( !!_realGlobal_ );
 
 // --
-// selector
+// routine
 // --
-
-let Looker = _.mapExtend( null, _.look.defaults.looker );
-Looker.Iteration = _.mapExtend( null, Looker.Iteration );
-// Looker.Iteration.apath = null;
-Looker.Iteration.query = null;
-Looker.Iteration.queryParsed = null;
-Looker.Iteration.writeToDown = null;
-Looker.Iteration.isFinal = null;
-Looker.Iteration.isRelative = false;
-Looker.Iteration.isGlob = false;
-Looker.Iteration.writingDown = true;
-
-// Looker.Iterator = _.mapExtend( null, Looker.Iterator );
-// Looker.Defaults = _.mapExtend( null, Looker.Defaults );
-// Looker.Defaults.aquery = null;
-
-//
-
-function errDoesNotExistThrow( it )
-{
-  let c = it.context;
-  it.looking = false;
-  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
-  {
-    it.result = undefined
-  }
-  else
-  {
-    // debugger;
-    let err = _.ErrorLooking
-    (
-      'Cant select', _.strQuote( c.query ),
-      '\nbecause', _.strQuote( it.query ), 'does not exist',
-      '\nat', _.strQuote( it.path ),
-      '\nin container\n', _.toStr( c.container )
-    );
-    // debugger;
-    it.result = undefined;
-    it.iterator.error = err;
-    if( c.missingAction === 'throw' )
-    throw err;
-  }
-}
-
-//
-
-function errNoDownThrow( it )
-{
-  let c = it.context;
-
-  it.looking = false;
-  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
-  {
-    it.result = undefined
-  }
-  else
-  {
-    let err = _.ErrorLooking
-    (
-      'Cant go down', _.strQuote( c.query ),
-      '\nbecause', _.strQuote( it.query ), 'does not exist',
-      '\nat', _.strQuote( it.path ),
-      '\nin container\n', _.toStr( c.container )
-    );
-    it.result = undefined;
-    it.iterator.error = err;
-    if( c.missingAction === 'throw' )
-    throw err;
-  }
-}
-
-//
-
-function errCantSetThrow( container, query )
-{
-  throw _.err
-  (
-    'Cant set', _.strQuote( query ),
-    'of container', _.toStrShort( container )
-  );
-}
-
-//
 
 function selectSingle_pre( routine, args )
 {
@@ -125,10 +43,10 @@ function selectSingle_pre( routine, args )
   let o = args[ 0 ]
   if( args.length === 2 )
   {
-    if( _.iterationIs( args[ 0 ] ) )
-    o = { it : args[ 0 ], query : args[ 1 ] }
+    if( _.lookIterationIs( args[ 0 ] ) )
+    o = { it : args[ 0 ], selector : args[ 1 ] }
     else
-    o = { container : args[ 0 ], query : args[ 1 ] }
+    o = { src : args[ 0 ], selector : args[ 1 ] }
   }
 
   _.routineOptionsPreservingUndefines( routine, o );
@@ -136,28 +54,29 @@ function selectSingle_pre( routine, args )
   _.assert( args.length === 1 || args.length === 2 );
   _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
   _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
-  _.assert( _.strIs( o.query ) );
+  _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( o.downToken ) );
   _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
-  _.assert( o.aquery === undefined );
+  _.assert( o.selectorArray === undefined );
 
   o.prevContext = null;
 
   if( o.it )
   {
-    _.assert( o.container === null );
-    _.assert( _.iterationIs( o.it ) );
-    _.assert( _.strIs( o.it.context.query ) );
-    o.container = o.it.src;
+    _.assert( o.src === null );
+    _.assert( _.lookIterationIs( o.it ) );
+    _.assert( _.objectIs( o.it.context ) );
+    _.assert( _.strIs( o.it.context.selector ) );
+    o.src = o.it.src;
     debugger;
-    o.query = o.it.context.query + _.strsShortest( o.it.iterator.upToken ) + o.query;
+    o.selector = o.it.context.selector + _.strsShortest( o.it.iterator.upToken ) + o.selector;
     o.prevContext = o.it.context;
   }
 
-  if( _.numberIs( o.query ) )
-  o.aquery = [ o.query ];
+  if( _.numberIs( o.selector ) )
+  o.selectorArray = [ o.selector ];
   else
-  o.aquery = split( o.query );
+  o.selectorArray = split( o.selector );
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
@@ -174,11 +93,11 @@ function selectSingle_pre( routine, args )
 
   /* */
 
-  function split( query )
+  function split( selector )
   {
     return _.strSplit
     ({
-      src : query,
+      src : selector,
       delimeter : o.upToken,
       preservingDelimeters : 0,
       preservingEmpty : 0,
@@ -193,18 +112,22 @@ function selectSingle_pre( routine, args )
   {
 
     let o2 = Object.create( null );
-    o2.src = o.container;
+    o2.src = o.src;
     o2.context = o;
     o2.onUp = up;
     o2.onDown = down;
     o2.onIterate = iterate;
-    o2.looker = Looker;
+    o2.onWhichIterable = o.onWhichIterable;
+    o2.Looker = Looker;
     o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
-    o2._current = o._current;
-    o2._extend = o._extend;
+    o2.iterationCurrent = o.iterationCurrent;
+    o2.iteratorExtension = o.iteratorExtension ? _.mapExtend( null, o.iteratorExtension ) : Object.create( null );
 
+    _.assert( !o2.iteratorExtension.multiple );
     _.assert( arguments.length === 1 );
+
+    o2.iteratorExtension.multiple = o.multiple;
 
     return o2;
   }
@@ -216,26 +139,24 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    it.query = c.aquery[ it.logicalLevel-1 ];
-    it.result = it.src;
+    it.selector = c.selectorArray[ it.logicalLevel-1 ];
+    it.dst = it.src;
 
-    it.writeToDown = function writeToDown( eit )
+    it.dstWriteDown = function dstWriteDown( eit )
     {
-      this.result = eit.result;
+      this.dst = eit.dst;
     }
 
     if( c.onUpBegin )
     c.onUpBegin.call( it );
 
-    it.isRelative = it.query === c.downToken;
-    it.isFinal = it.query === undefined;
-    it.isGlob = it.query ? _.strHas( it.query, '*' ) : false;
-
-    // debugger;
+    it.isRelative = it.selector === c.downToken;
+    it.isFinal = it.selector === undefined;
+    it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
 
     if( it.isFinal )
     upFinal.call( this );
-    else if( it.query === c.downToken )
+    else if( it.selector === c.downToken )
     upDown.call( this );
     else if( it.isGlob )
     upGlob.call( this );
@@ -249,26 +170,6 @@ function selectSingle_pre( routine, args )
 
   /* */
 
-  function iterate( onIteration )
-  {
-    let it = this;
-    let c = it.context;
-
-    // debugger;
-
-    if( it.isFinal )
-    iterateFinal.call( this, onIteration );
-    else if( it.query === c.downToken )
-    iterateDown.call( this, onIteration );
-    else if( it.isGlob )
-    iterateGlob.call( this, onIteration );
-    else
-    iterateSingle.call( this, onIteration );
-
-  }
-
-  /* */
-
   function down()
   {
     let it = this;
@@ -277,11 +178,9 @@ function selectSingle_pre( routine, args )
     if( c.onDownBegin )
     c.onDownBegin.call( it );
 
-    // debugger;
-
     if( it.isFinal )
     downFinal.call( this );
-    else if( it.query === c.downToken )
+    else if( it.selector === c.downToken )
     downDown.call( this );
     else if( it.isGlob )
     downGlob.call( this );
@@ -301,12 +200,12 @@ function selectSingle_pre( routine, args )
 
     if( it.down )
     {
-      _.assert( _.routineIs( it.down.writeToDown ) );
-      if( it.writingDown )
-      it.down.writeToDown( it );
+      _.assert( _.routineIs( it.down.dstWriteDown ) );
+      if( it.dstWritingDown )
+      it.down.dstWriteDown( it );
     }
 
-    return it.result;
+    // return it.dst;
   }
 
   /* - */
@@ -316,9 +215,8 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    /* actual node */
-    it.looking = false;
-    it.result = it.src;
+    it.continue = false;
+    it.dst = it.src;
 
   }
 
@@ -329,12 +227,7 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // it.isRelative = true;
-    _.assert( it.isRelative === true )
-    it.writeToDown = function( eit )
-    {
-      this.result = eit.result;
-    }
+    _.assert( it.isRelative === true );
 
   }
 
@@ -348,52 +241,58 @@ function selectSingle_pre( routine, args )
     /* !!! qqq : teach it to parse more than single "*=" */
 
     let regexp = /(.*){?\*=(\d*)}?(.*)/;
-    let match = it.query.match( regexp );
-    it.queryParsed = it.queryParsed || Object.create( null );
+    let match = it.selector.match( regexp );
+    it.parsedSelector = it.parsedSelector || Object.create( null );
 
     if( !match )
     {
-      it.queryParsed.glob = it.query;
+      it.parsedSelector.glob = it.selector;
     }
     else
     {
-      _.sure( _.strCount( it.query, '=' ) <= 1, () => 'Does not support query with several assertions, like ' + _.strQuote( it.query ) );
-      it.queryParsed.glob = match[ 1 ] + '*' + match[ 3 ];
+      _.sure( _.strCount( it.selector, '=' ) <= 1, () => 'Does not support selector with several assertions, like ' + _.strQuote( it.selector ) );
+      it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
       if( match[ 2 ].length > 0 )
       {
-        it.queryParsed.limit = _.numberFromStr( match[ 2 ] );
-        _.sure( !isNaN( it.queryParsed.limit ) && it.queryParsed.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.query ) );
+        it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
+        _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
       }
     }
 
-    if( it.queryParsed.glob !== '*' && c.usingGlob )
+    if( it.parsedSelector.glob !== '*' && c.usingGlob )
     {
-      it.src = _.path.globFilter
-      ({
-        src : it.src,
-        selector : it.queryParsed.glob,
-        onEvaluate : ( e, k ) => k,
-      });
+      if( it.iterable )
+      {
+        it.src = _.path.globFilter
+        ({
+          src : it.src,
+          selector : it.parsedSelector.glob,
+          onEvaluate : ( e, k ) => k,
+        });
+        it.iterable = it.onWhichIterable( it.src );
+      }
+      if( !it.iterable )
+      debugger;
     }
 
-    if( _.arrayLike( it.src ) )
+    if( it.iterable === 'array-like' )
     {
-      it.result = [];
-      it.writeToDown = function( eit )
+      it.dst = [];
+      it.dstWriteDown = function( eit )
       {
-        if( c.missingAction === 'ignore' && eit.result === undefined )
+        if( c.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        this.result.push( eit.result );
+        this.dst.push( eit.dst );
       }
     }
-    else if( _.objectLike( it.src ) )
+    else if( it.iterable === 'map-like' )
     {
-      it.result = Object.create( null );
-      it.writeToDown = function( eit )
+      it.dst = Object.create( null );
+      it.dstWriteDown = function( eit )
       {
-        if( c.missingAction === 'ignore' && eit.result === undefined )
+        if( c.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        this.result[ eit.key ] = eit.result;
+        this.dst[ eit.key ] = eit.dst;
       }
     }
     else
@@ -409,6 +308,24 @@ function selectSingle_pre( routine, args )
   {
     let it = this;
     let c = it.context;
+  }
+
+  /* */
+
+  function iterate( onIteration )
+  {
+    let it = this;
+    let c = it.context;
+
+    if( it.isFinal )
+    iterateFinal.call( this, onIteration );
+    else if( it.selector === c.downToken )
+    iterateDown.call( this, onIteration );
+    else if( it.isGlob )
+    iterateGlob.call( this, onIteration );
+    else
+    iterateSingle.call( this, onIteration );
+
   }
 
   /* - */
@@ -431,9 +348,9 @@ function selectSingle_pre( routine, args )
     if( !dit )
     return errNoDownThrow( it );
 
-    while( dit.query === c.downToken || dit.isFinal || counter > 0 )
+    while( dit.selector === c.downToken || dit.isFinal || counter > 0 )
     {
-      if( dit.query === c.downToken )
+      if( dit.selector === c.downToken )
       counter += 1;
       else if( !dit.isFinal )
       counter -= 1;
@@ -442,15 +359,15 @@ function selectSingle_pre( routine, args )
       return errNoDownThrow( it );
     }
 
-    _.assert( _.iterationIs( dit ) );
+    _.assert( _.lookIterationIs( dit ) );
 
     it.visitEndMaybe();
     dit.visitEndMaybe();
 
     let nit = it.iteration();
-    nit.select( it.query );
+    nit.select( it.selector );
     nit.src = dit.src;
-    nit.result = undefined;
+    nit.dst = undefined; // xxx
 
     onIteration.call( it, nit );
 
@@ -464,9 +381,8 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // let filtered = _.globFilter( it.query, it.src );
-
-    _.Looker.Defaults.onIterate.call( this, onIteration );
+    // _.Looker.Defaults.onIterate.call( this, onIteration );
+    _.Looker.Iterator.onIterate.call( this, onIteration );
 
   }
 
@@ -481,14 +397,14 @@ function selectSingle_pre( routine, args )
     {
       errDoesNotExistThrow( it );
     }
-    else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.query ) ) )
+    else if( it.context.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.selector ) ) )
     {
-      let q = _.numberFromStr( it.query );
-      it.query = _.mapKeys( it.src )[ q ];
-      if( it.query === undefined )
+      let q = _.numberFromStr( it.selector );
+      it.selector = _.mapKeys( it.src )[ q ];
+      if( it.selector === undefined )
       return errDoesNotExistThrow( it );
     }
-    else if( it.src[ it.query ] === undefined )
+    else if( it.src[ it.selector ] === undefined )
     {
       errDoesNotExistThrow( it );
     }
@@ -496,7 +412,7 @@ function selectSingle_pre( routine, args )
     {
     }
 
-    let eit = it.iteration().select( it.query ).select2( it.query ); /* !!! is select2 required? */
+    let eit = it.iteration().select( it.selector ); // .select2( it.selector ); /* !!! is select2 required? */
 
     onIteration.call( it, eit );
 
@@ -525,21 +441,21 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    if( !it.writingDown )
+    if( !it.dstWritingDown )
     return;
 
-    if( it.queryParsed.limit === undefined )
+    if( it.parsedSelector.limit === undefined )
     return;
 
-    let length = _.entityLength( it.result );
-    if( length !== it.queryParsed.limit )
+    let length = _.entityLength( it.dst );
+    if( length !== it.parsedSelector.limit )
     {
       // debugger;
       let err = _.ErrorLooking
       (
-        'Select constraint ' + _.strQuote( it.query ) + ' failed'
+        'Select constraint ' + _.strQuote( it.selector ) + ' failed'
         + ', got ' + length + ' elements'
-        + ' in query ' + _.strQuote( c.query )
+        + ' in selector ' + _.strQuote( c.selector )
         + '\nPath : ' + _.strQuote( it.path )
       );
       // debugger;
@@ -566,8 +482,8 @@ function selectSingle_pre( routine, args )
 function selectAct_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.objectIs( it.looker ) );
-  _.assert( _.prototypeOf( it.looker, it ) );
+  _.assert( _.lookerIs( it.Looker ) );
+  _.assert( it.looker === undefined );
   it.context.iteration = _.look.body( it );
   return it;
 }
@@ -576,8 +492,8 @@ selectAct_body.defaults =
 {
 
   it : null,
-  container : null,
-  query : null,
+  src : null,
+  selector : null,
   missingAction : 'undefine',
   usingIndexedAccessToMap : 0,
   usingGlob : 1,
@@ -588,16 +504,16 @@ selectAct_body.defaults =
   multiple : null,
   set : null,
   setting : null,
-  _current : null,
-  _extend : null,
+  iterationCurrent : null,
+  iteratorExtension : null,
 
-  // onSelectBegin : null,
-  // onSelectEnd : null,
   onUpBegin : null,
   onUpEnd : null,
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
+  onWhichIterable : onWhichIterable,
+  // onWhichIterable : _.look.defaults.onWhichIterable,
 
 }
 
@@ -614,7 +530,7 @@ function selectSingle_body( it )
   _.assert( arguments.length === 1, 'Expects single argument' );
   if( it.context.missingAction === 'error' && it.error )
   return it.error;
-  return it.result;
+  return it.dst;
 }
 
 _.routineExtend( selectSingle_body, selectAct );
@@ -631,13 +547,16 @@ function select_pre( routine, args )
   let o = args[ 0 ]
   if( args.length === 2 )
   {
-    if( _.iterationIs( args[ 0 ] ) )
-    o = { it : args[ 0 ], query : args[ 1 ] }
+    if( _.lookIterationIs( args[ 0 ] ) )
+    o = { it : args[ 0 ], selector : args[ 1 ] }
     else
-    o = { container : args[ 0 ], query : args[ 1 ] }
+    o = { src : args[ 0 ], selector : args[ 1 ] }
   }
 
   _.routineOptionsPreservingUndefines( routine, o );
+
+  if( o.root === null )
+  o.root = o.src;
 
   return o;
 }
@@ -647,42 +566,105 @@ function select_pre( routine, args )
 function select_body( o )
 {
 
-  if( _.arrayIs( o.query ) )
+  if( !_.strIs( o.selector ) )
   {
-    let result = [];
-    for( let q = 0 ; q < o.query.length ; q++ )
-    {
-      let o2 = _.mapExtend( null, o );
-      o2.query = o2.query[ q ];
-      result[ q ] = _.select.body.call( _, o2 );
-    }
-    return result;
+    debugger;
+    let it = _.replicateIt({ src : o.selector, onUp : onUp, onDown : onDown });
+    debugger;
+    return it.dst;
   }
 
-  if( o.onSelectBegin )
-  o = o.onSelectBegin( o );
+  return selectSingleAct( o, o.selector );
 
-  o.single = _.mapExtend( null, o );
-  o.single.multiple = o;
-  delete o.single.onSelectBegin;
-  delete o.single.onSelectEnd;
-  delete o.single.selecting;
-  delete o.single.result;
-  o.result = _.selectSingle( o.single );
+  /* */
 
-  if( o.onSelectEnd )
-  o.onSelectEnd( o );
+  function singleMake()
+  {
+    _.assert( !o.single );
 
-  return o.result;
+    let single = _.mapExtend( null, o );
+    single.multiple = o;
+    delete single.onSingleBegin;
+    delete single.onSingleEnd;
+    delete single.recursive;
+    delete single.onIsSelector;
+    delete single.dst;
+    delete single.root;
+
+    return single;
+  }
+
+  /* */
+
+  function selectSingleAct( o, selector )
+  {
+
+    // _.assert( _.strIs( selector ) );
+    _.assert( !o.recursive || !!o.onIsSelector, () => 'For recursive selection onIsSelector should be defined' );
+
+    let single = singleMake();
+
+    single.selector = selector;
+
+    if( o.onSingleBegin )
+    o.onSingleBegin( single );
+
+    _.assert( _.strIs( single.selector ) );
+
+    let dst = o.src;
+
+    _.assert( isSelector( single.selector ) );
+    // if( !isSelector( single.selector ) )
+    // return dst;
+
+    dst = _.selectSingle( single );
+
+    if( o.onSingleEnd )
+    o.onSingleEnd( single );
+
+    return dst;
+  }
+
+  /* */
+
+  function isSelector( selector )
+  {
+    if( o.onIsSelector )
+    return o.onIsSelector( selector );
+    else
+    return _.strIs( selector );
+  }
+
+  /* */
+
+  function onUp()
+  {
+    let it = this;
+    if( isSelector( it.src ) )
+    {
+      it.dst = selectSingleAct( o, it.src );
+      it.dstSetting = false;
+    }
+  }
+
+  /* */
+
+  function onDown()
+  {
+    let it = this;
+  }
+
 }
 
 _.routineExtend( select_body, selectSingle.body );
 
 var defaults = select_body.defaults;
-defaults.onSelectBegin = null;
-defaults.onSelectEnd = null;
-defaults.selecting = 1;
-defaults.result = null;
+defaults.root = null;
+defaults.onSingleBegin = null;
+defaults.onSingleEnd = null;
+defaults.onIsSelector = null;
+defaults.recursive = 0;
+// defaults.dst = null;
 
 let select = _.routineFromPreAndBody( select_pre, select_body );
 
@@ -702,7 +684,7 @@ function selectUnique_body( o )
   _.assert( arguments.length === 1 );
 
   let result = _.selectSingle.body( o );
-  if( _.arrayHas( o.aquery, '*' ) )
+  if( _.arrayHas( o.selectorArray, '*' ) )
   result = _.arrayUnique( result );
 
   return result;
@@ -717,8 +699,9 @@ let selectUnique = _.routineFromPreAndBody( selectSingle.pre, selectUnique_body 
 function _entityProbeReport( o )
 {
 
-  _.assert( arguments.length );
   o = _.routineOptions( _entityProbeReport,o );
+  _.assert( _.objectIs( o.result ) );
+  _.assert( arguments.length === 1 );
 
   /* report */
 
@@ -761,8 +744,8 @@ function entityProbeField( o )
   if( arguments[ 1 ] !== undefined )
   {
     o = Object.create( null );
-    o.container = arguments[ 0 ];
-    o.query = arguments[ 1 ];
+    o.src = arguments[ 0 ];
+    o.selector = arguments[ 1 ];
   }
 
   _.routineOptions( entityProbeField,o );
@@ -806,7 +789,7 @@ function entityProbeField( o )
   if( o.report )
   {
     if( o.title === null )
-    o.title = o.query;
+    o.title = o.selector;
     o.report = _._entityProbeReport
     ({
       title : o.title,
@@ -841,7 +824,7 @@ function entityProbe( o )
 
   /* */
 
-  _.entityMap( o.src, function( src,k )
+  _.entityMap( o.src, function( src, k )
   {
 
     o.total += 1;
@@ -938,16 +921,115 @@ entityProbe.defaults =
   title : 'Probe',
 }
 
+//
+
+function errDoesNotExistThrow( it )
+{
+  let c = it.context;
+  it.continue = false;
+  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
+  {
+    it.dst = undefined
+  }
+  else
+  {
+    debugger;
+    let err = _.ErrorLooking
+    (
+      'Cant select', _.strQuote( c.selector ),
+      '\nbecause', _.strQuote( it.selector ), 'does not exist',
+      '\nat', _.strQuote( it.path ),
+      '\nin container\n', _.toStrShort( c.src )
+    );
+    it.dst = undefined;
+    it.iterator.error = err;
+    if( c.missingAction === 'throw' )
+    throw err;
+  }
+}
+
+//
+
+function errNoDownThrow( it )
+{
+  let c = it.context;
+
+  it.continue = false;
+  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
+  {
+    it.dst = undefined
+  }
+  else
+  {
+    let err = _.ErrorLooking
+    (
+      'Cant go down', _.strQuote( c.selector ),
+      '\nbecause', _.strQuote( it.selector ), 'does not exist',
+      '\nat', _.strQuote( it.path ),
+      '\nin container\n', _.toStrShort( c.src )
+    );
+    it.dst = undefined;
+    it.iterator.error = err;
+    if( c.missingAction === 'throw' )
+    throw err;
+  }
+}
+
+//
+
+function errCantSetThrow( src, selector )
+{
+  throw _.err
+  (
+    'Cant set', _.strQuote( selector ),
+    'of container', _.toStrShort( src )
+  );
+}
+
+//
+
+function onWhichIterable( src )
+{
+  let it = this;
+
+  if( _.arrayLike( src ) )
+  {
+    return 'array-like';
+  }
+  else if( _.objectLike( src ) )
+  {
+    return 'map-like';
+  }
+  else
+  {
+    return false;
+  }
+
+}
+
+// --
+// declare looker
+// --
+
+let Looker = _.mapExtend( null, _.look.defaults.Looker );
+Looker.Looker = Looker;
+
+Looker.Iteration = _.mapExtend( null, Looker.Iteration );
+Looker.Iteration.dst = null;
+Looker.Iteration.selector = null;
+Looker.Iteration.parsedSelector = null;
+Looker.Iteration.isFinal = null;
+Looker.Iteration.isRelative = false;
+Looker.Iteration.isGlob = false;
+Looker.Iteration.dstWritingDown = true;
+Looker.Iteration.dstWriteDown = null;
+
 // --
 // declare
 // --
 
 let Proto =
 {
-
-  errDoesNotExistThrow,
-  errNoDownThrow,
-  errCantSetThrow,
 
   selectAct,
   selectSingle,
@@ -958,6 +1040,10 @@ let Proto =
   _entityProbeReport,
   entityProbeField,
   entityProbe,
+
+  errDoesNotExistThrow,
+  errNoDownThrow,
+  errCantSetThrow,
 
 }
 
