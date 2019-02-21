@@ -147,6 +147,11 @@ function selectSingle_pre( routine, args )
       this.dst = eit.dst;
     }
 
+    if( c.onSelectorNormalize )
+    debugger;
+    if( c.onSelectorNormalize )
+    c.onSelectorNormalize.call( it );
+
     if( c.onUpBegin )
     c.onUpBegin.call( it );
 
@@ -512,6 +517,7 @@ selectAct_body.defaults =
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
+  onSelectorNormalize : null,
   onWhichIterable : onWhichIterable,
   // onWhichIterable : _.look.defaults.onWhichIterable,
 
@@ -663,6 +669,7 @@ defaults.root = null;
 defaults.onSingleBegin = null;
 defaults.onSingleEnd = null;
 defaults.onIsSelector = null;
+defaults.onSelectorNormalize = null;
 defaults.recursive = 0;
 // defaults.dst = null;
 
