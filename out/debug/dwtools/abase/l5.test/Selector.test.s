@@ -21,6 +21,109 @@ var _ = _global_.wTools;
 // tests
 // --
 
+
+function selectSingle( test )
+{
+
+  test.open( 'trivial' );
+
+  /* */
+
+  var got = _.selectSingle( undefined, '' );
+  test.identical( got, undefined );
+
+  var got = _.selectSingle( undefined, '/' );
+  test.identical( got, undefined );
+
+  var got = _.selectSingle( null, '' );
+  test.identical( got, undefined );
+
+  var got = _.selectSingle( null, '/' );
+  test.identical( got, null );
+
+  /* */
+
+  var src =
+  {
+    a : 11,
+    b : 13,
+    c : 15,
+  }
+
+  var got = _.selectSingle( src, 'b' );
+  test.identical( got, 13 );
+
+  /* */
+
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    d : { name : 'name4', value : 25, date : new Date() },
+  }
+
+  var got = _.selectSingle( src, '*/name' );
+
+  test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
+
+  /* */
+
+  var src =
+  [
+    { name : 'name1', value : 13 },
+    { name : 'name2', value : 77 },
+    { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    { name : 'name4', value : 25, date : new Date() },
+  ]
+
+  var got = _.selectSingle( src, '*/name' );
+
+  test.identical( got, [ 'name1', 'name2', 'name3', 'name4' ] );
+
+  /* */
+
+  var src =
+  {
+    a : { a1 : 1, a2 : 'a2' },
+    b : { b1 : 1, b2 : 'b2' },
+    c : { c1 : 1, c2 : 'c2' },
+  }
+
+  var got = _.selectSingle( src, 'b/b2' );
+
+  test.identical( got, 'b2' );
+
+  /* */
+
+  test.close( 'trivial' );
+  test.open( 'usingIndexedAccessToMap' );
+
+  /* */
+
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
+  }
+
+  var got = _.selectSingle
+  ({
+    src : src,
+    selector : '*/1',
+    usingIndexedAccessToMap : 1,
+  });
+
+  test.identical( got, { a : 13, c : 53 } );
+
+  /* */
+
+  test.close( 'usingIndexedAccessToMap' );
+
+}
+
+//
+
 function selectTrivial( test )
 {
 
@@ -35,7 +138,7 @@ function selectTrivial( test )
   test.identical( got, undefined );
 
   var got = _.select( null, '' );
-  test.identical( got, null );
+  test.identical( got, undefined );
 
   var got = _.select( null, '/' );
   test.identical( got, null );
@@ -174,6 +277,13 @@ function selectMultiple( test )
   test.is( got[ 1 ][ 'a' ] === src.c );
   test.is( got[ 1 ][ 'b' ] === src.a.map );
 
+  test.case = 'self and empty selectors'; /* */
+  var expected = [ 'b2', { a : src, b : undefined } ];
+  var got = _.select( src, [ 'b/b2', { a : '/', b : '' } ] );
+  test.identical( got, expected );
+  test.is( got[ 0 ] === src );
+  test.is( got.length === 2 );
+
   test.close( 'array' );
 
   /* */
@@ -202,13 +312,20 @@ function selectMultiple( test )
   test.is( got[ 'array' ][ 0 ] === src.c );
   test.is( got[ 'array' ][ 1 ] === src.a.map );
 
+  test.case = 'self and empty selectors'; /* */
+  var expected = { b : undefined, array : [ src, undefined ] };
+  var got = _.select( src, { b : '', array : [ '/', '' ] } );
+  test.identical( got, expected );
+  test.is( got.array[ 0 ] === src );
+  test.is( got.array.length === 2 );
+
   test.close( 'map' );
 
 }
 
 //
 
-function selectWithSpecialSelector( test )
+function selectWithDecoratedSelector( test )
 {
 
   var src =
@@ -218,16 +335,53 @@ function selectWithSpecialSelector( test )
     c : { c1 : 1, c2 : 'c2' },
   }
 
-  function onIsSelector( selector )
-  {
-    return _.strBegins( selector, '{' ) && _.strEnds( selector, '}' );
-  }
-
-  function onSelectorNormalize()
+  function onSelector( selector )
   {
     let it = this;
-    it.selector = _.strUnjoin( it.selector, [ '{', _.any, '}' ] )
+    if( !_.strIs( selector ) )
+    return;
+    selector = _.strUnjoin( selector, [ '{', _.any, '}' ] );
+    if( selector )
+    return selector[ 1 ];
   }
+
+  /* */
+
+  test.open( 'primitive' );
+
+  test.case = 'first level'; /* */
+  var expected = { map : { name : 'name1' }, value : 13 };
+  var selector = '{a}';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got === src.a );
+
+  test.case = 'second level'; /* */
+  var expected = { name : 'name1' };
+  var selector = '{a/map}';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got === src.a.map );
+
+  test.close( 'primitive' );
+
+  /* */
+
+  test.open( 'primitive, lack of fixes' );
+
+  test.case = 'first level, lack of fixes'; /* */
+  var expected = undefined;
+  var selector = 'a';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+
+  test.case = 'second level, lack of fixes'; /* */
+  var expected = undefined;
+  var selector = 'a/map';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+
+  test.close( 'primitive, lack of fixes' );
 
   /* */
 
@@ -235,21 +389,24 @@ function selectWithSpecialSelector( test )
 
   test.case = 'first level selector'; /* */
   var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
-  var got = _.select( src, [ 'b', 'c' ] );
+  var selector = [ '{b}', '{c}' ];
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b );
   test.is( got[ 1 ] === src.c );
 
   test.case = 'second level selector'; /* */
   var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
-  var got = _.select( src, [ 'b/b2', 'c' ] );
+  var selector = [ '{b/b2}', '{c}' ];
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ] === src.c );
 
   test.case = 'complex selector'; /* */
   var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
-  var got = _.select( src, [ 'b/b2', { a : 'c', b : 'a/map' } ] );
+  var selector = [ '{b/b2}', { a : '{c}', b : '{a/map}' } ];
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ][ 'a' ] === src.c );
@@ -259,31 +416,160 @@ function selectWithSpecialSelector( test )
 
   /* */
 
+  test.open( 'array, lack of fixes' );
+
+  test.case = 'first level selector'; /* */
+  var selector = [ 'b', 'c' ];
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.case = 'second level selector'; /* */
+  var selector = [ 'b/b2', 'c' ];
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.case = 'complex selector'; /* */
+  var selector = [ 'b/b2', { a : 'c', b : 'a/map' } ];
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.close( 'array, lack of fixes' );
+
+  /* */
+
   test.open( 'map' );
 
   test.case = 'first level selector'; /* */
   var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
-  var got = _.select( src, { b : 'b', c : 'c' } );
+  var selector = { b : '{b}', c : '{c}' };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got.b === src.b );
   test.is( got.c === src.c );
 
   test.case = 'second level selector'; /* */
   var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
-  var got = _.select( src, { b2 : 'b/b2', c : 'c' } );
+  var selector = { b2 : '{b/b2}', c : '{c}' };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
   test.is( got.c === src.c );
 
   test.case = 'complex selector'; /* */
   var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
-  var got = _.select( src, { b : 'b/b2', array : [ 'c', 'a/map' ] } );
+  var selector = { b : '{b/b2}', array : [ '{c}', '{a/map}' ] };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
   test.is( got[ 'b' ] === src.b.b2 );
   test.is( got[ 'array' ][ 0 ] === src.c );
   test.is( got[ 'array' ][ 1 ] === src.a.map );
 
   test.close( 'map' );
+
+  /* */
+
+  test.open( 'map, lack of fixes' );
+
+  test.case = 'first level selector'; /* */
+  var selector = { b : 'b', c : 'c' };
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.case = 'second level selector'; /* */
+  var selector = { b2 : 'b/b2', c : 'c' };
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.case = 'complex selector'; /* */
+  var selector = { b : 'b/b2', array : [ 'c', 'a/map' ] };
+  var expected = selector;
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, selector );
+  test.is( got !== selector );
+
+  test.close( 'map, lack of fixes' );
+
+  /* */
+
+  test.open( 'mixed lack of fixes' );
+
+  test.case = 'first level selector'; /* */
+  var expected = { b : 'b', c : { c1 : 1, c2 : 'c2' } };
+  var selector = { b : 'b', c : '{c}' };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got.c === src.c );
+
+  test.case = 'second level selector'; /* */
+  var expected = { b2 : 'b2', c : 'c' };
+  var selector = { b2 : '{b/b2}', c : 'c' };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got.b2 === src.b.b2 );
+
+  test.case = 'complex selector'; /* */
+  var expected = { b : 'b2', array : [ 'c', { name : 'name1' } ] };
+  var selector = { b : '{b/b2}', array : [ 'c', '{a/map}' ] };
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got.b === src.b.b2 );
+  test.is( got.array[ 1 ] === src.a.map );
+
+  test.close( 'mixed lack of fixes' );
+
+}
+
+//
+
+function selectWithSubstrings( test )
+{
+
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { b1 : 1, b2 : 'b2' },
+    c : { c1 : 1, c2 : 'c2' },
+  }
+
+  function onSelector( selector )
+  {
+    let it = this;
+    if( !_.strIs( selector ) )
+    return;
+    selector = _.strStrip( selector, [ '{', '}' ] );
+    if( selector )
+    return selector[ 1 ];
+  }
+
+  /* */
+
+  test.open( 'primitive' );
+
+  test.case = 'first level'; /* */
+  var expected = { map : { name : 'name1' }, value : 13 };
+  var selector = '{a}';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got === src.a );
+
+  test.case = 'second level'; /* */
+  var expected = { name : 'name1' };
+  var selector = '{a/map}';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.identical( got, expected );
+  test.is( got === src.a.map );
+
+  test.close( 'primitive' );
 
 }
 
@@ -1157,7 +1443,9 @@ function selectWithDown( test )
   }
 
   var got = _.select( src, '' );
+  test.is( got === undefined );
 
+  var got = _.select( src, '/' );
   test.identical( got, src );
   test.is( got === src );
 
@@ -1585,9 +1873,12 @@ var Self =
 
   tests :
   {
+    selectSingle,
     selectTrivial,
     selectFromInstance,
     selectMultiple,
+    selectWithDecoratedSelector,
+    // g14selectWithSubstrings,
     selectMissing,
     selectSet,
     selectWithDown,
