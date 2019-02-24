@@ -278,10 +278,10 @@ function selectMultiple( test )
   test.is( got[ 1 ][ 'b' ] === src.a.map );
 
   test.case = 'self and empty selectors'; /* */
-  var expected = [ 'b2', { a : src, b : undefined } ];
+  var expected = [ 'b2', { a : src } ];
   var got = _.select( src, [ 'b/b2', { a : '/', b : '' } ] );
   test.identical( got, expected );
-  test.is( got[ 0 ] === src );
+  test.is( got[ 1 ].a === src );
   test.is( got.length === 2 );
 
   test.close( 'array' );
@@ -313,11 +313,11 @@ function selectMultiple( test )
   test.is( got[ 'array' ][ 1 ] === src.a.map );
 
   test.case = 'self and empty selectors'; /* */
-  var expected = { b : undefined, array : [ src, undefined ] };
+  var expected = { array : [ src ] };
   var got = _.select( src, { b : '', array : [ '/', '' ] } );
   test.identical( got, expected );
   test.is( got.array[ 0 ] === src );
-  test.is( got.array.length === 2 );
+  test.is( got.array.length === 1 );
 
   test.close( 'map' );
 
@@ -325,7 +325,140 @@ function selectMultiple( test )
 
 //
 
-function selectWithDecoratedSelector( test )
+function selectComposite( test )
+{
+
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    b : { b1 : 1, b2 : 'b2' },
+    c : { c1 : false, c2 : [ 'c21', 'c22' ] },
+  }
+
+  function onSelector( selector )
+  {
+    let it = this;
+    if( !_.strIs( selector ) )
+    return;
+
+    let selector2 = _.strSplit( selector, [ '{', '}' ] );
+
+    if( selector2.length < 5 )
+    return;
+
+    if( selector2.length === 5 )
+    if( selector2[ 0 ] === '' && selector2[ 1 ] === '{' && selector2[ 3 ] === '}' && selector2[ 4 ] === '' )
+    return selector2[ 2 ];
+
+    selector2 = _.strSplitsCoupledGroup({ splits : selector2, prefix : '{', postfix : '}' });
+    selector2 = selector2.map( ( els ) => _.arrayIs( els ) ? els.join( '' ) : els );
+
+    return selector2;
+  }
+
+  // function onSelector2( selector )
+  // {
+  //   if( _.strIs( selector ) )
+  //   return selector + 2;
+  //   else
+  //   return;
+  // }
+
+  /* */
+
+  test.case = 'compositeSelecting : 0, custom onSelector'; /* */
+  var expected = [ 'Some test with inlined', 'b2', '.' ];
+  var selector = 'Some test with inlined {b/b2}.';
+  var got = _.select({ src : src, selector : selector, onSelector : onSelector, compositeSelecting : 0 });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1'; /* */
+  var expected = 'Some test with inlined b2.';
+  var selector = 'Some test with inlined {b/b2}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  // test.case = 'compositeSelecting : 1, custom onSelector'; /* */
+  // var expected = 'Some test with inlined b2.';
+  // var selector = 'Some test with inlined {b/b}.';
+  // var got = _.select({ src : src, selector : selector, compositeSelecting : 1, onSelector : onSelector2 });
+  // test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, array'; /* */
+  var expected = [ 'Some test with inlined c21 and b2.', 'Some test with inlined c22 and b2.' ];
+  var selector = 'Some test with inlined {c/c2} and {b/b2}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, array + number + boolean'; /* */
+  var expected =
+  [
+    'Some test with inlined c21 and 1 and false.',
+    'Some test with inlined c22 and 1 and false.'
+  ]
+  var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 0, set manually'; /* */
+  var expected =
+  [
+    'Some test with inlined c21 and 1 and false.',
+    'Some test with inlined c22 and 1 and false.'
+  ]
+  var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : _.select.functor.onSelectorComposite(),
+    onSelectorDown : _.select.functor.onSelectorDownComposite(),
+  });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 0, set manually only onSelector'; /* */
+  var expected =
+  [
+    'Some test with inlined ',
+    [ 'c21', 'c22' ],
+    ' and ',
+    1,
+    ' and ',
+    false,
+    '.'
+  ]
+  var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : _.select.functor.onSelectorComposite(),
+  });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, set manually only onSelector'; /* */
+  var expected =
+  [
+    'Some test with inlined c21 and 1 and false.',
+    'Some test with inlined c22 and 1 and false.'
+  ]
+  var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite(),
+  });
+  test.identical( got, expected );
+
+}
+
+//
+
+function selectDecoratedFixes( test )
 {
 
   var src =
@@ -370,13 +503,13 @@ function selectWithDecoratedSelector( test )
   test.open( 'primitive, lack of fixes' );
 
   test.case = 'first level, lack of fixes'; /* */
-  var expected = undefined;
+  var expected = 'a';
   var selector = 'a';
   var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
 
   test.case = 'second level, lack of fixes'; /* */
-  var expected = undefined;
+  var expected = 'a/map';
   var selector = 'a/map';
   var got = _.select({ src : src, selector : selector, onSelector : onSelector });
   test.identical( got, expected );
@@ -531,45 +664,292 @@ function selectWithDecoratedSelector( test )
 
 //
 
-function selectWithSubstrings( test )
+function selectDecoratedInfix( test )
 {
 
   var src =
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { b1 : 1, b2 : 'b2' },
-    c : { c1 : 1, c2 : 'c2' },
+    c : { c1 : false, c2 : [ 'c21', 'c22' ] },
   }
 
   function onSelector( selector )
   {
-    let it = this;
-    if( !_.strIs( selector ) )
+    if( !_.strHas( selector, '::' ) )
     return;
-    selector = _.strStrip( selector, [ '{', '}' ] );
-    if( selector )
-    return selector[ 1 ];
+    return _.strIsolateEndOrAll( selector, '::' )[ 2 ];
   }
 
   /* */
 
-  test.open( 'primitive' );
+  test.open( 'compositeSelecting : 1' );
 
-  test.case = 'first level'; /* */
-  var expected = { map : { name : 'name1' }, value : 13 };
-  var selector = '{a}';
-  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.case = '{pre::b/b1}'; /* */
+  var expected = 1;
+  var selector = '{pre::b/b1}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
   test.identical( got, expected );
-  test.is( got === src.a );
 
-  test.case = 'second level'; /* */
-  var expected = { name : 'name1' };
-  var selector = '{a/map}';
-  var got = _.select({ src : src, selector : selector, onSelector : onSelector });
+  test.case = 'b'; /* */
+  var expected = 'b';
+  var selector = 'b';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : onSelector,
+  });
   test.identical( got, expected );
-  test.is( got === src.a.map );
 
-  test.close( 'primitive' );
+  test.case = '{pre::c/c2}'; /* */
+  var expected =
+  [
+    'c21',
+    'c22'
+  ]
+  var selector = '{pre::c/c2}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.case = 'composite selector'; /* */
+  var expected =
+  [
+    'Some test with inlined c21 and 1 and false.',
+    'Some test with inlined c22 and 1 and false.'
+  ]
+  var selector = 'Some test with inlined {pre::c/c2} and {pre::b/b1} and {pre::c/c1}.';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.close( 'compositeSelecting : 1' );
+
+  /* - */
+
+  test.open( 'compositeSelecting : 0' );
+
+  test.case = 'pre::b/b1'; /* */
+  var expected = 1;
+  var selector = 'pre::b/b1';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = 'b'; /* */
+  var expected = 'b';
+  var selector = 'b';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = 'pre::c/c2'; /* */
+  var expected =
+  [
+    'c21',
+    'c22'
+  ]
+  var selector = 'pre::c/c2';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = '{pre::c/c2'; /* */
+  var expected =
+  [
+    'c21',
+    'c22'
+  ]
+  var selector = '{pre::c/c2';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.close( 'compositeSelecting : 0' );
+
+}
+
+//
+
+function selectRecursive( test )
+{
+
+  function onSelector( selector )
+  {
+    if( !_.strIs( selector ) )
+    return;
+    if( !_.strHas( selector, '::' ) )
+    return;
+    return _.strIsolateEndOrAll( selector, '::' )[ 2 ];
+  }
+
+  /* - */
+
+  test.open( 'compositeSelecting : 0' );
+
+  var src =
+  {
+    a : { map : { name : '::c/c2/0' }, value : 13 },
+    b : { b1 : '::a/map/name', b2 : 'b2' },
+    c : { c1 : false, c2 : [ 'c21', 'c22' ] },
+  }
+
+  test.case = 'pre::b/b1'; /* */
+  var expected = 'c21';
+  var selector = 'pre::b/b1';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    recursive : Infinity,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = 'pre::b/b1, recursive : 0'; /* */
+  var expected = '::a/map/name';
+  var selector = 'pre::b/b1';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    recursive : 0,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = 'pre::b/b1, recursive : 1'; /* */
+  var expected = '::c/c2/0';
+  var selector = 'pre::b/b1';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    recursive : 1,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.case = 'pre::b/b1, recursive : 2'; /* */
+  var expected = 'c21';
+  var selector = 'pre::b/b1';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 0,
+    recursive : 2,
+    onSelector : onSelector,
+  });
+  test.identical( got, expected );
+
+  test.close( 'compositeSelecting : 0' );
+
+  /* - */
+
+  test.open( 'compositeSelecting : 0' );
+
+  var src =
+  {
+    a : { map : { name : '{::c/c2/0}' }, value : 13 },
+    b : { b1 : '{::a/map/name}', b2 : 'b2' },
+    c : { c1 : false, c2 : [ 'c21', 'c22' ] },
+  }
+
+  test.case = '{pre::b/b1}'; /* */
+  var expected = 'c21';
+  var selector = '{pre::b/b1}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    recursive : Infinity,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.case = '{pre::b/b1}, recursive : 0'; /* */
+  var expected = '{::a/map/name}';
+  var selector = '{pre::b/b1}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    recursive : 0,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.case = '{pre::b/b1}, recursive : 1'; /* */
+  var expected = '{::c/c2/0}';
+  var selector = '{pre::b/b1}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    recursive : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.case = '{pre::b/b1}, recursive : 2'; /* */
+  var expected = 'c21';
+  var selector = '{pre::b/b1}';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    recursive : 2,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector }),
+  });
+  test.identical( got, expected );
+
+  test.close( 'compositeSelecting : 0' );
 
 }
 
@@ -1653,7 +2033,7 @@ function selectWithGlobNonPrimitive( test )
     this.continue = false;
   }
 
-  function onWhichIterable( src )
+  function onIterable( src )
   {
     let it = this;
 
@@ -1705,23 +2085,23 @@ function selectWithGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  test.shouldThrowErrorSync( () => _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'throw', onWhichIterable : onWhichIterable }) );
+  test.shouldThrowErrorSync( () => _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'throw', onIterable : onIterable }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'undefine', onWhichIterable : onWhichIterable });
+  var got = _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'undefine', onIterable : onIterable });
   test.identical( got, expected );
 
   test.case = '**';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**', onWhichIterable : onWhichIterable });
+  var got = _.select({ src : src, selector : '**', onIterable : onIterable });
   test.identical( got, expected );
 
   var src = new _.Logger({ name : 'logger' });
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**/name', onWhichIterable : onWhichIterable });
+  var got = _.select({ src : src, selector : '**/name', onIterable : onIterable });
   test.identical( got, expected );
 
   test.close( 'only maps' );
@@ -1863,7 +2243,7 @@ function selectWithCallback( test )
 var Self =
 {
 
-  name : 'Tools/base/l3/Selector',
+  name : 'Tools/base/l5/Selector',
   silencing : 1,
   enabled : 1,
 
@@ -1877,8 +2257,10 @@ var Self =
     selectTrivial,
     selectFromInstance,
     selectMultiple,
-    selectWithDecoratedSelector,
-    // g14selectWithSubstrings,
+    selectComposite,
+    selectDecoratedFixes,
+    selectDecoratedInfix,
+    selectRecursive,
     selectMissing,
     selectSet,
     selectWithDown,

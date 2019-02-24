@@ -68,12 +68,12 @@ function selectSingle_pre( routine, args )
     o.prevContext = o.it.context;
   }
 
-  debugger;
+  // debugger;
   if( _.numberIs( o.selector ) /*|| o.selector === ''*/ )
   o.selectorArray = [ o.selector ];
   else
   o.selectorArray = split( o.selector );
-  debugger;
+  // debugger;
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
@@ -121,8 +121,8 @@ function selectSingle_pre( routine, args )
     o2.context = o;
     o2.onUp = up;
     o2.onDown = down;
-    o2.onIterate = iterate;
-    o2.onWhichIterable = o.onWhichIterable;
+    o2.onAscend = iterate;
+    o2.onIterable = o.onIterable;
     o2.Looker = Looker;
     o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
@@ -279,7 +279,7 @@ function selectSingle_pre( routine, args )
           selector : it.parsedSelector.glob,
           onEvaluate : ( e, k ) => k,
         });
-        it.iterable = it.onWhichIterable( it.src );
+        it.iterable = it.onIterable( it.src );
       }
       if( !it.iterable )
       debugger;
@@ -391,8 +391,8 @@ function selectSingle_pre( routine, args )
     let it = this;
     let c = it.context;
 
-    // _.Looker.Defaults.onIterate.call( this, onIteration );
-    _.Looker.Iterator.onIterate.call( this, onIteration );
+    // _.Looker.Defaults.onAscend.call( this, onIteration );
+    _.Looker.Iterator.onAscend.call( this, onIteration );
 
   }
 
@@ -523,8 +523,8 @@ selectAct_body.defaults =
   onDownEnd : null,
   onQuantitativeFail : null,
   onSelectorSplitNormalize : onSelectorSplitNormalize,
-  onWhichIterable : onWhichIterable,
-  // onWhichIterable : _.look.defaults.onWhichIterable,
+  onIterable : onIterable,
+  // onIterable : _.look.defaults.onIterable,
 
 }
 
@@ -569,6 +569,22 @@ function select_pre( routine, args )
   if( o.root === null )
   o.root = o.src;
 
+  if( o.compositeSelecting )
+  {
+    // debugger;
+    // _.assert( o.onSelector === onSelector );
+    // _.assert( o.onSelectorDown === null );
+
+    if( o.onSelector === onSelector || o.onSelector === null )
+    o.onSelector = _.select.functor.onSelectorComposite();
+    if( o.onSelectorDown === null )
+    o.onSelectorDown = _.select.functor.onSelectorDownComposite();
+
+    _.assert( _.routineIs( o.onSelector ) );
+    _.assert( _.routineIs( o.onSelectorDown ) );
+
+  }
+
   return o;
 }
 
@@ -576,76 +592,118 @@ function select_pre( routine, args )
 
 function select_body( o )
 {
-  debugger;
 
-  if( o.selector && !_.strIs( o.selector ) )
+  _.assert( !o.recursive || !!o.onSelector, () => 'For recursive selection onSelector should be defined' );
+
+  // if( o.selector && !_.strIs( o.selector ) )
   return multipleSelect( o.selector );
 
-  let selector = o.onSelector( o.selector );
-
-  if( _.primitiveIs( selector ) && !_.strIs( selector ) )
-  {
-    return _.errBadSelectorHandle( o );
-  }
-  else if( !_.strIs( selector ) )
-  {
-    // o.selector = selector;
-    return multipleSelect( selector );
-  }
-
-  return singleSelect( o, selector );
+  // let selector = onSelector( o.selector );
+  // if( selector === undefined )
+  // {
+  //   return o.selector;
+  // }
+  //
+  // if( _.primitiveIs( selector ) && !_.strIs( selector ) )
+  // {
+  //   return _.errBadSelectorHandle( o );
+  // }
+  // else if( !_.strIs( selector ) )
+  // {
+  //   return multipleSelect( selector );
+  // }
+  //
+  // return singleSelectFirst( o, selector );
 
   /* */
 
   function multipleSelect( selector )
   {
-    let it = _.replicateIt({ src : selector, onUp : onUp, onDown : onDown });
+    let it = _.replicateIt({ src : selector, onUp : onUp, onDown : onDown /*, recursive : o.recursive*/ });
     return it.dst;
   }
 
   /* */
 
-  function singleMake()
+  function multipleMake( o )
   {
-    _.assert( !o.single );
+    let multiple = _.mapExtend( null, o );
+    multiple.visited = [];
+    return multiple;
+  }
+
+  /* */
+
+  function singleOptions( o )
+  {
+    // _.assert( !o.single );
 
     let single = _.mapExtend( null, o );
     single.multiple = o;
-    delete single.onSingleBegin;
-    delete single.onSingleEnd;
-    delete single.recursive;
+
+    // delete single.onSingleBegin;
+    // delete single.onSingleEnd;
+    delete single.onSelectorUp;
+    delete single.onSelectorDown;
     delete single.onSelector;
+    delete single.recursive;
     delete single.dst;
     delete single.root;
+    delete single.compositeSelecting;
+    delete single.compositePrefix;
+    delete single.compositePostfix;
 
     return single;
   }
 
   /* */
 
-  function singleSelect( o, selector )
+  function singleSelectFirst( o, selector )
   {
-
-    debugger;
-
-    _.assert( !o.recursive || !!o.onSelector, () => 'For recursive selection onSelector should be defined' );
     _.assert( _.strIs( selector ) );
+    let dst = singleSelect( o, selector, [] );
+    return dst;
+  }
 
-    let single = singleMake();
+  /* */
+
+  function singleSelect( o, selector, visited )
+  {
+    _.assert( !_.arrayHas( visited, selector ), () => 'Loop selecting ' + selector );
+
+    visited.push( selector );
+
+    let single = singleOptions( o );
 
     single.selector = selector;
 
-    if( o.onSingleBegin )
-    o.onSingleBegin( single );
+    // if( o.onSingleBegin )
+    // o.onSingleBegin( single );
 
     _.assert( _.strIs( single.selector ) );
 
     let dst = _.selectSingle( single );
 
-    if( o.onSingleEnd )
-    o.onSingleEnd( single );
+    if( o.recursive && visited.length <= o.recursive )
+    {
+      let selector2 = o.onSelector( dst );
+      if( selector2 !== undefined )
+      return singleSelect( o, selector2, visited );
+    }
+
+    // if( o.onSingleEnd )
+    // o.onSingleEnd( single );
 
     return dst;
+  }
+
+  /* */
+
+  function onSelector( selector )
+  {
+    let it = this;
+    let normalizedSelector = o.onSelector( selector );
+    return normalizedSelector;
   }
 
   /* */
@@ -653,15 +711,20 @@ function select_body( o )
   function onUp()
   {
     let it = this;
-    debugger;
-    let selector = o.onSelector( it.src );
-    if( selector )
+    let selector = onSelector( it.src );
+    if( _.strIs( selector ) )
     {
-      it.dst = singleSelect( o, selector );
-      debugger;
-      it.dstSetting = false;
+      it.dst = singleSelectFirst( o, selector );
       it.continue = false;
+      it.dstSetting = false;
     }
+    else if( selector !== undefined )
+    {
+      it.src = selector;
+      it.iterable = it.onIterable( it.src );
+    }
+    if( o.onSelectorUp )
+    o.onSelectorUp.call( it, o );
   }
 
   /* */
@@ -669,6 +732,8 @@ function select_body( o )
   function onDown()
   {
     let it = this;
+    if( o.onSelectorDown )
+    o.onSelectorDown.call( it, o );
   }
 
 }
@@ -677,10 +742,88 @@ _.routineExtend( select_body, selectSingle.body );
 
 var defaults = select_body.defaults;
 defaults.root = null;
-defaults.onSingleBegin = null;
-defaults.onSingleEnd = null;
+// defaults.onSingleBegin = null;
+// defaults.onSingleEnd = null;
+defaults.onSelectorUp = null;
+defaults.onSelectorDown = null;
 defaults.onSelector = onSelector;
 defaults.recursive = 0;
+defaults.compositeSelecting = 0;
+
+var functor = select_body.functor = Object.create( null );
+functor.onSelectorComposite = onSelectorComposite_functor;
+functor.onSelectorDownComposite = onSelectorDownComposite_functor;
+
+function onSelectorComposite_functor( op )
+{
+
+  op = _.routineOptions( onSelectorComposite_functor, arguments );
+  op.prefix = _.arrayAs( op.prefix );
+  op.postfix = _.arrayAs( op.postfix );
+
+  _.assert( _.strsAreAll( op.prefix ) );
+  _.assert( _.strsAreAll( op.postfix ) );
+
+  return function onSelectorComposite( selector )
+  {
+
+    if( !_.strIs( selector ) )
+    return;
+
+    let selector2 = _.strSplitFast
+    ({
+      src : selector,
+      delimeter : _.arrayAppendArrays( [], [ op.prefix, op.postfix ] ),
+    });
+
+    if( selector2.length < 5 )
+    return;
+
+    if( selector2.length === 5 )
+    if( selector2[ 0 ] === '' && selector2[ 4 ] === '' )
+    if( _.strsEquivalentAny( op.prefix, selector2[ 1 ] ) && _.strsEquivalentAny( op.postfix, selector2[ 3 ] ) )
+    if( op.onSelector )
+    return op.onSelector( selector2[ 2 ] );
+    else
+    return selector2[ 2 ];
+
+    selector2 = _.strSplitsCoupledGroup({ splits : selector2, prefix : '{', postfix : '}' });
+
+    if( op.onSelector )
+    selector2 = selector2.map( ( es ) =>
+    {
+      if( !_.arrayIs( es ) )
+      return es;
+      _.assert( es.length === 3 )
+      if( op.onSelector( es[ 1 ] ) === undefined )
+      return es.join( '' );
+      else
+      return es;
+    });
+
+    selector2 = selector2.map( ( es ) => _.arrayIs( es ) ? es.join( '' ) : es );
+    selector2.rejoin = _.hold;
+
+    return selector2;
+  }
+}
+
+onSelectorComposite_functor.defaults =
+{
+  prefix : '{',
+  postfix : '}',
+  onSelector : null,
+}
+
+function onSelectorDownComposite_functor( op )
+{
+  return function onSelectorDownComposite()
+  {
+    let it = this;
+    if( it.continue && _.arrayIs( it.dst ) && it.src.rejoin === _.hold )
+    it.dst = _.strJoin( it.dst );
+  }
+}
 
 let select = _.routineFromPreAndBody( select_pre, select_body );
 
@@ -689,7 +832,6 @@ let select = _.routineFromPreAndBody( select_pre, select_body );
 let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
 
 var defaults = selectSet.defaults;
-
 defaults.set = null;
 defaults.setting = 1;
 
@@ -818,7 +960,7 @@ function onSelectorSplitNormalize()
 
 //
 
-function onWhichIterable( src )
+function onIterable( src )
 {
   let it = this;
 
