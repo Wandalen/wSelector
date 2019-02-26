@@ -63,17 +63,14 @@ function selectSingle_pre( routine, args )
     _.assert( _.objectIs( o.it.context ) );
     _.assert( _.strIs( o.it.context.selector ) );
     o.src = o.it.src;
-    debugger;
     o.selector = o.it.context.selector + _.strsShortest( o.it.iterator.upToken ) + o.selector;
     o.prevContext = o.it.context;
   }
 
-  // debugger;
-  if( _.numberIs( o.selector ) /*|| o.selector === ''*/ )
+  if( _.numberIs( o.selector ) )
   o.selectorArray = [ o.selector ];
   else
   o.selectorArray = split( o.selector );
-  // debugger;
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
@@ -101,13 +98,20 @@ function selectSingle_pre( routine, args )
       preservingQuoting : 0,
       stripping : 1,
     });
-    if( splits.length > 1 && splits[ 0 ] === '' )
-    {
-      if( splits.length === 2 && splits[ 1 ] === '' )
-      splits = [];
-      else
-      splits.splice( 0, 1 );
-    }
+
+    if( _.strBegins( selector, o.upToken ) )
+    splits.splice( 0, 1 );
+    if( _.strEnds( selector, o.upToken ) )
+    splits.pop();
+
+    // if( splits.length > 1 && splits[ 0 ] === '' )
+    // {
+    //   if( splits.length === 2 && splits[ 1 ] === '' )
+    //   splits = [];
+    //   else
+    //   splits.splice( 0, 1 );
+    // }
+
     return splits;
   }
 
@@ -158,7 +162,7 @@ function selectSingle_pre( routine, args )
     // if( c.onSelectorSplitNormalize )
     // debugger;
     // if( c.onSelectorSplitNormalize )
-    c.onSelectorSplitNormalize.call( it );
+    // c.onSelectorSplitNormalize.call( it );
 
     if( c.onUpBegin )
     c.onUpBegin.call( it );
@@ -463,7 +467,7 @@ function selectSingle_pre( routine, args )
     let length = _.entityLength( it.dst );
     if( length !== it.parsedSelector.limit )
     {
-      // debugger;
+      debugger;
       let err = _.ErrorLooking
       (
         'Select constraint ' + _.strQuote( it.selector ) + ' failed'
@@ -471,7 +475,6 @@ function selectSingle_pre( routine, args )
         + ' in selector ' + _.strQuote( c.selector )
         + '\nPath : ' + _.strQuote( it.path )
       );
-      // debugger;
       if( c.onQuantitativeFail )
       c.onQuantitativeFail.call( it, err );
       else
@@ -525,7 +528,7 @@ selectAct_body.defaults =
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
-  onSelectorSplitNormalize : onSelectorSplitNormalize,
+  // onSelectorSplitNormalize : onSelectorSplitNormalize,
   onIterable : onIterable,
   // onIterable : _.look.defaults.onIterable,
 
@@ -574,10 +577,6 @@ function select_pre( routine, args )
 
   if( o.compositeSelecting )
   {
-    // debugger;
-    // _.assert( o.onSelector === onSelector );
-    // _.assert( o.onSelectorDown === null );
-
     if( o.onSelector === onSelector || o.onSelector === null )
     o.onSelector = _.select.functor.onSelectorComposite();
     if( o.onSelectorDown === null )
@@ -585,7 +584,6 @@ function select_pre( routine, args )
 
     _.assert( _.routineIs( o.onSelector ) );
     _.assert( _.routineIs( o.onSelectorDown ) );
-
   }
 
   return o;
@@ -956,10 +954,10 @@ function onSelector( src )
 
 //
 
-function onSelectorSplitNormalize()
-{
-  let it = this;
-}
+// function onSelectorSplitNormalize()
+// {
+//   let it = this;
+// }
 
 //
 

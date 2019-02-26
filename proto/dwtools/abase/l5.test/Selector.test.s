@@ -64,7 +64,6 @@ function selectSingle( test )
   }
 
   var got = _.selectSingle( src, '*/name' );
-
   test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
 
   /* */
@@ -78,7 +77,6 @@ function selectSingle( test )
   ]
 
   var got = _.selectSingle( src, '*/name' );
-
   test.identical( got, [ 'name1', 'name2', 'name3', 'name4' ] );
 
   /* */
@@ -91,7 +89,9 @@ function selectSingle( test )
   }
 
   var got = _.selectSingle( src, 'b/b2' );
+  test.identical( got, 'b2' );
 
+  var got = _.selectSingle( src, 'b/b2/' );
   test.identical( got, 'b2' );
 
   /* */
@@ -113,7 +113,6 @@ function selectSingle( test )
     selector : '*/1',
     usingIndexedAccessToMap : 1,
   });
-
   test.identical( got, { a : 13, c : 53 } );
 
   /* */
@@ -166,7 +165,6 @@ function selectTrivial( test )
   }
 
   var got = _.select( src, '*/name' );
-
   test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
 
   /* */
@@ -180,7 +178,6 @@ function selectTrivial( test )
   ]
 
   var got = _.select( src, '*/name' );
-
   test.identical( got, [ 'name1', 'name2', 'name3', 'name4' ] );
 
   /* */
@@ -193,7 +190,6 @@ function selectTrivial( test )
   }
 
   var got = _.select( src, 'b/b2' );
-
   test.identical( got, 'b2' );
 
   /* */
@@ -215,7 +211,6 @@ function selectTrivial( test )
     selector : '*/1',
     usingIndexedAccessToMap : 1,
   });
-
   test.identical( got, { a : 13, c : 53 } );
 
   /* */
