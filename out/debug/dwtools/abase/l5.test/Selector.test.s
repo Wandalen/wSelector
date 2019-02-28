@@ -673,7 +673,7 @@ function selectDecoratedInfix( test )
   {
     if( !_.strHas( selector, '::' ) )
     return;
-    return _.strIsolateEndOrAll( selector, '::' )[ 2 ];
+    return _.strIsolateRightOrAll( selector, '::' )[ 2 ];
   }
 
   /* */
@@ -813,7 +813,7 @@ function selectRecursive( test )
     return;
     if( !_.strHas( selector, '::' ) )
     return;
-    return _.strIsolateEndOrAll( selector, '::' )[ 2 ];
+    return _.strIsolateRightOrAll( selector, '::' )[ 2 ];
   }
 
   /* - */
