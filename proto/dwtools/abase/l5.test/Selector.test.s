@@ -720,6 +720,34 @@ function selectDecoratedInfix( test )
   });
   test.identical( got, expected );
 
+  test.case = 'pre::c/c2, isStrippedSelector : 0'; /* */
+  var expected = 'pre::c/c2';
+  var selector = 'pre::c/c2';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector, isStrippedSelector : 0 }),
+  });
+  test.identical( got, expected );
+
+  test.case = 'pre::c/c2, isStrippedSelector : 1'; /* */
+  var expected =
+  [
+    'c21',
+    'c22'
+  ]
+  var selector = 'pre::c/c2';
+  var got = _.select
+  ({
+    src : src,
+    selector : selector,
+    compositeSelecting : 1,
+    onSelector : _.select.functor.onSelectorComposite({ onSelector : onSelector, isStrippedSelector : 1 }),
+  });
+  test.identical( got, expected );
+
   test.case = 'composite selector'; /* */
   var expected =
   [
@@ -1966,12 +1994,12 @@ function selectWithDown( test )
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it = _.selectAct( it.lastSelect.reiteration(), '../../b/name' );
+  var it = _.selectAct( it.lastSelected.iterationReinit(), '../../b/name' );
 
   test.identical( it.dst, src.b.name );
   test.is( it.dst === src.b.name );
 
-  var it = _.selectAct( it.lastSelect.reiteration(), '..' );
+  var it = _.selectAct( it.lastSelected.iterationReinit(), '..' );
 
   test.identical( it.dst, src.b );
   test.is( it.dst === src.b );
