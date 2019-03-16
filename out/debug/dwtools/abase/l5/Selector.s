@@ -476,7 +476,7 @@ function selectSingle_pre( routine, args )
       (
         'Select constraint ' + _.strQuote( it.selector ) + ' failed'
         + ', got ' + length + ' elements'
-        + ' for selector ' + _.strQuote( c.selector )
+        + ' using selector ' + _.strQuote( c.selector )
         + '\nAt : ' + _.strQuote( it.path )
       );
       if( c.onQuantitativeFail )
