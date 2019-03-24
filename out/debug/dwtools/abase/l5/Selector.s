@@ -900,7 +900,6 @@ function errDoesNotExistThrow( it )
   }
   else
   {
-    debugger;
     let err = _.ErrorLooking
     (
       'Cant select', _.strQuote( c.selector ),
@@ -911,7 +910,10 @@ function errDoesNotExistThrow( it )
     it.dst = undefined;
     it.iterator.error = err;
     if( c.missingAction === 'throw' )
-    throw err;
+    {
+      debugger;
+      throw err;
+    }
   }
 }
 
