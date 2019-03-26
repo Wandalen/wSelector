@@ -328,6 +328,7 @@ function selectComposite( test )
     a : { map : { name : 'name1' }, value : 13 },
     b : { b1 : 1, b2 : 'b2' },
     c : { c1 : false, c2 : [ 'c21', 'c22' ] },
+    complex : { bools : [ true, false ], string : 'is', numbers : [ 1, 3 ], strings : [ 'or', 'and' ], empty : [] },
   }
 
   function onSelector( selector )
@@ -351,14 +352,6 @@ function selectComposite( test )
     return selector2;
   }
 
-  // function onSelector2( selector )
-  // {
-  //   if( _.strIs( selector ) )
-  //   return selector + 2;
-  //   else
-  //   return;
-  // }
-
   /* */
 
   test.case = 'compositeSelecting : 0, custom onSelector'; /* */
@@ -372,12 +365,6 @@ function selectComposite( test )
   var selector = 'Some test with inlined {b/b2}.';
   var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
   test.identical( got, expected );
-
-  // test.case = 'compositeSelecting : 1, custom onSelector'; /* */
-  // var expected = 'Some test with inlined b2.';
-  // var selector = 'Some test with inlined {b/b}.';
-  // var got = _.select({ src : src, selector : selector, compositeSelecting : 1, onSelector : onSelector2 });
-  // test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1, array'; /* */
   var expected = [ 'Some test with inlined c21 and b2.', 'Some test with inlined c22 and b2.' ];
@@ -448,6 +435,30 @@ function selectComposite( test )
     onSelector : _.select.functor.onSelectorComposite(),
   });
   test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, vector of array + vector of number + vector of boolean'; /* */
+  var expected =
+  [
+    'This is combination of bools true, a string is, a numbers 1 and strings or.',
+    'This is combination of bools false, a string is, a numbers 3 and strings and.'
+  ]
+  var selector = 'This is combination of bools {complex/bools}, a string {complex/string}, a numbers {complex/numbers} and strings {complex/strings}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, empty vector'; /* */
+  var expected = [];
+  var selector = 'This is empty {complex/empty}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  test.case = 'compositeSelecting : 1, string and empty vector'; /* */
+  var expected = [];
+  var selector = 'This is combination a string {complex/string} and empty {complex/empty}.';
+  var got = _.select({ src : src, selector : selector, compositeSelecting : 1 });
+  test.identical( got, expected );
+
+  // complex : { bools : [ true, false ], string : 'is', numbers : [ 1, 3 ], strings : [ 'or', 'and' ] },
 
 }
 
