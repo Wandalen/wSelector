@@ -165,7 +165,7 @@ function selectSingle_pre( routine, args )
 
     it.dstWriteDown = function dstWriteDown( eit )
     {
-      this.dst = eit.dst;
+      it.dst = eit.dst;
     }
 
     if( c.onUpBegin )
@@ -303,7 +303,10 @@ function selectSingle_pre( routine, args )
       {
         if( c.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        this.dst.push( eit.dst );
+        if( c.preservingIteration )
+        it.dst.push( eit );
+        else
+        it.dst.push( eit.dst );
       }
     }
     else if( it.iterable === 'map-like' )
@@ -313,7 +316,10 @@ function selectSingle_pre( routine, args )
       {
         if( c.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        this.dst[ eit.key ] = eit.dst;
+        if( c.preservingIteration )
+        it.dst[ eit.key ] = eit;
+        else
+        it.dst[ eit.key ] = eit.dst;
       }
     }
     else
@@ -515,6 +521,7 @@ selectAct_body.defaults =
   src : null,
   selector : null,
   missingAction : 'undefine',
+  preservingIteration : 0,
   usingIndexedAccessToMap : 0,
   usingGlob : 1,
   trackingVisits : 1,
@@ -623,14 +630,14 @@ function select_body( o )
     return it.dst;
   }
 
-  /* */
-
-  function multipleMake( o )
-  {
-    let multiple = _.mapExtend( null, o );
-    multiple.visited = [];
-    return multiple;
-  }
+  // /* */
+  //
+  // function multipleMake( o )
+  // {
+  //   let multiple = _.mapExtend( null, o );
+  //   multiple.visited = [];
+  //   return multiple;
+  // }
 
   /* */
 
