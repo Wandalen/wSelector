@@ -189,6 +189,9 @@ function selectSingle_pre( routine, args )
     // // it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
     // it.isGlob = it.selector ? isGlob( it.selector ) : false;
 
+    // if( it.selector === null ) // yyy
+    // {}
+    // else
     if( it.selector === undefined )
     upFinal.call( this );
     else if( it.selector === sop.downToken )
@@ -213,6 +216,9 @@ function selectSingle_pre( routine, args )
     if( sop.onDownBegin )
     sop.onDownBegin.call( it );
 
+    // if( it.selector === null ) // yyy
+    // {}
+    // else
     if( it.selector === undefined )
     downFinal.call( this );
     else if( it.selector === sop.downToken )
@@ -373,6 +379,9 @@ function selectSingle_pre( routine, args )
     let it = this;
     let sop = it.selectOptions;
 
+    // if( it.selector === null ) // yyy
+    // {}
+    // else
     if( it.selector === undefined )
     iterateFinal.call( this, onIteration );
     else if( it.selector === sop.downToken )
@@ -619,6 +628,7 @@ function select_pre( routine, args )
 
   if( o.compositeSelecting )
   {
+
     if( o.onSelector === onSelector || o.onSelector === null )
     o.onSelector = _.select.functor.onSelectorComposite();
     if( o.onSelectorDown === null )
@@ -626,6 +636,7 @@ function select_pre( routine, args )
 
     _.assert( _.routineIs( o.onSelector ) );
     _.assert( _.routineIs( o.onSelectorDown ) );
+
   }
 
   return o;
@@ -872,7 +883,10 @@ function onSelectorDownComposite_functor( op )
   {
     let it = this;
     if( it.continue && _.arrayIs( it.dst ) && it.src.rejoin === _.hold )
-    it.dst = _.strJoin( it.dst );
+    {
+      debugger;
+      it.dst = _.strJoin( it.dst );
+    }
   }
 }
 
