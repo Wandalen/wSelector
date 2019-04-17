@@ -11,6 +11,13 @@
  * @file l5/Selector.s.
  */
 
+/**
+ * Collection of routines to select a sub-structure from a complex data structure.
+  @namespace Selector
+  @augments wTools
+  @memberof module:Tools/base/Selector
+*/
+
 if( typeof module !== 'undefined' )
 {
 
@@ -578,6 +585,44 @@ selectAct_body.defaults =
 
 //
 
+/**
+ * @summary Selects elements from source object( src ) using provided pattern( selector ).
+ * @description Returns iterator with result of selection
+ * @param {} src Source entity.
+ * @param {String} selector Pattern that matches against elements in a entity.
+ *
+ * @example //select element with key 'a1'
+ * let it = _.selectAct( { a1 : 1, a2 : 2 }, 'a1' );
+ * console.log( it.dst )//1
+ *
+ * @example //select any that starts with 'a'
+ * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*' );
+ * console.log( it.dst ) // { a1 : 1, a2 : 1 }
+ *
+ * @example //select with constraint, only one element should be selected
+ * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=1' );
+ * console.log( it.error ) // error
+ *
+ * @example //select with constraint, two elements
+ * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=2' );
+ * console.log( it.dst ) // { a1 : 1, a2 : 1 }
+ *
+ * @example //select inner element using path selector
+ * let it = _.selectSingle( { a : { b : { c : 1 } } }, 'a/b' );
+ * console.log( it.dst ) //{ c : 1 }
+ *
+ * @example //select value of each property with name 'x'
+ * let it = _.selectSingle( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' );
+ * console.log( it.dst ) //{a: 1, b: 2, c: 3}
+ *
+ * @example // select root
+ * let it = _.selectSingle( { a : { b : { c : 1 } } }, '/' );
+ * console.log( it.dst )
+ *
+ * @function selectAct
+ * @memberof module:Tools/base/Selector.Selector
+*/
+
 let selectAct = _.routineFromPreAndBody( selectSingle_pre, selectAct_body );
 
 //
@@ -595,6 +640,37 @@ function selectSingle_body( it )
 _.routineExtend( selectSingle_body, selectAct );
 
 //
+
+/**
+ * @summary Selects elements from source object( src ) using provided pattern( selector ).
+ * @description Short-cur for {@link module:Tools/base/Selector.Selector.selectSingle _.selectAct }. Returns found element(s) instead of iterator.
+ * @param {} src Source entity.
+ * @param {String} selector Pattern that matches against elements in a entity.
+ *
+ * @example //select element with key 'a1'
+ * _.selectSingle( { a1 : 1, a2 : 2 }, 'a1' ); // 1
+ *
+ * @example //select any that starts with 'a'
+ * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*' ); // { a1 : 1, a2 : 1 }
+ *
+ * @example //select with constraint, only one element should be selected
+ * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=1' ); // error
+ *
+ * @example //select with constraint, two elements
+ * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=2' ); // { a1 : 1, a2 : 1 }
+ *
+ * @example //select inner element using path selector
+ * _.selectSingle( { a : { b : { c : 1 } } }, 'a/b' ); //{ c : 1 }
+ *
+ * @example //select value of each property with name 'x'
+ * _.selectSingle( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' ); //{a: 1, b: 2, c: 3}
+ *
+ * @example // select root
+ * _.selectSingle( { a : { b : { c : 1 } } }, '/' );
+ *
+ * @function selectSingle
+ * @memberof module:Tools/base/Selector.Selector
+*/
 
 let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
 
@@ -876,9 +952,62 @@ function onSelectorDownComposite_functor( op )
   }
 }
 
+/**
+ * @summary Selects elements from source object( src ) using provided pattern( selector ).
+ * @param {} src Source entity.
+ * @param {String} selector Pattern that matches against elements in a entity.
+ *
+ * @example //select element with key 'a1'
+ * _.select( { a1 : 1, a2 : 2 }, 'a1' ); // 1
+ *
+ * @example //select any that starts with 'a'
+ * _.select( { a1 : 1, a2 : 2 }, 'a*' ); // { a1 : 1, a2 : 1 }
+ *
+ * @example //select with constraint, only one element should be selected
+ * _.select( { a1 : 1, a2 : 2 }, 'a*=1' ); // error
+ *
+ * @example //select with constraint, two elements
+ * _.select( { a1 : 1, a2 : 2 }, 'a*=2' ); // { a1 : 1, a2 : 1 }
+ *
+ * @example //select inner element using path selector
+ * _.select( { a : { b : { c : 1 } } }, 'a/b' ); //{ c : 1 }
+ *
+ * @example //select value of each property with name 'x'
+ * _.select( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' ); //{a: 1, b: 2, c: 3}
+ *
+ * @example // select root
+ * _.select( { a : { b : { c : 1 } } }, '/' );
+ *
+ * @example // select from array
+ * _.selectSingle( [ 'a', 'b', 'c' ], '2' ); // 'c'
+ *
+ * @example // select second element from each string of array
+ * _.selectSingle( [ 'ax', 'by', 'cz' ], '*\/1' ); // [ 'x', 'y', 'z' ]
+ *
+ * @function select
+ * @memberof module:Tools/base/Selector.Selector
+*/
+
 let select = _.routineFromPreAndBody( select_pre, select_body );
 
 //
+
+/**
+ * @summary Short-cut for {@link module:Tools/base/Selector.Selector.selectSingle _.selectSingle }. Sets value of element selected by pattern ( o.selector ).
+ * @param {Object} o Options map
+ * @param {} o.src Source entity
+ * @param {String} o.selector Pattern to select element(s).
+ * @param {} o.set=null Entity to set.
+ * @param {Boolean} o.setting=1 Allows to set value for a property or create a new property if needed.
+ *
+ * @example
+ * let src = {};
+   _.selectSet({ src : src, selector : 'a', set : 1 });
+   console.log( src.a ); //1
+ *
+ * @function selectSet
+ * @memberof module:Tools/base/Selector.Selector
+*/
 
 let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
 
@@ -887,6 +1016,15 @@ defaults.set = null;
 defaults.setting = 1;
 
 //
+
+/**
+ * @summary Short-cut for {@link module:Tools/base/Selector.Selector.selectSingle _.selectSingle }. Returns only unique elements.
+ * @param {} src Source entity.
+ * @param {String} selector Pattern that matches against elements in a entity.
+ *
+ * @function select
+ * @memberof module:Tools/base/Selector.Selector
+*/
 
 function selectUnique_body( o )
 {
