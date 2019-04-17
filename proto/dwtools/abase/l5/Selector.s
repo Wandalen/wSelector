@@ -44,6 +44,18 @@ function selectSingle_pre( routine, args )
     o = { src : args[ 0 ], selector : args[ 1 ] }
   }
 
+  // let isGlob;
+  // if( _.path && _.path.isGlob )
+  // isGlob = function( selector )
+  // {
+  //   return _.path.isGlob( selector )
+  // }
+  // else
+  // isGlob = function isGlob( selector )
+  // {
+  //   return _.strHas( selector, '*' );
+  // }
+
   _.routineOptionsPreservingUndefines( routine, o );
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 || args.length === 2 );
@@ -126,7 +138,7 @@ function selectSingle_pre( routine, args )
     o2.onUp = up;
     o2.onDown = down;
     o2.onAscend = iterate;
-    o2.onIterable = o.onIterable;
+    o2.srcChanged = o.srcChanged;
     o2.Looker = Looker;
     o2.trackingVisits = o.trackingVisits;
     o2.it = o.it;
@@ -158,9 +170,9 @@ function selectSingle_pre( routine, args )
   function up()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
-    it.selector = c.selectorArray[ it.logicalLevel-1 ];
+    it.selector = sop.selectorArray[ it.logicalLevel-1 ];
     it.dst = it.src;
 
     it.dstWriteDown = function dstWriteDown( eit )
@@ -168,24 +180,26 @@ function selectSingle_pre( routine, args )
       it.dst = eit.dst;
     }
 
-    if( c.onUpBegin )
-    c.onUpBegin.call( it );
+    if( sop.onUpBegin )
+    sop.onUpBegin.call( it );
 
-    it.isRelative = it.selector === c.downToken;
-    it.isFinal = it.selector === undefined;
-    it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
+    sop.selectorChanged.call( it ); // xxx
 
-    if( it.isFinal )
+    // it.isRelative = it.selector === sop.downToken;
+    // // it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
+    // it.isGlob = it.selector ? isGlob( it.selector ) : false;
+
+    if( it.selector === undefined )
     upFinal.call( this );
-    else if( it.selector === c.downToken )
+    else if( it.selector === sop.downToken )
     upDown.call( this );
     else if( it.isGlob )
     upGlob.call( this );
     else
     upSingle.call( this );
 
-    if( c.onUpEnd )
-    c.onUpEnd.call( it );
+    if( sop.onUpEnd )
+    sop.onUpEnd.call( it );
 
   }
 
@@ -194,30 +208,30 @@ function selectSingle_pre( routine, args )
   function down()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
-    if( c.onDownBegin )
-    c.onDownBegin.call( it );
+    if( sop.onDownBegin )
+    sop.onDownBegin.call( it );
 
-    if( it.isFinal )
+    if( it.selector === undefined )
     downFinal.call( this );
-    else if( it.selector === c.downToken )
+    else if( it.selector === sop.downToken )
     downDown.call( this );
     else if( it.isGlob )
     downGlob.call( this );
     else
     downSingle.call( this );
 
-    if( c.setting && it.isFinal )
+    if( sop.setting && it.selector === undefined )
     {
       if( it.down && !_.primitiveIs( it.down.src ) )
-      it.down.src[ it.key ] = c.set;
+      it.down.src[ it.key ] = sop.set;
       else
-      errCantSetThrow( it.down.src, it.key );
+      errCantSetThrow( /*it.down.src,*/ it );
     }
 
-    if( c.onDownEnd )
-    c.onDownEnd.call( it );
+    if( sop.onDownEnd )
+    sop.onDownEnd.call( it );
 
     if( it.down )
     {
@@ -226,7 +240,6 @@ function selectSingle_pre( routine, args )
       it.down.dstWriteDown( it );
     }
 
-    // return it.dst;
   }
 
   /* - */
@@ -234,7 +247,7 @@ function selectSingle_pre( routine, args )
   function upFinal()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     it.continue = false;
     it.dst = it.src;
@@ -246,7 +259,7 @@ function selectSingle_pre( routine, args )
   function upDown()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     _.assert( it.isRelative === true );
 
@@ -257,30 +270,32 @@ function selectSingle_pre( routine, args )
   function upGlob()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     /* !!! qqq : teach it to parse more than single "*=" */
 
-    let regexp = /(.*){?\*=(\d*)}?(.*)/;
-    let match = it.selector.match( regexp );
-    it.parsedSelector = it.parsedSelector || Object.create( null );
+    sop.globParse.call( it );
 
-    if( !match )
-    {
-      it.parsedSelector.glob = it.selector;
-    }
-    else
-    {
-      _.sure( _.strCount( it.selector, '=' ) <= 1, () => 'Does not support selector with several assertions, like ' + _.strQuote( it.selector ) );
-      it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
-      if( match[ 2 ].length > 0 )
-      {
-        it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
-        _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
-      }
-    }
+    // let regexp = /(.*){?\*=(\d*)}?(.*)/;
+    // let match = it.selector.match( regexp );
+    // it.parsedSelector = it.parsedSelector || Object.create( null );
+    //
+    // if( !match )
+    // {
+    //   it.parsedSelector.glob = it.selector;
+    // }
+    // else
+    // {
+    //   _.sure( _.strCount( it.selector, '=' ) <= 1, () => 'Does not support selector with several assertions, like ' + _.strQuote( it.selector ) );
+    //   it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
+    //   if( match[ 2 ].length > 0 )
+    //   {
+    //     it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
+    //     _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
+    //   }
+    // }
 
-    if( it.parsedSelector.glob !== '*' && c.usingGlob )
+    if( it.parsedSelector.glob !== '*' && sop.usingGlob )
     {
       if( it.iterable )
       {
@@ -290,7 +305,7 @@ function selectSingle_pre( routine, args )
           selector : it.parsedSelector.glob,
           onEvaluate : ( e, k ) => k,
         });
-        it.iterable = it.onIterable( it.src );
+        it.srcChanged(); // xxx
       }
       if( !it.iterable )
       debugger;
@@ -301,9 +316,9 @@ function selectSingle_pre( routine, args )
       it.dst = [];
       it.dstWriteDown = function( eit )
       {
-        if( c.missingAction === 'ignore' && eit.dst === undefined )
+        if( sop.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        if( c.preservingIteration )
+        if( sop.preservingIteration )
         it.dst.push( eit );
         else
         it.dst.push( eit.dst );
@@ -314,9 +329,9 @@ function selectSingle_pre( routine, args )
       it.dst = Object.create( null );
       it.dstWriteDown = function( eit )
       {
-        if( c.missingAction === 'ignore' && eit.dst === undefined )
+        if( sop.missingAction === 'ignore' && eit.dst === undefined )
         return;
-        if( c.preservingIteration )
+        if( sop.preservingIteration )
         it.dst[ eit.key ] = eit;
         else
         it.dst[ eit.key ] = eit.dst;
@@ -334,19 +349,33 @@ function selectSingle_pre( routine, args )
   function upSingle()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
   }
+
+  /* */
+
+  // function selectorChanged()
+  // {
+  //   let it = this;
+  //   let sop = it.selectOptions;
+  //
+  //   // xxx
+  //   it.isRelative = it.selector === sop.downToken;
+  //   // it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
+  //   it.isGlob = it.selector ? isGlob( it.selector ) : false;
+  //
+  // }
 
   /* */
 
   function iterate( onIteration )
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
-    if( it.isFinal )
+    if( it.selector === undefined )
     iterateFinal.call( this, onIteration );
-    else if( it.selector === c.downToken )
+    else if( it.selector === sop.downToken )
     iterateDown.call( this, onIteration );
     else if( it.isGlob )
     iterateGlob.call( this, onIteration );
@@ -360,7 +389,7 @@ function selectSingle_pre( routine, args )
   function iterateFinal( onIteration )
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
   }
 
   /* */
@@ -368,18 +397,18 @@ function selectSingle_pre( routine, args )
   function iterateDown( onIteration )
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
     let counter = 0;
     let dit = it.down;
 
     if( !dit )
     return errNoDownThrow( it );
 
-    while( dit.selector === c.downToken || dit.isFinal || counter > 0 )
+    while( dit.selector === sop.downToken || dit.selector === undefined || counter > 0 )
     {
-      if( dit.selector === c.downToken )
+      if( dit.selector === sop.downToken )
       counter += 1;
-      else if( !dit.isFinal )
+      else if( dit.selector !== undefined )
       counter -= 1;
       dit = dit.down;
       if( !dit )
@@ -406,7 +435,7 @@ function selectSingle_pre( routine, args )
   function iterateGlob( onIteration )
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     // _.Looker.Defaults.onAscend.call( this, onIteration );
     _.Looker.Iterator.onAscend.call( this, onIteration );
@@ -418,7 +447,7 @@ function selectSingle_pre( routine, args )
   function iterateSingle( onIteration )
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     if( _.primitiveIs( it.src ) )
     {
@@ -450,7 +479,7 @@ function selectSingle_pre( routine, args )
   function downFinal()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
   }
 
   /* */
@@ -458,7 +487,7 @@ function selectSingle_pre( routine, args )
   function downDown()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
   }
 
   /* */
@@ -466,7 +495,7 @@ function selectSingle_pre( routine, args )
   function downGlob()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
 
     if( !it.dstWritingDown )
     return;
@@ -482,11 +511,11 @@ function selectSingle_pre( routine, args )
       (
         'Select constraint ' + _.strQuote( it.selector ) + ' failed'
         + ', got ' + length + ' elements'
-        + ' using selector ' + _.strQuote( c.selector )
+        + ' using selector ' + _.strQuote( sop.selector )
         + '\nAt : ' + _.strQuote( it.path )
       );
-      if( c.onQuantitativeFail )
-      c.onQuantitativeFail.call( it, err );
+      if( sop.onQuantitativeFail )
+      sop.onQuantitativeFail.call( it, err );
       else
       throw err;
     }
@@ -498,7 +527,7 @@ function selectSingle_pre( routine, args )
   function downSingle()
   {
     let it = this;
-    let c = it.selectOptions;
+    let sop = it.selectOptions;
   }
 
 }
@@ -540,7 +569,10 @@ selectAct_body.defaults =
   onDownBegin : null,
   onDownEnd : null,
   onQuantitativeFail : null,
-  onIterable : onIterable,
+
+  srcChanged : srcChanged,
+  selectorChanged : selectorChanged,
+  globParse : globParse,
 
 }
 
@@ -691,7 +723,7 @@ function select_body( o )
 
     if( o.recursive && visited.length <= o.recursive )
     {
-      let selector2 = o.onSelector( dst );
+      let selector2 = o.onSelector.call( it, dst );
       if( selector2 !== undefined )
       {
         it.src = selector2;
@@ -708,7 +740,7 @@ function select_body( o )
   {
     let it = this;
 
-    let selector = o.onSelector( it.src );
+    let selector = o.onSelector.call( it, it.src );
     if( _.strIs( selector ) )
     {
       it.src = selector;
@@ -725,7 +757,7 @@ function select_body( o )
         it.composite = true;
       }
       it.src = selector;
-      it.iterable = it.onIterable( it.src );
+      it.srcChanged();
     }
 
     if( o.onSelectorUp )
@@ -771,6 +803,7 @@ function onSelectorComposite_functor( fop )
 
   return function onSelectorComposite( selector )
   {
+    let it = this;
 
     if( !_.strIs( selector ) )
     return;
@@ -789,14 +822,14 @@ function onSelectorComposite_functor( fop )
     if( selector2.length < 3 )
     {
       if( fop.isStrippedSelector )
-      return fop.onSelector( selector );
+      return fop.onSelector.call( it, selector );
       else
       return;
     }
 
     if( selector2.length === 3 )
     if( _.strsEquivalentAny( fop.prefix, selector2[ 0 ] ) && _.strsEquivalentAny( fop.postfix, selector2[ 2 ] ) )
-    return fop.onSelector( selector2[ 1 ] );
+    return fop.onSelector.call( it, selector2[ 1 ] );
 
     selector2 = _.strSplitsCoupledGroup({ splits : selector2, prefix : '{', postfix : '}' });
 
@@ -806,7 +839,7 @@ function onSelectorComposite_functor( fop )
       if( !_.arrayIs( split ) )
       return split;
       _.assert( split.length === 3 )
-      if( fop.onSelector( split[ 1 ] ) === undefined )
+      if( fop.onSelector.call( it, split[ 1 ] ) === undefined )
       return split.join( '' );
       else
       return split;
@@ -899,66 +932,70 @@ function errBadSelectorHandle( o )
 
 function errDoesNotExistThrow( it )
 {
-  let c = it.selectOptions;
+  let sop = it.selectOptions;
   it.continue = false;
-  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
+
+  debugger;
+
+  if( sop.missingAction === 'undefine' || sop.missingAction === 'ignore' )
   {
-    it.dst = undefined
+    it.dst = undefined;
   }
   else
   {
     let err = _.ErrorLooking
     (
-      'Cant select', _.strQuote( c.selector ),
+      'Cant select', _.strQuote( sop.selector ),
       '\nbecause', _.strQuote( it.selector ), 'does not exist',
       '\nat', _.strQuote( it.path ),
-      '\nin container\n', _.toStrShort( c.src )
+      '\nin container\n', _.toStrShort( sop.src )
     );
     it.dst = undefined;
     it.iterator.error = err;
-    if( c.missingAction === 'throw' )
+    if( sop.missingAction === 'throw' )
     {
       debugger;
       throw err;
     }
   }
+
 }
 
 //
 
 function errNoDownThrow( it )
 {
-  let c = it.selectOptions;
+  let sop = it.selectOptions;
 
   it.continue = false;
-  if( c.missingAction === 'undefine' || c.missingAction === 'ignore' )
+  if( sop.missingAction === 'undefine' || sop.missingAction === 'ignore' )
   {
-    it.dst = undefined
+    it.dst = undefined;
   }
   else
   {
     let err = _.ErrorLooking
     (
-      'Cant go down', _.strQuote( c.selector ),
+      'Cant go down', _.strQuote( sop.selector ),
       '\nbecause', _.strQuote( it.selector ), 'does not exist',
       '\nat', _.strQuote( it.path ),
-      '\nin container\n', _.toStrShort( c.src )
+      '\nin container\n', _.toStrShort( sop.src )
     );
     it.dst = undefined;
     it.iterator.error = err;
-    if( c.missingAction === 'throw' )
+    if( sop.missingAction === 'throw' )
     throw err;
   }
 }
 
 //
 
-function errCantSetThrow( src, selector )
+function errCantSetThrow( it )
 {
   throw _.err
   (
-    'Cant set', _.strQuote( selector ),
-    'of container', _.toStrShort( src )
+    'Cant set', _.strQuote( it.key )
+    // 'of container', _.toStrShort( src )
   );
 }
 
@@ -973,21 +1010,79 @@ function onSelector( src )
 
 //
 
-function onIterable( src )
+function srcChanged()
 {
   let it = this;
 
-  if( _.arrayLike( src ) )
+  _.assert( arguments.length === 0 );
+
+  if( _.arrayLike( it.src ) )
   {
-    return 'array-like';
+    it.iterable = 'array-like';
   }
-  else if( _.objectLike( src ) )
+  else if( _.objectIs( it.src ) )
   {
-    return 'map-like';
+    it.iterable = 'map-like';
   }
   else
   {
-    return false;
+    it.iterable = false;
+  }
+
+}
+
+//
+
+function selectorChanged()
+{
+  let it = this;
+  let sop = it.selectOptions;
+
+  let isGlob;
+  if( _.path && _.path.isGlob )
+  isGlob = function( selector )
+  {
+    return _.path.isGlob( selector )
+  }
+  else
+  isGlob = function isGlob( selector )
+  {
+    return _.strHas( selector, '*' );
+  }
+
+  _.assert( arguments.length === 0 ); // xxx
+
+  it.isRelative = it.selector === sop.downToken;
+  it.isGlob = it.selector ? isGlob( it.selector ) : false;
+
+}
+
+//
+
+function globParse()
+{
+  let it = this;
+  let sop = it.selectOptions;
+
+  _.assert( arguments.length === 0 );
+
+  let regexp = /(.*){?\*=(\d*)}?(.*)/;
+  let match = it.selector.match( regexp );
+  it.parsedSelector = it.parsedSelector || Object.create( null );
+
+  if( !match )
+  {
+    it.parsedSelector.glob = it.selector;
+  }
+  else
+  {
+    _.sure( _.strCount( it.selector, '=' ) <= 1, () => 'Does not support selector with several assertions, like ' + _.strQuote( it.selector ) );
+    it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
+    if( match[ 2 ].length > 0 )
+    {
+      it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
+      _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
+    }
   }
 
 }
@@ -1003,7 +1098,6 @@ Looker.Iteration = _.mapExtend( null, Looker.Iteration );
 Looker.Iteration.dst = null;
 Looker.Iteration.selector = null;
 Looker.Iteration.parsedSelector = null;
-Looker.Iteration.isFinal = null;
 Looker.Iteration.isRelative = false;
 Looker.Iteration.isGlob = false;
 Looker.Iteration.dstWritingDown = true;
@@ -1013,7 +1107,17 @@ Looker.Iteration.dstWriteDown = null;
 // declare
 // --
 
-let Proto =
+let ExtendSelect =
+{
+
+  onSelector,
+  srcChanged,
+  selectorChanged,
+  globParse,
+
+}
+
+let ExtendTools =
 {
 
   selectAct,
@@ -1030,7 +1134,8 @@ let Proto =
 
 }
 
-_.mapSupplement( Self, Proto );
+_.mapSupplement( Self, ExtendTools );
+_.mapSupplement( select, ExtendSelect );
 
 // --
 // export

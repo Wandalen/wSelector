@@ -1765,20 +1765,26 @@ function selectSet( test )
 
   /* */
 
-  var src = {};
-  var expected = {};
+  test.shouldThrowErrorSync( () =>
+  {
 
-  var got = _.select
-  ({
-    src : src,
-    selector : '/1',
-    set : {},
-    setting : 1,
-    usingIndexedAccessToMap : 1,
+    var src = {};
+    var expected = {};
+
+    debugger;
+    var got = _.select
+    ({
+      src : src,
+      selector : '/1',
+      set : {},
+      setting : 1,
+      usingIndexedAccessToMap : 1,
+    });
+
+    test.identical( got, undefined );
+    test.identical( src, expected );
+
   });
-
-  test.identical( got, undefined );
-  test.identical( src, expected );
 
   /* */
 
@@ -2067,21 +2073,23 @@ function selectWithGlobNonPrimitive( test )
     this.continue = false;
   }
 
-  function onIterable( src )
+  function srcChanged()
   {
     let it = this;
 
-    if( _.arrayLike( src ) )
+    _.assert( arguments.length === 0 );
+
+    if( _.arrayLike( it.src ) )
     {
-      return 'array-like';
+      it.iterable = 'array-like';
     }
-    else if( _.mapLike( src ) )
+    else if( _.mapLike( it.src ) )
     {
-      return 'map-like';
+      it.iterable = 'map-like';
     }
     else
     {
-      return false;
+      it.iterable = false;
     }
 
   }
@@ -2119,23 +2127,23 @@ function selectWithGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  test.shouldThrowErrorSync( () => _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'throw', onIterable : onIterable }) );
+  test.shouldThrowErrorSync( () => _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'throw', srcChanged : srcChanged }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'undefine', onIterable : onIterable });
+  var got = _.select({ src : src, selector : '**', onUpBegin : onUpBegin, missingAction : 'undefine', srcChanged : srcChanged });
   test.identical( got, expected );
 
   test.case = '**';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**', onIterable : onIterable });
+  var got = _.select({ src : src, selector : '**', srcChanged : srcChanged });
   test.identical( got, expected );
 
   var src = new _.Logger({ name : 'logger' });
   var expected = undefined;
-  var got = _.select({ src : src, selector : '**/name', onIterable : onIterable });
+  var got = _.select({ src : src, selector : '**/name', srcChanged : srcChanged });
   test.identical( got, expected );
 
   test.close( 'only maps' );
@@ -2144,12 +2152,14 @@ function selectWithGlobNonPrimitive( test )
 
   test.open( 'not only maps' );
 
+  test.case = 'setup';
   var src = new _.Logger();
   var expected = src;
   var got = _.select( src, '**' );
   test.is( got !== expected );
   test.is( _.mapIs( got ) );
   test.is( _.entityLength( got ) > 10 );
+
 
   test.case = 'Composes/name';
   var src = new _.Logger({ name : 'logger' });
@@ -2280,6 +2290,7 @@ var Self =
   name : 'Tools/base/l5/Selector',
   silencing : 1,
   enabled : 1,
+  // routineTimeOut : 60000, // xxx
 
   context :
   {
