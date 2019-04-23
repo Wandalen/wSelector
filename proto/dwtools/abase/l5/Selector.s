@@ -1086,7 +1086,7 @@ function errDoesNotExistThrow( it )
   let sop = it.selectOptions;
   it.continue = false;
 
-  debugger;
+  // debugger;
 
   if( sop.missingAction === 'undefine' || sop.missingAction === 'ignore' )
   {
