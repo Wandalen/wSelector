@@ -13,7 +13,7 @@
 
 /**
  * Collection of routines to select a sub-structure from a complex data structure.
-  @namespace wTools(module:Selector)
+  @namespace Tools( module::Selector )
   @memberof module:Tools/base/Selector
 */
 
@@ -628,7 +628,7 @@ selectAct_body.defaults =
  * console.log( it.dst )
  *
  * @function selectAct
- * @memberof module:Tools/base/Selector.wTools(module:Selector)
+ * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
 let selectAct = _.routineFromPreAndBody( selectSingle_pre, selectAct_body );
@@ -651,7 +651,7 @@ _.routineExtend( selectSingle_body, selectAct );
 
 /**
  * @summary Selects elements from source object( src ) using provided pattern( selector ).
- * @description Short-cur for {@link module:Tools/base/Selector.wTools(module:Selector).selectSingle _.selectAct }. Returns found element(s) instead of iterator.
+ * @description Short-cur for {@link module:Tools/base/Selector.Tools( module::Selector ).selectSingle _.selectAct }. Returns found element(s) instead of iterator.
  * @param {} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
@@ -677,7 +677,7 @@ _.routineExtend( selectSingle_body, selectAct );
  * _.selectSingle( { a : { b : { c : 1 } } }, '/' );
  *
  * @function selectSingle
- * @memberof module:Tools/base/Selector.wTools(module:Selector)
+ * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
 let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
@@ -998,7 +998,7 @@ function onSelectorDownComposite_functor( op )
  * _.selectSingle( [ 'ax', 'by', 'cz' ], '*\/1' ); // [ 'x', 'y', 'z' ]
  *
  * @function select
- * @memberof module:Tools/base/Selector.wTools(module:Selector)
+ * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
 let select = _.routineFromPreAndBody( select_pre, select_body );
@@ -1006,7 +1006,7 @@ let select = _.routineFromPreAndBody( select_pre, select_body );
 //
 
 /**
- * @summary Short-cut for {@link module:Tools/base/Selector.wTools(module:Selector).selectSingle _.selectSingle }. Sets value of element selected by pattern ( o.selector ).
+ * @summary Short-cut for {@link module:Tools/base/Selector.Tools( module::Selector ).selectSingle _.selectSingle }. Sets value of element selected by pattern ( o.selector ).
  * @param {Object} o Options map
  * @param {} o.src Source entity
  * @param {String} o.selector Pattern to select element(s).
@@ -1019,7 +1019,7 @@ let select = _.routineFromPreAndBody( select_pre, select_body );
    console.log( src.a ); //1
  *
  * @function selectSet
- * @memberof module:Tools/base/Selector.wTools(module:Selector)
+ * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
 let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
@@ -1031,12 +1031,12 @@ defaults.setting = 1;
 //
 
 /**
- * @summary Short-cut for {@link module:Tools/base/Selector.wTools(module:Selector).selectSingle _.selectSingle }. Returns only unique elements.
+ * @summary Short-cut for {@link module:Tools/base/Selector.Tools( module::Selector ).selectSingle _.selectSingle }. Returns only unique elements.
  * @param {} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @function select
- * @memberof module:Tools/base/Selector.wTools(module:Selector)
+ * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
 function selectUnique_body( o )
