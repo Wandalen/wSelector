@@ -959,7 +959,7 @@ function onSelectorDownComposite_functor( op )
     let it = this;
     if( it.continue && _.arrayIs( it.dst ) && it.src.rejoin === _.hold )
     {
-      debugger;
+      // debugger;
       it.dst = _.strJoin( it.dst );
     }
   }
