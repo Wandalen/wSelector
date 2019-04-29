@@ -737,7 +737,7 @@ function select_body( o )
       onDown : onDown,
     }
 
-    o2.iterationPreserve = Object.create( null );
+    o2.iterationPreserve = Object.create( null ); 
     o2.iterationPreserve.composite = false;
     o2.iterationPreserve.compositeRoot = null;
 
@@ -959,7 +959,6 @@ function onSelectorDownComposite_functor( op )
     let it = this;
     if( it.continue && _.arrayIs( it.dst ) && it.src.rejoin === _.hold )
     {
-      // debugger;
       it.dst = _.strJoin( it.dst );
     }
   }
