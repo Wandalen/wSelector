@@ -21,8 +21,8 @@ execution :
 
 path :
 
-  repository : git+https://github.com/Wandalen/wSelector.git
-  bugs : https://github.com/Wandalen/wSelector/issues
+  repository : git+https:///github.com/Wandalen/wSelector.git
+  bugs : https:///github.com/Wandalen/wSelector/issues
 
 step :
 

@@ -737,7 +737,7 @@ function select_body( o )
       onDown : onDown,
     }
 
-    o2.iterationPreserve = Object.create( null ); 
+    o2.iterationPreserve = Object.create( null );
     o2.iterationPreserve.composite = false;
     o2.iterationPreserve.compositeRoot = null;
 
@@ -1093,6 +1093,7 @@ function errDoesNotExistThrow( it )
   }
   else
   {
+    debugger;
     let err = _.ErrorLooking
     (
       'Cant select', _.strQuote( sop.selector ),
