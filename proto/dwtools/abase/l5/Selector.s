@@ -521,12 +521,15 @@ function selectSingle_pre( routine, args )
     let length = _.entityLength( it.dst );
     if( length !== it.parsedSelector.limit )
     {
+      let currentSelector = it.selector;
+      if( it.parsedSelector && it.parsedSelector.full )
+      currentSelector = it.parsedSelector.full;
       debugger;
       let err = _.ErrorLooking
       (
-        'Select constraint ' + _.strQuote( it.selector ) + ' failed'
+        'Select constraint ' + _.strQuote( currentSelector ) + ' failed'
         + ', got ' + length + ' elements'
-        + ' using selector ' + _.strQuote( sop.selector )
+        + ' for selector ' + _.strQuote( sop.selector )
         + '\nAt : ' + _.strQuote( it.path )
       );
       if( sop.onQuantitativeFail )
