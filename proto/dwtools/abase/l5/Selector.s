@@ -189,23 +189,21 @@ function selectSingle_pre( routine, args )
     if( sop.onUpBegin )
     sop.onUpBegin.call( it );
 
-    sop.selectorChanged.call( it ); // xxx
+    if( it.dstWritingDown ) // yyy
+    {
 
-    // it.isRelative = it.selector === sop.downToken;
-    // // it.isGlob = it.selector ? _.strHas( it.selector, '*' ) : false;
-    // it.isGlob = it.selector ? isGlob( it.selector ) : false;
+      sop.selectorChanged.call( it );
 
-    // if( it.selector === null ) // yyy
-    // {}
-    // else
-    if( it.selector === undefined )
-    upFinal.call( this );
-    else if( it.selector === sop.downToken )
-    upDown.call( this );
-    else if( it.isGlob )
-    upGlob.call( this );
-    else
-    upSingle.call( this );
+      if( it.selector === undefined )
+      upFinal.call( this );
+      else if( it.selector === sop.downToken )
+      upDown.call( this );
+      else if( it.isGlob )
+      upGlob.call( this );
+      else
+      upSingle.call( this );
+
+    }
 
     if( sop.onUpEnd )
     sop.onUpEnd.call( it );
@@ -319,8 +317,8 @@ function selectSingle_pre( routine, args )
         });
         it.srcChanged(); // xxx
       }
-      if( !it.iterable )
-      debugger;
+      // if( !it.iterable )
+      // debugger;
     }
 
     if( it.iterable === 'array-like' )
