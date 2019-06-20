@@ -746,17 +746,9 @@ function select_body( o )
     o2.iteratorExtension.selectMultipleOptions = o;
 
     let it = _.replicateIt( o2 );
+
     return it.dst;
   }
-
-  // /* */
-  //
-  // function multipleMake( o )
-  // {
-  //   let multiple = _.mapExtend( null, o );
-  //   multiple.visited = [];
-  //   return multiple;
-  // }
 
   /* */
 
@@ -791,7 +783,6 @@ function select_body( o )
 
   /* */
 
-  // function singleSelect( o, selector, visited )
   function singleSelect( visited )
   {
     let it = this;
