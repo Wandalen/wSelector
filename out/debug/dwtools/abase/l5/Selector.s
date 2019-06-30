@@ -586,9 +586,9 @@ selectAct_body.defaults =
   onDownEnd : null,
   onQuantitativeFail : null,
 
-  srcChanged : srcChanged,
-  selectorChanged : selectorChanged,
-  globParse : globParse,
+  /*ttt*/srcChanged,
+  /*ttt*/selectorChanged,
+  /*ttt*/globParse,
 
 }
 
@@ -734,8 +734,8 @@ function select_body( o )
     let o2 =
     {
       src : selector,
-      onUp : onUp,
-      onDown : onDown,
+      /*ttt*/onUp,
+      /*ttt*/onDown,
     }
 
     o2.iterationPreserve = Object.create( null );
@@ -1006,7 +1006,7 @@ let select = _.routineFromPreAndBody( select_pre, select_body );
  *
  * @example
  * let src = {};
-   _.selectSet({ src : src, selector : 'a', set : 1 });
+   _.selectSet({ src, selector : 'a', set : 1 });
    console.log( src.a ); //1
  *
  * @function selectSet
@@ -1076,8 +1076,6 @@ function errDoesNotExistThrow( it )
 {
   let sop = it.selectOptions;
   it.continue = false;
-
-  // debugger;
 
   if( sop.missingAction === 'undefine' || sop.missingAction === 'ignore' )
   {
