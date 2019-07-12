@@ -1036,7 +1036,7 @@ function selectUnique_body( o )
 
   let result = _.selectSingle.body( o );
   if( _.arrayHas( o.selectorArray, '*' ) )
-  result = _.arrayUnique( result );
+  result = _.longUnduplicate( null, result );
 
   return result;
 }
@@ -1088,8 +1088,8 @@ function errDoesNotExistThrow( it )
     (
       'Cant select', _.strQuote( sop.selector ),
       '\nbecause', _.strQuote( it.selector ), 'does not exist',
-      '\nat', _.strQuote( it.path ),
-      '\nin container\n', _.toStrShort( sop.src )
+      'at', _.strQuote( it.path ),
+      '\nin container', _.toStrShort( sop.src )
     );
     it.dst = undefined;
     it.iterator.error = err;
