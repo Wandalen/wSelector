@@ -109,7 +109,7 @@ function selectSingle( test )
 
   var got = _.selectSingle
   ({
-    /*ttt*/src,
+    src,
     selector : '*/1',
     usingIndexedAccessToMap : 1,
   });
@@ -207,7 +207,7 @@ function selectTrivial( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/1',
     usingIndexedAccessToMap : 1,
   });
@@ -357,19 +357,19 @@ function selectComposite( test )
   test.case = 'compositeSelecting : 0, custom onSelector'; /* */
   var expected = [ 'Some test with inlined', 'b2', '.' ];
   var selector = 'Some test with inlined {b/b2}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector, compositeSelecting : 0 });
+  var got = _.select({ src, selector, onSelector, compositeSelecting : 0 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1'; /* */
   var expected = 'Some test with inlined b2.';
   var selector = 'Some test with inlined {b/b2}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1, array'; /* */
   var expected = [ 'Some test with inlined c21 and b2.', 'Some test with inlined c22 and b2.' ];
   var selector = 'Some test with inlined {c/c2} and {b/b2}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1, array + number + boolean'; /* */
@@ -379,7 +379,7 @@ function selectComposite( test )
     'Some test with inlined c22 and 1 and false.'
   ]
   var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 0, set manually'; /* */
@@ -391,8 +391,8 @@ function selectComposite( test )
   var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     onSelector : _.select.functor.onSelectorComposite(),
     onSelectorDown : _.select.functor.onSelectorDownComposite(),
@@ -413,8 +413,8 @@ function selectComposite( test )
   var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     onSelector : _.select.functor.onSelectorComposite(),
   });
@@ -429,8 +429,8 @@ function selectComposite( test )
   var selector = 'Some test with inlined {c/c2} and {b/b1} and {c/c1}.';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
     onSelector : _.select.functor.onSelectorComposite(),
   });
@@ -443,19 +443,19 @@ function selectComposite( test )
     'This is combination of bools false, a string is, a numbers 3 and strings and.'
   ]
   var selector = 'This is combination of bools {complex/bools}, a string {complex/string}, a numbers {complex/numbers} and strings {complex/strings}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1, empty vector'; /* */
   var expected = [];
   var selector = 'This is empty {complex/empty}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1, string and empty vector'; /* */
   var expected = [];
   var selector = 'This is combination a string {complex/string} and empty {complex/empty}.';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, compositeSelecting : 1 });
+  var got = _.select({ src, selector, compositeSelecting : 1 });
   test.identical( got, expected );
 
   // complex : { bools : [ true, false ], string : 'is', numbers : [ 1, 3 ], strings : [ 'or', 'and' ] },
@@ -491,14 +491,14 @@ function selectDecoratedFixes( test )
   test.case = 'first level'; /* */
   var expected = { map : { name : 'name1' }, value : 13 };
   var selector = '{a}';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got === src.a );
 
   test.case = 'second level'; /* */
   var expected = { name : 'name1' };
   var selector = '{a/map}';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got === src.a.map );
 
@@ -511,13 +511,13 @@ function selectDecoratedFixes( test )
   test.case = 'first level, lack of fixes'; /* */
   var expected = 'a';
   var selector = 'a';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
 
   test.case = 'second level, lack of fixes'; /* */
   var expected = 'a/map';
   var selector = 'a/map';
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
 
   test.close( 'primitive, lack of fixes' );
@@ -529,7 +529,7 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
   var selector = [ '{b}', '{c}' ];
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b );
   test.is( got[ 1 ] === src.c );
@@ -537,7 +537,7 @@ function selectDecoratedFixes( test )
   test.case = 'second level selector'; /* */
   var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
   var selector = [ '{b/b2}', '{c}' ];
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ] === src.c );
@@ -545,7 +545,7 @@ function selectDecoratedFixes( test )
   test.case = 'complex selector'; /* */
   var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
   var selector = [ '{b/b2}', { a : '{c}', b : '{a/map}' } ];
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ][ 'a' ] === src.c );
@@ -560,21 +560,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var selector = [ 'b', 'c' ];
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'second level selector'; /* */
   var selector = [ 'b/b2', 'c' ];
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'complex selector'; /* */
   var selector = [ 'b/b2', { a : 'c', b : 'a/map' } ];
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
@@ -587,7 +587,7 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
   var selector = { b : '{b}', c : '{c}' };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got.b === src.b );
   test.is( got.c === src.c );
@@ -595,7 +595,7 @@ function selectDecoratedFixes( test )
   test.case = 'second level selector'; /* */
   var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
   var selector = { b2 : '{b/b2}', c : '{c}' };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
   test.is( got.c === src.c );
@@ -603,7 +603,7 @@ function selectDecoratedFixes( test )
   test.case = 'complex selector'; /* */
   var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
   var selector = { b : '{b/b2}', array : [ '{c}', '{a/map}' ] };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got[ 'b' ] === src.b.b2 );
   test.is( got[ 'array' ][ 0 ] === src.c );
@@ -618,21 +618,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var selector = { b : 'b', c : 'c' };
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'second level selector'; /* */
   var selector = { b2 : 'b/b2', c : 'c' };
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'complex selector'; /* */
   var selector = { b : 'b/b2', array : [ 'c', 'a/map' ] };
   var expected = selector;
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, selector );
   test.is( got !== selector );
 
@@ -645,21 +645,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = { b : 'b', c : { c1 : 1, c2 : 'c2' } };
   var selector = { b : 'b', c : '{c}' };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got.c === src.c );
 
   test.case = 'second level selector'; /* */
   var expected = { b2 : 'b2', c : 'c' };
   var selector = { b2 : '{b/b2}', c : 'c' };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
 
   test.case = 'complex selector'; /* */
   var expected = { b : 'b2', array : [ 'c', { name : 'name1' } ] };
   var selector = { b : '{b/b2}', array : [ 'c', '{a/map}' ] };
-  var got = _.select({ /*ttt*/src, /*ttt*/selector, /*ttt*/onSelector });
+  var got = _.select({ src, selector, onSelector });
   test.identical( got, expected );
   test.is( got.b === src.b.b2 );
   test.is( got.array[ 1 ] === src.a.map );
@@ -696,10 +696,10 @@ function selectDecoratedInfix( test )
   var selector = '{pre::b/b1}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -708,10 +708,10 @@ function selectDecoratedInfix( test )
   var selector = 'b';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -724,10 +724,10 @@ function selectDecoratedInfix( test )
   var selector = '{pre::c/c2}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -736,10 +736,10 @@ function selectDecoratedInfix( test )
   var selector = 'pre::c/c2';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector, isStrippedSelector : 0 }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector, isStrippedSelector : 0 }),
   });
   test.identical( got, expected );
 
@@ -752,10 +752,10 @@ function selectDecoratedInfix( test )
   var selector = 'pre::c/c2';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector, isStrippedSelector : 1 }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector, isStrippedSelector : 1 }),
   });
   test.identical( got, expected );
 
@@ -768,10 +768,10 @@ function selectDecoratedInfix( test )
   var selector = 'Some test with inlined {pre::c/c2} and {pre::b/b1} and {pre::c/c1}.';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -786,10 +786,10 @@ function selectDecoratedInfix( test )
   var selector = 'pre::b/b1';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -798,10 +798,10 @@ function selectDecoratedInfix( test )
   var selector = 'b';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -814,10 +814,10 @@ function selectDecoratedInfix( test )
   var selector = 'pre::c/c2';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -830,10 +830,10 @@ function selectDecoratedInfix( test )
   var selector = '{pre::c/c2';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -871,11 +871,11 @@ function selectRecursive( test )
   var selector = 'pre::b/b1';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     recursive : Infinity,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -884,11 +884,11 @@ function selectRecursive( test )
   var selector = 'pre::b/b1';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     recursive : 0,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -897,11 +897,11 @@ function selectRecursive( test )
   var selector = 'pre::b/b1';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     recursive : 1,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -910,11 +910,11 @@ function selectRecursive( test )
   var selector = 'pre::b/b1';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 0,
     recursive : 2,
-    /*ttt*/onSelector,
+    onSelector,
   });
   test.identical( got, expected );
 
@@ -936,11 +936,11 @@ function selectRecursive( test )
   var selector = '{pre::b/b1}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
     recursive : Infinity,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -949,11 +949,11 @@ function selectRecursive( test )
   var selector = '{pre::b/b1}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
     recursive : 0,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -962,11 +962,11 @@ function selectRecursive( test )
   var selector = '{pre::b/b1}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
     recursive : 1,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -975,11 +975,11 @@ function selectRecursive( test )
   var selector = '{pre::b/b1}';
   var got = _.select
   ({
-    /*ttt*/src,
-    /*ttt*/selector,
+    src,
+    selector,
     compositeSelecting : 1,
     recursive : 2,
-    onSelector : _.select.functor.onSelectorComposite({ /*ttt*/onSelector }),
+    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
   });
   test.identical( got, expected );
 
@@ -1005,7 +1005,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'a/map/name',
     missingAction : 'undefine',
   });
@@ -1022,7 +1022,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x',
     missingAction : 'undefine',
   })
@@ -1039,7 +1039,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x',
     missingAction : 'undefine',
   })
@@ -1056,7 +1056,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x/x',
     missingAction : 'undefine',
   })
@@ -1074,7 +1074,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/name',
     missingAction : 'undefine',
   });
@@ -1092,7 +1092,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/map/name',
     missingAction : 'undefine',
   });
@@ -1109,7 +1109,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*',
     missingAction : 'undefine',
   })
@@ -1127,7 +1127,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*',
     missingAction : 'undefine',
   })
@@ -1151,7 +1151,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*',
     missingAction : 'undefine',
   })
@@ -1175,7 +1175,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*/*',
     missingAction : 'undefine',
   })
@@ -1199,7 +1199,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'a/map/name',
     missingAction : 'ignore',
   });
@@ -1216,7 +1216,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x',
     missingAction : 'ignore',
   })
@@ -1233,7 +1233,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x',
     missingAction : 'ignore',
   })
@@ -1250,7 +1250,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x/x',
     missingAction : 'ignore',
   })
@@ -1268,7 +1268,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/name',
     missingAction : 'ignore',
   });
@@ -1286,7 +1286,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/map/name',
     missingAction : 'ignore',
   });
@@ -1303,7 +1303,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*',
     missingAction : 'ignore',
   })
@@ -1321,7 +1321,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*',
     missingAction : 'ignore',
   })
@@ -1345,7 +1345,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*',
     missingAction : 'ignore',
   })
@@ -1369,7 +1369,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*/*',
     missingAction : 'ignore',
   })
@@ -1393,7 +1393,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/name',
     missingAction : 'ignore',
   });
@@ -1402,7 +1402,7 @@ function selectMissing( test )
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=1/name',
     missingAction : 'ignore',
   }));
@@ -1418,7 +1418,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/map/name',
     missingAction : 'ignore',
   });
@@ -1427,7 +1427,7 @@ function selectMissing( test )
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=3/name',
     missingAction : 'ignore',
   }));
@@ -1442,7 +1442,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2',
     missingAction : 'ignore',
   })
@@ -1452,7 +1452,7 @@ function selectMissing( test )
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=3',
     missingAction : 'ignore',
   }));
@@ -1467,7 +1467,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=2',
     missingAction : 'ignore',
   })
@@ -1477,14 +1477,14 @@ function selectMissing( test )
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=3/*=2',
     missingAction : 'ignore',
   }));
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=3',
     missingAction : 'ignore',
   }));
@@ -1505,7 +1505,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=0/*=0',
     missingAction : 'ignore',
   })
@@ -1515,21 +1515,21 @@ function selectMissing( test )
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=1/*=0/*=0',
     missingAction : 'ignore',
   }));
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=1/*=0',
     missingAction : 'ignore',
   }));
 
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=0/*=1',
     missingAction : 'ignore',
   }));
@@ -1550,7 +1550,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*=2/*=0/*=0/*=0',
     missingAction : 'ignore',
   })
@@ -1573,7 +1573,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x',
     missingAction : 'error',
   });
@@ -1583,7 +1583,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x',
     missingAction : 'error',
   });
@@ -1593,7 +1593,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/x',
     missingAction : 'error',
   });
@@ -1603,7 +1603,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*',
     missingAction : 'error',
   });
@@ -1613,7 +1613,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '..',
     missingAction : 'error',
   });
@@ -1623,7 +1623,7 @@ function selectMissing( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'a/../..',
     missingAction : 'error',
   });
@@ -1647,7 +1647,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x',
     missingAction : 'throw',
   }));
@@ -1655,7 +1655,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'x/x',
     missingAction : 'throw',
   }));
@@ -1663,7 +1663,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/x',
     missingAction : 'throw',
   }));
@@ -1671,7 +1671,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/*/*',
     missingAction : 'throw',
   }));
@@ -1680,7 +1680,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '..',
     missingAction : 'throw',
   }));
@@ -1688,7 +1688,7 @@ function selectMissing( test )
   // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
-    /*ttt*/src,
+    src,
     selector : 'a/../..',
     missingAction : 'throw',
   }));
@@ -1721,7 +1721,7 @@ function selectSet( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '*/name',
     set : 'x',
     missingAction : 'undefine',
@@ -1737,7 +1737,7 @@ function selectSet( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '/a',
     set : 'c',
     setting : 1,
@@ -1753,7 +1753,7 @@ function selectSet( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '/1',
     set : {},
     setting : 1,
@@ -1774,7 +1774,7 @@ function selectSet( test )
     debugger;
     var got = _.select
     ({
-      /*ttt*/src,
+      src,
       selector : '/1',
       set : {},
       setting : 1,
@@ -1793,7 +1793,7 @@ function selectSet( test )
 
   var got = _.select
   ({
-    /*ttt*/src,
+    src,
     selector : '/1',
     set : '2',
     setting : 1,
@@ -2115,7 +2115,7 @@ function selectWithGlobNonPrimitive( test )
   test.case = '**';
   var src = 'abc';
   var expected = undefined;
-  var got = _.select({ /*ttt*/src, selector : '**' });
+  var got = _.select({ src, selector : '**' });
   test.is( got === expected );
 
   test.close( 'trivial' );
@@ -2127,23 +2127,23 @@ function selectWithGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  test.shouldThrowErrorSync( () => _.select({ /*ttt*/src, selector : '**', /*ttt*/onUpBegin, missingAction : 'throw', /*ttt*/srcChanged }) );
+  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', srcChanged }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ /*ttt*/src, selector : '**', /*ttt*/onUpBegin, missingAction : 'undefine', /*ttt*/srcChanged });
+  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', srcChanged });
   test.identical( got, expected );
 
   test.case = '**';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ /*ttt*/src, selector : '**', /*ttt*/srcChanged });
+  var got = _.select({ src, selector : '**', srcChanged });
   test.identical( got, expected );
 
   var src = new _.Logger({ name : 'logger' });
   var expected = undefined;
-  var got = _.select({ /*ttt*/src, selector : '**/name', /*ttt*/srcChanged });
+  var got = _.select({ src, selector : '**/name', srcChanged });
   test.identical( got, expected );
 
   test.close( 'only maps' );
@@ -2185,13 +2185,13 @@ function selectWithGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = {};
-  var got = _.select({ /*ttt*/src, selector : '**', /*ttt*/onUpBegin, missingAction : 'throw' });
+  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'throw' });
   test.identical( got, expected );
 
   test.case = 'should return empty map if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = {};
-  var got = _.select({ /*ttt*/src, selector : '**', /*ttt*/onUpBegin, missingAction : 'undefine' });
+  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine' });
   test.identical( got, expected );
 
   test.close( 'not only maps' );
@@ -2275,7 +2275,7 @@ function selectWithCallback( test )
   }
 
   var expected = {};
-  var got = _.select({ /*ttt*/src, selector : 'a*=0', /*ttt*/onDownBegin });
+  var got = _.select({ src, selector : 'a*=0', onDownBegin });
   test.identical( got, expected );
 
 }

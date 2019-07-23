@@ -586,9 +586,9 @@ selectAct_body.defaults =
   onDownEnd : null,
   onQuantitativeFail : null,
 
-  /*ttt*/srcChanged,
-  /*ttt*/selectorChanged,
-  /*ttt*/globParse,
+  srcChanged,
+  selectorChanged,
+  globParse,
 
 }
 
@@ -734,8 +734,8 @@ function select_body( o )
     let o2 =
     {
       src : selector,
-      /*ttt*/onUp,
-      /*ttt*/onDown,
+      onUp,
+      onDown,
     }
 
     o2.iterationPreserve = Object.create( null );
@@ -822,13 +822,14 @@ function select_body( o )
     if( _.strIs( selector ) )
     {
       it.src = selector;
+      it.srcChanged();
       it.dst = singleSelectFirst.call( it );
       it.continue = false;
       it.dstSetting = false;
     }
     else if( selector !== undefined )
     {
-      if( selector && selector.rejoin === _.hold )
+      if( selector && selector.composite === _.select.composite )
       {
         if( !it.compositeRoot )
         it.compositeRoot = it;
@@ -924,7 +925,7 @@ function onSelectorComposite_functor( fop )
     });
 
     selector2 = selector2.map( ( split ) => _.arrayIs( split ) ? split.join( '' ) : split );
-    selector2.rejoin = _.hold;
+    selector2.composite = _.select.composite;
 
     return selector2;
   }
@@ -949,7 +950,7 @@ function onSelectorDownComposite_functor( op )
   return function onSelectorDownComposite()
   {
     let it = this;
-    if( it.continue && _.arrayIs( it.dst ) && it.src.rejoin === _.hold )
+    if( it.continue && _.arrayIs( it.dst ) && it.src.composite === _.select.composite )
     {
       it.dst = _.strJoin( it.dst );
     }
@@ -1232,6 +1233,8 @@ function globParse()
 // declare looker
 // --
 
+let composite = Symbol.for( 'composite' );
+
 let Looker = _.mapExtend( null, _.look.defaults.Looker );
 Looker.Looker = Looker;
 
@@ -1255,6 +1258,7 @@ let ExtendSelect =
   srcChanged,
   selectorChanged,
   globParse,
+  composite,
 
 }
 
@@ -1281,10 +1285,6 @@ _.mapSupplement( select, ExtendSelect );
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;
