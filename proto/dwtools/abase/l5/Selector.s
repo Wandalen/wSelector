@@ -1222,6 +1222,7 @@ function globParse()
     it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
     if( match[ 2 ].length > 0 )
     {
+      debugger;
       it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
       _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
     }
