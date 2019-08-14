@@ -21,6 +21,11 @@ var _ = _global_.wTools;
 // tests
 // --
 
+/*
+qqq : add descriptions:
+test.case = '...' ...
+...
+*/
 
 function selectSingle( test )
 {
@@ -49,9 +54,37 @@ function selectSingle( test )
     b : 13,
     c : 15,
   }
-
   var got = _.selectSingle( src, 'b' );
   test.identical( got, 13 );
+
+  /* */
+
+  var src =
+  {
+    a : 11,
+    b : 13,
+    c : 15,
+  }
+  var got = _.selectSingle( src, '/' );
+  test.identical( got, src );
+  test.is( got === src );
+
+  /* */
+
+  var src =
+  {
+    a : 11,
+    b : 13,
+    c : 15,
+  }
+  var got = _.selectSingle
+  ({
+    src : src,
+    selector : '/',
+    upToken : [ '/', './' ],
+  });
+  test.identical( got, src );
+  test.is( got === src );
 
   /* */
 
@@ -1611,6 +1644,12 @@ function selectMissing( test )
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
   var got = _.select
   ({
     src,
@@ -1620,6 +1659,27 @@ function selectMissing( test )
 
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
+
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var got = _.select
+  ({
+    src,
+    selector : 'a/..',
+    missingAction : 'error',
+  });
+
+  test.is( got === src );
+
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    c : { value : 25, date : new Date() },
+  }
 
   var got = _.select
   ({
@@ -2006,20 +2066,41 @@ function selectWithDown( test )
     c : { value : 25, date : new Date() },
   }
 
-  var it = _.selectAct( src, 'a/name' );
+  var it = _.selectIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it = _.selectAct( it.lastSelected.iterationReinit(), '../../b/name' );
+  var it = _.selectIt( it.lastSelected.iterationReinit(), '..' );
 
-  test.identical( it.dst, src.b.name );
-  test.is( it.dst === src.b.name );
+  test.identical( it.dst, src.a );
+  test.is( it.dst === src.a );
 
-  var it = _.selectAct( it.lastSelected.iterationReinit(), '..' );
+  /* */
 
-  test.identical( it.dst, src.b );
-  test.is( it.dst === src.b );
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date() },
+  }
+
+  var it = _.selectIt( src, 'a/name' );
+
+  test.identical( it.dst, src.a.name );
+  test.is( it.dst === src.a.name );
+
+  var it2 = _.selectIt( it.lastSelected.iterationReinit(), '../../b/name' );
+
+  test.identical( it2.dst, src.b.name );
+  test.is( it2.dst === src.b.name );
+  test.is( it !== it2 );
+
+  var it3 = _.selectIt( it.lastSelected.iterationReinit(), '..' );
+
+  test.identical( it3.dst, src.b );
+  test.is( it3.dst === src.b );
+  test.is( it3 !== it2 );
 
 }
 
@@ -2065,6 +2146,79 @@ function selectWithGlob( test )
 
 //
 
+function testPaths( test )
+{
+
+  let onUpBeginCounter = 0;
+  function onUpBegin()
+  {
+    let it = this;
+    let expectedPaths = [ '/', '/d', '/d/b' ];
+    test.identical( it.path, expectedPaths[ onUpBeginCounter ] );
+    onUpBeginCounter += 1;
+  }
+
+  let onUpEndCounter = 0;
+  function onUpEnd()
+  {
+    let it = this;
+    let expectedPaths = [ '/', '/d', '/d/b' ];
+    test.identical( it.path, expectedPaths[ onUpEndCounter ] );
+    onUpEndCounter += 1;
+  }
+
+  let onDownBeginCounter = 0;
+  function onDownBegin()
+  {
+    let it = this;
+    let expectedPaths = [ '/d/b', '/d', '/' ];
+    test.identical( it.path, expectedPaths[ onDownBeginCounter ] );
+    onDownBeginCounter += 1;
+  }
+
+  let onDownEndCounter = 0;
+  function onDownEnd()
+  {
+    let it = this;
+    let expectedPaths = [ '/d/b', '/d', '/' ];
+    test.identical( it.path, expectedPaths[ onDownEndCounter ] );
+    onDownEndCounter += 1;
+  }
+
+  /* */
+
+  var src =
+  {
+    a : 11,
+    d :
+    {
+      b : 13,
+      c : 15,
+    }
+  }
+  var got = _.select
+  ({
+    src : src,
+    selector : '/d/b',
+    upToken : [ '/', './' ],
+    onUpBegin,
+    onUpEnd,
+    onDownBegin,
+    onDownEnd,
+  });
+  var expected = 13;
+  test.identical( got, expected );
+  test.identical( onUpBeginCounter, 3 );
+  test.identical( onUpEndCounter, 3 );
+  test.identical( onDownBeginCounter, 3 );
+  test.identical( onDownEndCounter, 3 );
+
+  /* */
+
+}
+
+//
+
 function selectWithGlobNonPrimitive( test )
 {
 
@@ -2077,7 +2231,7 @@ function selectWithGlobNonPrimitive( test )
   {
     let it = this;
 
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0 ); debugger;
 
     if( _.arrayLike( it.src ) )
     {
@@ -2093,6 +2247,11 @@ function selectWithGlobNonPrimitive( test )
     }
 
   }
+
+  let Selector2 = _.mapExtend( null, _.Selector );
+  Selector2.Looker = Selector2;
+  let Iterator = Selector2.Iterator = _.mapExtend( null, Selector2.Iterator );
+  Iterator.srcChanged = srcChanged;
 
   /* */
 
@@ -2127,23 +2286,23 @@ function selectWithGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', srcChanged }) );
+  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', srcChanged });
+  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Looker : Selector2 });
   test.identical( got, expected );
 
   test.case = '**';
   var src = new _.Logger();
   var expected = undefined;
-  var got = _.select({ src, selector : '**', srcChanged });
+  var got = _.select({ src, selector : '**', Looker : Selector2 });
   test.identical( got, expected );
 
   var src = new _.Logger({ name : 'logger' });
   var expected = undefined;
-  var got = _.select({ src, selector : '**/name', srcChanged });
+  var got = _.select({ src, selector : '**/name', Looker : Selector2 });
   test.identical( got, expected );
 
   test.close( 'only maps' );
@@ -2290,7 +2449,7 @@ var Self =
   name : 'Tools/base/l5/Selector',
   silencing : 1,
   enabled : 1,
-  // routineTimeOut : 60000, // xxx
+  routineTimeOut : 15000,
 
   context :
   {
@@ -2310,6 +2469,7 @@ var Self =
     selectSet,
     selectWithDown,
     selectWithGlob,
+    testPaths,
     selectWithGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
