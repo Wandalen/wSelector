@@ -24,7 +24,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wLooker' );
   _.include( 'wReplicator' );
-  _.include( 'wPathBasic' );
+  _.include( 'wPathTools' );
 
 }
 
