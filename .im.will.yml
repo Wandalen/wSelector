@@ -3,24 +3,24 @@ submodule :
 
   wTools :
     path : npm:///wTools
-    enabled : 0
-  wlooker :
+    enabled : 0 # submodule
+  wLooker :
     path : npm:///wlooker
-    enabled : 0
-  wreplicator :
+    enabled : 0 # submodule
+  wReplicator :
     path : npm:///wreplicator
-    enabled : 0
-  wpathtools :
+    enabled : 0 # submodule
+  wPathTools :
     path : npm:///wpathtools
-    enabled : 0
+    enabled : 0 # submodule
   wselector :
     path : hd://.
-    enabled : 0
+    enabled : 0 # submodule
     criterion :
       development : 1
   wTesting :
     path : npm:///wTesting
-    enabled : 0
+    enabled : 0 # submodule
     criterion :
       development : 1
 
