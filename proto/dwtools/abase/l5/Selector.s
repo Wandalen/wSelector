@@ -17,6 +17,12 @@
   @memberof module:Tools/base/Selector
 */
 
+/*
+xxx qqq : optimize selector
+          use test routine filesFindGlob of test suite FilesFind.Extract.test.s
+          Extract use selectro extensively
+*/
+
 if( typeof module !== 'undefined' )
 {
 
@@ -150,7 +156,7 @@ defaults.selector = null;
 defaults.missingAction = 'undefine';
 defaults.preservingIteration = 0;
 defaults.usingIndexedAccessToMap = 0;
-defaults.usingGlob = 1;
+defaults.globing = 1;
 defaults.trackingVisits = 1;
 defaults.upToken = '/';
 defaults.downToken = '..';
@@ -672,22 +678,27 @@ function selectorChanged()
 {
   let it = this;
 
-  let isGlob;
-  if( _.path && _.path.isGlob )
-  isGlob = function( selector )
-  {
-    return _.path.isGlob( selector )
-  }
-  else
-  isGlob = function isGlob( selector )
-  {
-    return _.strHas( selector, '*' );
-  }
-
   _.assert( arguments.length === 0 );
 
   it.isRelative = it.selector === it.downToken;
-  it.isGlob = it.selector ? isGlob( it.selector ) : false;
+
+  if( it.globing )
+  {
+
+    let isGlob;
+    if( _.path && _.path.isGlob )
+    isGlob = function( selector )
+    {
+      return _.path.isGlob( selector )
+    }
+    else
+    isGlob = function isGlob( selector )
+    {
+      return _.strHas( selector, '*' );
+    }
+
+    it.isGlob = it.selector ? isGlob( it.selector ) : false;
+  }
 
 }
 
@@ -698,6 +709,7 @@ function globParse()
   let it = this;
 
   _.assert( arguments.length === 0 );
+  _.assert( it.globing );
 
   let regexp = /(.*){?\*=(\d*)}?(.*)/;
   let match = it.selector.match( regexp );
@@ -892,11 +904,15 @@ function upGlob()
 {
   let it = this;
 
+  _.assert( it.globing );
+
   /* !!! qqq : teach it to parse more than single "*=" */
 
+  if( it.globing )
   it.globParse();
 
-  if( it.parsedSelector.glob !== '*' && it.usingGlob )
+  if( it.globing )
+  if( it.parsedSelector.glob !== '*' )
   {
     if( it.iterable )
     {
@@ -1028,6 +1044,8 @@ function downGlob()
 
   if( it.parsedSelector.limit === undefined )
   return;
+
+  _.assert( it.globing );
 
   let length = _.entityLength( it.dst );
   if( length !== it.parsedSelector.limit )
