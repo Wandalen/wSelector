@@ -21,6 +21,12 @@
 xxx qqq : optimize selector
           use test routine filesFindGlob of test suite FilesFind.Extract.test.s
           Extract use selectro extensively
+
+xxx qqq : investigate
+          at /filesGrouped"/temp/tmp.tmp/suite-FilesFind-155617-949-2cf3/routine-filesFindGroups/Produced.txt"/0
+          - got :          undefined
+          - expected :          undefined
+
 */
 
 if( typeof module !== 'undefined' )
@@ -536,7 +542,7 @@ function selectUnique_body( o )
 
   // if( _.arrayHas( o.selectorArray, '*' ) )
   if( _.strHas( o.selector, '*' ) )
-  result = _.longUnduplicate( null, result );
+  result = _./*longOnce*/arrayAppendArrayOnce( null, result );
 
   return result;
 }

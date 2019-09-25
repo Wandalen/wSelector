@@ -92,7 +92,7 @@ function selectSingle( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
     d : { name : 'name4', value : 25, date : new Date() },
   }
 
@@ -105,7 +105,7 @@ function selectSingle( test )
   [
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
-    { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
     { name : 'name4', value : 25, date : new Date() },
   ]
 
@@ -193,7 +193,7 @@ function selectTrivial( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
     d : { name : 'name4', value : 25, date : new Date() },
   }
 
@@ -206,7 +206,7 @@ function selectTrivial( test )
   [
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
-    { name : 'name3', value : 55, buffer : new Float32Array([ 1,2,3 ]) },
+    { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
     { name : 'name4', value : 25, date : new Date() },
   ]
 
@@ -2446,7 +2446,7 @@ function selectWithCallback( test )
 var Self =
 {
 
-  name : 'Tools/base/l5/Selector',
+  name : 'Tools.base.l5.Selector',
   silencing : 1,
   enabled : 1,
   routineTimeOut : 15000,
