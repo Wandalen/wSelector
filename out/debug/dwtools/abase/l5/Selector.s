@@ -1136,8 +1136,9 @@ function ascendDown( onAscend )
 
   /* */
 
-  let nit = it.iterationInit();
-  nit.select( it.selector );
+  debugger;
+  let nit = it.iterationMake();
+  nit.select( undefined, it.selector );
   nit.src = dit.src;
   nit.dst = undefined;
 
@@ -1180,7 +1181,7 @@ function ascendSingle( onAscend )
   {
   }
 
-  let eit = it.iterationInit().select( it.selector );
+  let eit = it.iterationMake().select( undefined, it.selector );
 
   onAscend.call( it, eit );
 
