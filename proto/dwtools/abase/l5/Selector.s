@@ -2,6 +2,7 @@
 
 'use strict';
 
+
 /**
  * Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short selector string.
   @module Tools/base/Selector
@@ -281,7 +282,6 @@ function select_pre( routine, args )
   let o = args[ 0 ]
   if( args.length === 2 )
   {
-    // if( _.lookIterationIs( args[ 0 ] ) )
     if( Self.iterationIs( args[ 0 ] ) )
     o = { it : args[ 0 ], selector : args[ 1 ] }
     else
