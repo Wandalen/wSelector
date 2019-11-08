@@ -71,7 +71,7 @@ function selectSingle_pre( routine, args )
   _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( o.downToken ) );
-  _.assert( _.arrayHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
+  _.assert( _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
   _.assert( o.selectorArray === undefined );
 
   if( o.it )
@@ -381,7 +381,7 @@ function select_body( o )
   {
     let it = this;
 
-    _.assert( !_.arrayHas( visited, it.src ), () => 'Loop selecting ' + it.src );
+    _.assert( !_.longHas( visited, it.src ), () => 'Loop selecting ' + it.src );
     _.assert( arguments.length === 1 );
 
     visited.push( it.src );
@@ -540,7 +540,7 @@ function selectUnique_body( o )
 
   let result = _.selectSingle.body( o );
 
-  // if( _.arrayHas( o.selectorArray, '*' ) )
+  // if( _.longHas( o.selectorArray, '*' ) )
   if( _.strHas( o.selector, '*' ) )
   result = _./*longOnce*/arrayAppendArrayOnce( null, result );
 
