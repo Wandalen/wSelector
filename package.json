@@ -18,11 +18,11 @@
   }, 
   "dependencies" : 
   {
-    "wTools" : "", 
-    "wlooker" : "", 
-    "wreplicator" : "", 
-    "wpathtools" : ""
+    "wTools" : "alpha", 
+    "wlooker" : "alpha", 
+    "wreplicator" : "alpha", 
+    "wpathtools" : "alpha"
   }, 
-  "devDependencies" : { "wTesting" : "" }, 
+  "devDependencies" : { "wTesting" : "alpha" }, 
   "keywords" : [ "wTools" ]
 }
