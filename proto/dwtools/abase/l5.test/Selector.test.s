@@ -2071,7 +2071,7 @@ function selectWithDown( test )
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it = _.selectIt( it.lastSelected.iterationReinit(), '..' );
+  var it = _.selectIt( it.lastSelected.iterationRemake(), '..' );
 
   test.identical( it.dst, src.a );
   test.is( it.dst === src.a );
@@ -2090,13 +2090,13 @@ function selectWithDown( test )
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it2 = _.selectIt( it.lastSelected.iterationReinit(), '../../b/name' );
+  var it2 = _.selectIt( it.lastSelected.iterationRemake(), '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.is( it2.dst === src.b.name );
   test.is( it !== it2 );
 
-  var it3 = _.selectIt( it.lastSelected.iterationReinit(), '..' );
+  var it3 = _.selectIt( it.lastSelected.iterationRemake(), '..' );
 
   test.identical( it3.dst, src.b );
   test.is( it3.dst === src.b );
@@ -2235,7 +2235,7 @@ function selectWithGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = 'array-like';
+      it.iterable = 'long-like';
     }
     else if( _.mapLike( it.src ) )
     {

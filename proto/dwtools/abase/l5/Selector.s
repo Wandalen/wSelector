@@ -164,7 +164,7 @@ defaults.missingAction = 'undefine';
 defaults.preservingIteration = 0;
 defaults.usingIndexedAccessToMap = 0;
 defaults.globing = 1;
-defaults.trackingVisits = 1;
+defaults.revisiting = 2;
 defaults.upToken = '/';
 defaults.downToken = '..';
 
@@ -657,23 +657,59 @@ function onSelectorDownComposite_functor( fop )
 // extend looker
 // --
 
-function srcChanged()
+// function srcChanged()
+// {
+//   let it = this;
+//
+//   _.assert( arguments.length === 0 );
+//
+//   if( _.arrayLike( it.src ) )
+//   {
+//     it.iterable = 'long-like';
+//   }
+//   else if( _.objectIs( it.src ) )
+//   {
+//     it.iterable = 'map-like';
+//   }
+//   else
+//   {
+//     it.iterable = false;
+//   }
+//
+// }
+
+//
+
+function iterableEval()
 {
   let it = this;
 
   _.assert( arguments.length === 0 );
 
-  if( _.arrayLike( it.src ) )
+  if( _.longLike( it.src ) )
   {
-    it.iterable = 'array-like';
+    it.iterable = 'long-like';
+    it.ascendAct = it._longAscend;
   }
   else if( _.objectIs( it.src ) )
   {
     it.iterable = 'map-like';
+    it.ascendAct = it._mapAscend;
+  }
+  else if( _.hashMapLike( it.src ) )
+  {
+    it.iterable = 'hash-map-like';
+    it.ascendAct = it._hashMapAscend;
+  }
+  else if( _.setLike( it.src ) )
+  {
+    it.iterable = 'set-like';
+    it.ascendAct = it._setAscend;
   }
   else
   {
     it.iterable = false;
+    it.ascendAct = it._termianlAscend;
   }
 
 }
@@ -932,7 +968,7 @@ function upGlob()
     }
   }
 
-  if( it.iterable === 'array-like' )
+  if( it.iterable === 'long-like' )
   {
     it.dst = [];
     it.dstWriteDown = function( eit )
@@ -1195,7 +1231,8 @@ let Selector = Object.create( Parent );
 
 Selector.constructor = function Selector(){};
 Selector.Looker = Selector;
-Selector.srcChanged = srcChanged;
+// Selector.srcChanged = srcChanged;
+Selector.iterableEval = iterableEval;
 Selector.selectorChanged = selectorChanged;
 Selector.globParse = globParse;
 
