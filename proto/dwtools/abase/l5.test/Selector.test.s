@@ -34,15 +34,36 @@ function selectSingle( test )
 
   /* */
 
+  var got = _.selectSingle( 'a', '' );
+  test.identical( got, undefined );
+  var got = _.selectSingle({ src : 'a', selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.selectSingle({ src : 'a', selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.selectSingle( 'a', '' ) );
+  var got = _.selectSingle( 'a', '/' );
+  test.identical( got, 'a' );
+
   var got = _.selectSingle( undefined, '' );
   test.identical( got, undefined );
-
+  var got = _.selectSingle({ src : undefined, selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.selectSingle({ src : undefined, selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.selectSingle( undefined, '' ) );
   var got = _.selectSingle( undefined, '/' );
   test.identical( got, undefined );
 
   var got = _.selectSingle( null, '' );
   test.identical( got, undefined );
-
+  var got = _.selectSingle({ src : null, selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.selectSingle({ src : null, selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.selectSingle( null, '' ) );
   var got = _.selectSingle( null, '/' );
   test.identical( got, null );
 
@@ -93,9 +114,8 @@ function selectSingle( test )
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
     c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
-    d : { name : 'name4', value : 25, date : new Date() },
+    d : { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
-
   var got = _.selectSingle( src, '*/name' );
   test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
 
@@ -106,7 +126,7 @@ function selectSingle( test )
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
     { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
-    { name : 'name4', value : 25, date : new Date() },
+    { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   ]
 
   var got = _.selectSingle( src, '*/name' );
@@ -130,10 +150,17 @@ function selectSingle( test )
   /* */
 
   test.close( 'trivial' );
-  test.open( 'usingIndexedAccessToMap' );
+
+}
+
+//
+
+function selectSingleOptionUsingIndexedAccessToMap( test )
+{
 
   /* */
 
+  test.case = '*/1';
   var src =
   {
     a : { map : { name : 'name1' }, value : 13 },
@@ -150,7 +177,55 @@ function selectSingle( test )
 
   /* */
 
-  test.close( 'usingIndexedAccessToMap' );
+  test.case = '1';
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
+  }
+
+  var got = _.selectSingle
+  ({
+    src,
+    selector : '1',
+    usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, { value : 25, date : 53 } );
+  test.is( got === src.c );
+
+  /* */
+
+  var exp = { a : 'a', b : {} };
+  var src = { a : 'a', b : 'b' };
+  var got = _.selectSingle
+  ({
+    src,
+    selector : '/1',
+    set : {},
+    setting : 1,
+    usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, 'b' );
+  test.identical( src, exp );
+
+  /* */
+
+  test.shouldThrowErrorSync( () =>
+  {
+
+    var src = { a : 'a' };
+    var got = _.selectSingle
+    ({
+      src,
+      selector : '/1',
+      set : {},
+      setting : 1,
+      usingIndexedAccessToMap : 1,
+    });
+
+  });
+
+  /* */
 
 }
 
@@ -163,15 +238,36 @@ function selectTrivial( test )
 
   /* */
 
+  var got = _.select( 'a', '' );
+  test.identical( got, undefined );
+  var got = _.select({ src : 'a', selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.select({ src : 'a', selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.select( 'a', '' ) );
+  var got = _.select( 'a', '/' );
+  test.identical( got, 'a' );
+
   var got = _.select( undefined, '' );
   test.identical( got, undefined );
-
+  var got = _.select({ src : undefined, selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.select({ src : undefined, selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.select( undefined, '' ) );
   var got = _.select( undefined, '/' );
   test.identical( got, undefined );
 
   var got = _.select( null, '' );
   test.identical( got, undefined );
-
+  var got = _.select({ src : null, selector : '', missingAction : 'undefine' });
+  test.identical( got, undefined );
+  if( Config.debug )
+  test.shouldThrowErrorSync( () => _.select({ src : null, selector : '', missingAction : 'throw' }) );
+  // if( Config.debug )
+  // test.shouldThrowErrorSync( () => _.select( null, '' ) );
   var got = _.select( null, '/' );
   test.identical( got, null );
 
@@ -194,7 +290,7 @@ function selectTrivial( test )
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
     c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
-    d : { name : 'name4', value : 25, date : new Date() },
+    d : { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, '*/name' );
@@ -207,7 +303,7 @@ function selectTrivial( test )
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
     { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
-    { name : 'name4', value : 25, date : new Date() },
+    { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   ]
 
   var got = _.select( src, '*/name' );
@@ -228,6 +324,14 @@ function selectTrivial( test )
   /* */
 
   test.close( 'trivial' );
+
+}
+
+//
+
+function selectUsingIndexedAccessToMap( test )
+{
+
   test.open( 'usingIndexedAccessToMap' );
 
   /* */
@@ -279,25 +383,31 @@ function selectMultiple( test )
     c : { c1 : 1, c2 : 'c2' },
   }
 
-  /* */
+  /* - */
 
   test.open( 'array' );
 
-  test.case = 'first level selector'; /* */
+  /* */
+
+  test.case = 'first level selector';
   var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
   var got = _.select( src, [ 'b', 'c' ] );
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b );
   test.is( got[ 1 ] === src.c );
 
-  test.case = 'second level selector'; /* */
+  /* */
+
+  test.case = 'second level selector';
   var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
   var got = _.select( src, [ 'b/b2', 'c' ] );
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ] === src.c );
 
-  test.case = 'complex selector'; /* */
+  /* */
+
+  test.case = 'complex selector';
   var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
   var got = _.select( src, [ 'b/b2', { a : 'c', b : 'a/map' } ] );
   test.identical( got, expected );
@@ -305,34 +415,44 @@ function selectMultiple( test )
   test.is( got[ 1 ][ 'a' ] === src.c );
   test.is( got[ 1 ][ 'b' ] === src.a.map );
 
-  test.case = 'self and empty selectors'; /* */
+  /* */
+
+  test.case = 'self and empty selectors';
   var expected = [ 'b2', { a : src } ];
   var got = _.select( src, [ 'b/b2', { a : '/', b : '' } ] );
   test.identical( got, expected );
   test.is( got[ 1 ].a === src );
   test.is( got.length === 2 );
 
+  /* */
+
   test.close( 'array' );
 
-  /* */
+  /* - */
 
   test.open( 'map' );
 
-  test.case = 'first level selector'; /* */
+  /* */
+
+  test.case = 'first level selector';
   var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
   var got = _.select( src, { b : 'b', c : 'c' } );
   test.identical( got, expected );
   test.is( got.b === src.b );
   test.is( got.c === src.c );
 
-  test.case = 'second level selector'; /* */
+  /* */
+
+  test.case = 'second level selector';
   var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
   var got = _.select( src, { b2 : 'b/b2', c : 'c' } );
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
   test.is( got.c === src.c );
 
-  test.case = 'complex selector'; /* */
+  /* */
+
+  test.case = 'complex selector';
   var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
   var got = _.select( src, { b : 'b/b2', array : [ 'c', 'a/map' ] } );
   test.identical( got, expected );
@@ -340,14 +460,20 @@ function selectMultiple( test )
   test.is( got[ 'array' ][ 0 ] === src.c );
   test.is( got[ 'array' ][ 1 ] === src.a.map );
 
-  test.case = 'self and empty selectors'; /* */
+  /* */
+
+  test.case = 'self and empty selectors';
   var expected = { array : [ src ] };
   var got = _.select( src, { b : '', array : [ '/', '' ] } );
   test.identical( got, expected );
   test.is( got.array[ 0 ] === src );
   test.is( got.array.length === 1 );
 
+  /* */
+
   test.close( 'map' );
+
+  /* - */
 
 }
 
@@ -364,7 +490,7 @@ function selectComposite( test )
     complex : { bools : [ true, false ], string : 'is', numbers : [ 1, 3 ], strings : [ 'or', 'and' ], empty : [] },
   }
 
-  function onSelector( selector )
+  function onSelectorReplicate( selector )
   {
     let it = this;
     if( !_.strIs( selector ) )
@@ -387,10 +513,10 @@ function selectComposite( test )
 
   /* */
 
-  test.case = 'compositeSelecting : 0, custom onSelector'; /* */
+  test.case = 'compositeSelecting : 0, custom onSelectorReplicate'; /* */
   var expected = [ 'Some test with inlined', 'b2', '.' ];
   var selector = 'Some test with inlined {b/b2}.';
-  var got = _.select({ src, selector, onSelector, compositeSelecting : 0 });
+  var got = _.select({ src, selector, onSelectorReplicate, compositeSelecting : 0 });
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1'; /* */
@@ -427,12 +553,12 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector : _.select.functor.onSelectorComposite(),
-    onSelectorDown : _.select.functor.onSelectorDownComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
+    onSelectorDown : _.selector.functor.onSelectorDownComposite(),
   });
   test.identical( got, expected );
 
-  test.case = 'compositeSelecting : 0, set manually only onSelector'; /* */
+  test.case = 'compositeSelecting : 0, set manually only onSelectorReplicate'; /* */
   var expected =
   [
     'Some test with inlined ',
@@ -449,11 +575,11 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector : _.select.functor.onSelectorComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
   });
   test.identical( got, expected );
 
-  test.case = 'compositeSelecting : 1, set manually only onSelector'; /* */
+  test.case = 'compositeSelecting : 1, set manually only onSelectorReplicate'; /* */
   var expected =
   [
     'Some test with inlined c21 and 1 and false.',
@@ -465,7 +591,7 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
   });
   test.identical( got, expected );
 
@@ -507,7 +633,7 @@ function selectDecoratedFixes( test )
     c : { c1 : 1, c2 : 'c2' },
   }
 
-  function onSelector( selector )
+  function onSelectorReplicate( selector )
   {
     let it = this;
     if( !_.strIs( selector ) )
@@ -524,14 +650,14 @@ function selectDecoratedFixes( test )
   test.case = 'first level'; /* */
   var expected = { map : { name : 'name1' }, value : 13 };
   var selector = '{a}';
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got === src.a );
 
   test.case = 'second level'; /* */
   var expected = { name : 'name1' };
   var selector = '{a/map}';
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got === src.a.map );
 
@@ -544,13 +670,13 @@ function selectDecoratedFixes( test )
   test.case = 'first level, lack of fixes'; /* */
   var expected = 'a';
   var selector = 'a';
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
 
   test.case = 'second level, lack of fixes'; /* */
   var expected = 'a/map';
   var selector = 'a/map';
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
 
   test.close( 'primitive, lack of fixes' );
@@ -562,7 +688,7 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
   var selector = [ '{b}', '{c}' ];
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b );
   test.is( got[ 1 ] === src.c );
@@ -570,7 +696,7 @@ function selectDecoratedFixes( test )
   test.case = 'second level selector'; /* */
   var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
   var selector = [ '{b/b2}', '{c}' ];
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ] === src.c );
@@ -578,7 +704,7 @@ function selectDecoratedFixes( test )
   test.case = 'complex selector'; /* */
   var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
   var selector = [ '{b/b2}', { a : '{c}', b : '{a/map}' } ];
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got[ 0 ] === src.b.b2 );
   test.is( got[ 1 ][ 'a' ] === src.c );
@@ -593,21 +719,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var selector = [ 'b', 'c' ];
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'second level selector'; /* */
   var selector = [ 'b/b2', 'c' ];
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'complex selector'; /* */
   var selector = [ 'b/b2', { a : 'c', b : 'a/map' } ];
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
@@ -620,7 +746,7 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
   var selector = { b : '{b}', c : '{c}' };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got.b === src.b );
   test.is( got.c === src.c );
@@ -628,7 +754,7 @@ function selectDecoratedFixes( test )
   test.case = 'second level selector'; /* */
   var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
   var selector = { b2 : '{b/b2}', c : '{c}' };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
   test.is( got.c === src.c );
@@ -636,7 +762,7 @@ function selectDecoratedFixes( test )
   test.case = 'complex selector'; /* */
   var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
   var selector = { b : '{b/b2}', array : [ '{c}', '{a/map}' ] };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got[ 'b' ] === src.b.b2 );
   test.is( got[ 'array' ][ 0 ] === src.c );
@@ -651,21 +777,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var selector = { b : 'b', c : 'c' };
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'second level selector'; /* */
   var selector = { b2 : 'b/b2', c : 'c' };
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
   test.case = 'complex selector'; /* */
   var selector = { b : 'b/b2', array : [ 'c', 'a/map' ] };
   var expected = selector;
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, selector );
   test.is( got !== selector );
 
@@ -678,21 +804,21 @@ function selectDecoratedFixes( test )
   test.case = 'first level selector'; /* */
   var expected = { b : 'b', c : { c1 : 1, c2 : 'c2' } };
   var selector = { b : 'b', c : '{c}' };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got.c === src.c );
 
   test.case = 'second level selector'; /* */
   var expected = { b2 : 'b2', c : 'c' };
   var selector = { b2 : '{b/b2}', c : 'c' };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got.b2 === src.b.b2 );
 
   test.case = 'complex selector'; /* */
   var expected = { b : 'b2', array : [ 'c', { name : 'name1' } ] };
   var selector = { b : '{b/b2}', array : [ 'c', '{a/map}' ] };
-  var got = _.select({ src, selector, onSelector });
+  var got = _.select({ src, selector, onSelectorReplicate });
   test.identical( got, expected );
   test.is( got.b === src.b.b2 );
   test.is( got.array[ 1 ] === src.a.map );
@@ -713,18 +839,13 @@ function selectDecoratedInfix( test )
     c : { c1 : false, c2 : [ 'c21', 'c22' ] },
   }
 
-  function onSelector( selector )
-  {
-    if( !_.strHas( selector, '::' ) )
-    return;
-    return _.strIsolateRightOrAll( selector, '::' )[ 2 ];
-  }
-
   /* */
 
   test.open( 'compositeSelecting : 1' );
 
-  test.case = '{pre::b/b1}'; /* */
+  /* */
+
+  test.case = '{pre::b/b1}';
   var expected = 1;
   var selector = '{pre::b/b1}';
   var got = _.select
@@ -732,11 +853,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'b'; /* */
+  /* */
+
+  test.case = 'b';
   var expected = 'b';
   var selector = 'b';
   var got = _.select
@@ -744,11 +868,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector,
+    onSelectorReplicate,
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = '{pre::c/c2}'; /* */
+  /* */
+
+  test.case = '{pre::c/c2}';
   var expected =
   [
     'c21',
@@ -760,11 +887,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::c/c2, isStrippedSelector : 0'; /* */
+  /* */
+
+  test.case = 'pre::c/c2, isStrippedSelector : 0';
   var expected = 'pre::c/c2';
   var selector = 'pre::c/c2';
   var got = _.select
@@ -772,11 +902,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector, isStrippedSelector : 0 }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate, isStrippedSelector : 0 }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::c/c2, isStrippedSelector : 1'; /* */
+  /* */
+
+  test.case = 'pre::c/c2, isStrippedSelector : 1';
   var expected =
   [
     'c21',
@@ -788,11 +921,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector, isStrippedSelector : 1 }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate, isStrippedSelector : 1 }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'composite selector'; /* */
+  /* */
+
+  test.case = 'composite selector';
   var expected =
   [
     'Some test with inlined c21 and 1 and false.',
@@ -804,7 +940,8 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
@@ -814,7 +951,9 @@ function selectDecoratedInfix( test )
 
   test.open( 'compositeSelecting : 0' );
 
-  test.case = 'pre::b/b1'; /* */
+  /* */
+
+  test.case = 'pre::b/b1';
   var expected = 1;
   var selector = 'pre::b/b1';
   var got = _.select
@@ -822,11 +961,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector,
+    onSelectorReplicate,
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'b'; /* */
+  /* */
+
+  test.case = 'b';
   var expected = 'b';
   var selector = 'b';
   var got = _.select
@@ -834,11 +976,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector,
+    onSelectorReplicate,
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::c/c2'; /* */
+  /* */
+
+  test.case = 'pre::c/c2';
   var expected =
   [
     'c21',
@@ -850,11 +995,14 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector,
+    onSelectorReplicate,
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = '{pre::c/c2'; /* */
+  /* */
+
+  test.case = '{pre::c/c2';
   var expected =
   [
     'c21',
@@ -866,11 +1014,30 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelector,
+    onSelectorReplicate,
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
+  /* */
+
   test.close( 'compositeSelecting : 0' );
+
+  function onSelectorReplicate( selector )
+  {
+    if( !_.strHas( selector, '::' ) )
+    return;
+    // return _.strIsolateRightOrAll( selector, '::' )[ 2 ];
+    return selector;
+  }
+
+  function onSelectorUndecorate()
+  {
+    let it = this;
+    if( !_.strHas( it.selector, '::' ) )
+    return;
+    it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
+  }
 
 }
 
@@ -878,15 +1045,6 @@ function selectDecoratedInfix( test )
 
 function selectRecursive( test )
 {
-
-  function onSelector( selector )
-  {
-    if( !_.strIs( selector ) )
-    return;
-    if( !_.strHas( selector, '::' ) )
-    return;
-    return _.strIsolateRightOrAll( selector, '::' )[ 2 ];
-  }
 
   /* - */
 
@@ -899,7 +1057,9 @@ function selectRecursive( test )
     c : { c1 : false, c2 : [ 'c21', 'c22' ] },
   }
 
-  test.case = 'pre::b/b1'; /* */
+  /* */
+
+  test.case = 'pre::b/b1';
   var expected = 'c21';
   var selector = 'pre::b/b1';
   var got = _.select
@@ -908,11 +1068,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 0,
     recursive : Infinity,
-    onSelector,
+    onSelectorUndecorate,
+    onSelectorReplicate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::b/b1, recursive : 0'; /* */
+  /* */
+
+  test.case = 'pre::b/b1, recursive : 0';
   var expected = '::a/map/name';
   var selector = 'pre::b/b1';
   var got = _.select
@@ -921,11 +1084,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 0,
     recursive : 0,
-    onSelector,
+    onSelectorUndecorate,
+    onSelectorReplicate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::b/b1, recursive : 1'; /* */
+  /* */
+
+  test.case = 'pre::b/b1, recursive : 1';
   var expected = '::c/c2/0';
   var selector = 'pre::b/b1';
   var got = _.select
@@ -934,11 +1100,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 0,
     recursive : 1,
-    onSelector,
+    onSelectorUndecorate,
+    onSelectorReplicate,
   });
   test.identical( got, expected );
 
-  test.case = 'pre::b/b1, recursive : 2'; /* */
+  /* */
+
+  test.case = 'pre::b/b1, recursive : 2';
   var expected = 'c21';
   var selector = 'pre::b/b1';
   var got = _.select
@@ -947,15 +1116,18 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 0,
     recursive : 2,
-    onSelector,
+    onSelectorUndecorate,
+    onSelectorReplicate,
   });
   test.identical( got, expected );
+
+  /* */
 
   test.close( 'compositeSelecting : 0' );
 
   /* - */
 
-  test.open( 'compositeSelecting : 0' );
+  test.open( 'compositeSelecting : 1' );
 
   var src =
   {
@@ -964,7 +1136,9 @@ function selectRecursive( test )
     c : { c1 : false, c2 : [ 'c21', 'c22' ] },
   }
 
-  test.case = '{pre::b/b1}'; /* */
+  /* */
+
+  test.case = '{pre::b/b1}';
   var expected = 'c21';
   var selector = '{pre::b/b1}';
   var got = _.select
@@ -973,11 +1147,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : Infinity,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = '{pre::b/b1}, recursive : 0'; /* */
+  /* */
+
+  test.case = '{pre::b/b1}, recursive : 0';
   var expected = '{::a/map/name}';
   var selector = '{pre::b/b1}';
   var got = _.select
@@ -986,11 +1163,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 0,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = '{pre::b/b1}, recursive : 1'; /* */
+  /* */
+
+  test.case = '{pre::b/b1}, recursive : 1';
   var expected = '{::c/c2/0}';
   var selector = '{pre::b/b1}';
   var got = _.select
@@ -999,11 +1179,14 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 1,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.case = '{pre::b/b1}, recursive : 2'; /* */
+  /* */
+
+  test.case = '{pre::b/b1}, recursive : 2';
   var expected = 'c21';
   var selector = '{pre::b/b1}';
   var got = _.select
@@ -1012,11 +1195,208 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 2,
-    onSelector : _.select.functor.onSelectorComposite({ onSelector }),
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
   });
   test.identical( got, expected );
 
-  test.close( 'compositeSelecting : 0' );
+  /* */
+
+  test.close( 'compositeSelecting : 1' );
+
+  /* - */
+
+  test.open( 'compositeSelecting : 1, composite strings' );
+
+  var src =
+  {
+    a : { map : { name : '{::c/c2/0}' }, value : 13 },
+    b : { b1 : '{::a/map/name}', b2 : [ 'b2-a', 'b2-b' ] },
+    c : { c1 : false, c2 : [ 'c21', 'c22' ] },
+  }
+
+  /* */
+
+  test.case = 'begin {pre::b/b1} mid {b/b2} end';
+  var expected = [ 'begin c21 mid b2-a end', 'begin c21 mid b2-b end' ];
+  var selector = 'begin {pre::b/b1} mid {::b/b2} end';
+  var got = _.select
+  ({
+    src,
+    selector,
+    compositeSelecting : 1,
+    recursive : Infinity,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'begin {pre::b/b1} mid {b/b2} end, recursive : 0';
+  var expected = [ 'begin {::a/map/name} mid b2-a end', 'begin {::a/map/name} mid b2-b end' ];
+  var selector = 'begin {pre::b/b1} mid {::b/b2} end';
+  var got = _.select
+  ({
+    src,
+    selector,
+    compositeSelecting : 1,
+    recursive : 0,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'begin {pre::b/b1} mid {b/b2} end, recursive : 1';
+  var expected = [ 'begin {::c/c2/0} mid b2-a end', 'begin {::c/c2/0} mid b2-b end' ];
+  var selector = 'begin {pre::b/b1} mid {::b/b2} end';
+  var got = _.select
+  ({
+    src,
+    selector,
+    compositeSelecting : 1,
+    recursive : 1,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'begin {pre::b/b1} mid {b/b2} end, recursive : 2';
+  var expected = [ 'begin c21 mid b2-a end', 'begin c21 mid b2-b end' ];
+  var selector = 'begin {pre::b/b1} mid {::b/b2} end';
+  var got = _.select
+  ({
+    src,
+    selector,
+    compositeSelecting : 1,
+    recursive : 2,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, expected );
+
+  /* */
+
+  test.close( 'compositeSelecting : 1, composite strings' );
+
+  /* - */
+
+  test.open( 'compositeSelecting : 1, composite strings, deep' );
+
+  var src =
+  {
+    var :
+    {
+      dir :
+      {
+        x : 13,
+      }
+    },
+    about :
+    {
+      user : 'user1',
+    },
+    result :
+    {
+      dir :
+      {
+        userX : '{::about/::user} - {::var/::dir/::x}'
+      }
+    },
+  }
+
+  /* */
+
+  test.case = 'explicit';
+  var exp = 'user1 - 13 !';
+  var got = _.select
+  ({
+    src : src,
+    selector : '{::result/::dir/::userX} !',
+    compositeSelecting : 1,
+    recursive : Infinity,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, exp );
+  console.log( got );
+
+  /* */
+
+  test.case = 'implicit';
+  var exp = '{::about/::user} - {::var/::dir/::x} !';
+  var got = _.select
+  ({
+    src : src,
+    selector : '{::result/::dir/::userX} !',
+    compositeSelecting : 1,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, exp );
+  console.log( got );
+
+  /* */
+
+  test.case = 'recursive : 0';
+  var exp = '{::about/::user} - {::var/::dir/::x} !';
+  var got = _.select
+  ({
+    src : src,
+    selector : '{::result/::dir/::userX} !',
+    compositeSelecting : 1,
+    recursive : 0,
+    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorUndecorate,
+  });
+  test.identical( got, exp );
+  console.log( got );
+
+  /* */
+
+  test.case = 'error';
+  test.shouldThrowErrorSync( () =>
+  {
+    var got = _.select
+    ({
+      src : src,
+      selector : '{result::dir/userX} !',
+      compositeSelecting : 1,
+      recursive : Infinity,
+      onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+      onSelectorUndecorate,
+      missingAction : 'throw',
+    });
+  });
+
+  /* */
+
+  test.close( 'compositeSelecting : 1, composite strings, deep' );
+
+  /* - */
+
+  function onSelectorReplicate( selector )
+  {
+    if( !_.strIs( selector ) )
+    return;
+    if( !_.strHas( selector, '::' ) )
+    return;
+    return selector;
+  }
+
+  function onSelectorUndecorate()
+  {
+    let it = this;
+    if( !_.strIs( it.selector ) )
+    return;
+    if( !_.strHas( it.selector, '::' ) )
+    return;
+    it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
+  }
 
 }
 
@@ -1033,7 +1413,7 @@ function selectMissing( test )
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1050,7 +1430,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1067,7 +1447,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1084,7 +1464,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1102,7 +1482,7 @@ function selectMissing( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1120,7 +1500,7 @@ function selectMissing( test )
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1137,7 +1517,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1155,7 +1535,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1179,7 +1559,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1203,7 +1583,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1227,7 +1607,7 @@ function selectMissing( test )
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1244,7 +1624,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1261,7 +1641,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1278,7 +1658,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1296,7 +1676,7 @@ function selectMissing( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1314,7 +1694,7 @@ function selectMissing( test )
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1331,7 +1711,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1349,7 +1729,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1373,7 +1753,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1397,7 +1777,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1421,7 +1801,7 @@ function selectMissing( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1446,7 +1826,7 @@ function selectMissing( test )
   {
     a : { map : { name : 'name1' }, value : 13 },
     b : { map : { name : 'name2' }, value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1470,7 +1850,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1495,7 +1875,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1533,7 +1913,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1578,7 +1958,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1601,7 +1981,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1630,7 +2010,6 @@ function selectMissing( test )
     selector : '*/x',
     missingAction : 'error',
   });
-
   test.is( got instanceof _.ErrorLooking );
   console.log( got );
 
@@ -1647,7 +2026,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1663,7 +2042,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1678,7 +2057,7 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1701,10 +2080,9 @@ function selectMissing( test )
   var src =
   {
     a : { name : 'name1', value : 13 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1712,7 +2090,6 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1720,7 +2097,6 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1728,7 +2104,6 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1737,7 +2112,6 @@ function selectMissing( test )
   }));
 
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1745,7 +2119,6 @@ function selectMissing( test )
     missingAction : 'throw',
   }));
 
-  // if( Config.debug )
   test.shouldThrowErrorSync( () => _.select
   ({
     src,
@@ -1769,14 +2142,14 @@ function selectSet( test )
   {
     a : { name : 'x', value : 13 },
     b : { name : 'x', value : 77 },
-    c : { name : 'x', value : 25, date : new Date() },
+    c : { name : 'x', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var src =
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select
@@ -1831,7 +2204,6 @@ function selectSet( test )
     var src = {};
     var expected = {};
 
-    debugger;
     var got = _.select
     ({
       src,
@@ -1840,9 +2212,6 @@ function selectSet( test )
       setting : 1,
       usingIndexedAccessToMap : 1,
     });
-
-    test.identical( got, undefined );
-    test.identical( src, expected );
 
   });
 
@@ -1863,7 +2232,139 @@ function selectSet( test )
   test.identical( got, '1' );
   test.identical( src, expected );
 
+  /* - */
+
+  test.open( '/a from empty map' );
+
+  var expected = { 'a' : 'x' }
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a',
+    set : 'x',
+    missingAction : 'ignore',
+  });
+
+  test.identical( got, undefined );
+  test.identical( src, expected );
+
   /* */
+
+  var expected = { 'a' : 'x' }
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a',
+    set : 'x',
+    missingAction : 'undefine',
+  });
+
+  test.identical( got, undefined );
+  test.identical( src, expected );
+
+  /* */
+
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a',
+    set : 'x',
+    missingAction : 'error',
+  });
+
+  test.is( _.errIs( got ) );
+  test.identical( src, expected );
+
+  /* */
+
+  test.shouldThrowErrorSync( () =>
+  {
+    var src = {}
+    var got = _.select
+    ({
+      src,
+      selector : '/a',
+      set : 'x',
+      missingAction : 'throw',
+    });
+  });
+
+  /* */
+
+  test.close( '/a from empty map' );
+
+  /* - */
+
+  test.open( '/a/b from empty map' );
+
+  /* */
+
+  var expected = {}
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a/b',
+    set : 'x',
+    missingAction : 'ignore',
+  });
+
+  test.identical( got, undefined );
+  test.identical( src, expected );
+
+  /* */
+
+  var expected = {}
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a/b',
+    set : 'x',
+    missingAction : 'undefine',
+  });
+
+  test.identical( got, undefined );
+  test.identical( src, expected );
+
+  /* */
+
+  var src = {}
+  var got = _.select
+  ({
+    src,
+    selector : '/a/b',
+    set : 'x',
+    missingAction : 'error',
+  });
+
+  test.is( _.errIs( got ) );
+  test.identical( src, expected );
+
+  /* */
+
+  test.shouldThrowErrorSync( () =>
+  {
+    var src = {}
+    var got = _.select
+    ({
+      src,
+      selector : '/a/b',
+      set : 'x',
+      missingAction : 'throw',
+    });
+  });
+
+  /* */
+
+  test.close( '/a/b from empty map' );
+
+  /* - */
+
+  test.open( 'throwing' );
 
   test.shouldThrowErrorSync( () => _.select
   ({
@@ -1884,27 +2385,7 @@ function selectSet( test )
     missingAction : 'throw',
   }));
 
-  /* */
-
-  test.shouldThrowErrorSync( () => _.select
-  ({
-    src : {},
-    selector : '/a/b',
-    set : 'c',
-    setting : 1,
-    missingAction : 'ignore',
-  }));
-
-  /* */
-
-  test.shouldThrowErrorSync( () => _.select
-  ({
-    src : {},
-    selector : '/a/b',
-    set : 'c',
-    setting : 1,
-    missingAction : 'undefine',
-  }));
+  test.close( 'throwing' );
 
 }
 
@@ -1919,7 +2400,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, '' );
@@ -1935,7 +2416,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, '/' );
@@ -1949,7 +2430,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, 'a/..' );
@@ -1963,7 +2444,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, 'a/name/..' );
@@ -1977,7 +2458,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, 'a/name/../..' );
@@ -1991,7 +2472,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, 'a/name/../../a/name' );
@@ -2005,7 +2486,7 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
   var got = _.select( src, 'a/../a/../a/name' );
@@ -2059,19 +2540,28 @@ function selectWithDown( test )
 
   /* */
 
+}
+
+//
+
+function selectWithDownRemake( test )
+{
+
+  /* */
+
   var src =
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectIt( src, 'a/name' );
+  var it = _.selectSingleIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it = _.selectIt( it.lastSelected.iterationRemake(), '..' );
+  var it = _.selectSingleIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it.dst, src.a );
   test.is( it.dst === src.a );
@@ -2082,25 +2572,276 @@ function selectWithDown( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { value : 25, date : new Date() },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectIt( src, 'a/name' );
+  var it = _.selectSingleIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it2 = _.selectIt( it.lastSelected.iterationRemake(), '../../b/name' );
+  var it2 = _.selectSingleIt( it.lastSelected.iterationMake(), '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.is( it2.dst === src.b.name );
   test.is( it !== it2 );
 
-  var it3 = _.selectIt( it.lastSelected.iterationRemake(), '..' );
+  var it3 = _.selectSingleIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it3.dst, src.b );
   test.is( it3.dst === src.b );
   test.is( it3 !== it2 );
+
+  /* */
+
+  test.case = 'onDown, iterationMake';
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
+  }
+
+  var it = _.selectSingleIt
+  ({
+    src : src,
+    selector : 'a/name',
+    onDown : onRemakeDown,
+  });
+
+  test.identical( it.dst, src.b.name );
+  test.is( it.dst === src.b.name );
+
+  function onRemakeDown( e, k, it )
+  {
+    if( it.path === '/a/name' )
+    {
+      it.dst = _.select( it.lastSelected.iterationMake(), '../../b/name' );
+    }
+  }
+
+}
+
+//
+
+function reselect( test )
+{
+  let upsLevel = [];
+  let upsAbsoluteLevel = [];
+  let upsSelector = [];
+  let upsPath = [];
+  let dwsLevel = [];
+  let dwsAbsoluteLevel = [];
+  let dwsSelector = [];
+  let dwsPath = [];
+
+  /* */
+
+  test.case = 'onDown';
+
+  clean();
+
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
+  }
+
+  var it = _.selectSingleIt
+  ({
+    src : src,
+    selector : 'a/name',
+    onUp : onUp,
+    onDown : onDown,
+  });
+
+  test.identical( it.dst, src.b.value );
+  test.identical( it.dst, 77 );
+
+  var exp = [ 0, 1, 2, 2, 3, 4, 5, 6, 6, 7, 8 ];
+  test.identical( upsLevel, exp );
+  var exp = [ 0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2 ];
+  test.identical( upsAbsoluteLevel, exp );
+  var exp = [ 'a', 'name', undefined, '..', '..', 'b', 'name', undefined, '..', 'value', undefined ];
+  test.identical( upsSelector, exp );
+  var exp =
+  [
+    '/',
+    '/a',
+    '/a/name',
+    '/a/name',
+    '/a/name/..',
+    '/a/name/../..',
+    '/a/name/../../b',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name/..',
+    '/a/name/../../b/name/../value'
+  ]
+  test.identical( upsPath, exp );
+
+  var exp = [ 2, 6, 8, 7, 6, 5, 4, 3, 2, 1, 0 ];
+  test.identical( dwsLevel, exp );
+  var exp = [ 2, 2, 2, 1, 2, 1, 0, 1, 2, 1, 0 ];
+  test.identical( dwsAbsoluteLevel, exp );
+  var exp = [ undefined, undefined, undefined, 'value', '..', 'name', 'b', '..', '..', 'name', 'a' ];
+  test.identical( dwsSelector, exp );
+  var exp =
+  [
+    '/a/name',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name/../value',
+    '/a/name/../../b/name/..',
+    '/a/name/../../b/name',
+    '/a/name/../../b',
+    '/a/name/../..',
+    '/a/name/..',
+    '/a/name',
+    '/a',
+    '/'
+  ];
+  test.identical( dwsPath, exp );
+
+  /* */
+
+  test.case = 'onTerminal';
+
+  clean();
+
+  var src =
+  {
+    a : { name : 'name1', value : 13 },
+    b : { name : 'name2', value : 77 },
+    c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
+  }
+
+  var it = _.selectSingleIt
+  ({
+    src : src,
+    selector : 'a/name',
+    onUp : onUp,
+    onDown : onDown0,
+    onTerminal : onTerminal,
+  });
+
+  test.identical( it.dst, src.b.value );
+  test.identical( it.dst, 77 );
+
+  var exp = [ 0, 1, 2, 2, 3, 4, 5, 6, 6, 7, 8 ];
+  test.identical( upsLevel, exp );
+  var exp = [ 0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2 ];
+  test.identical( upsAbsoluteLevel, exp );
+  var exp = [ 'a', 'name', undefined, '..', '..', 'b', 'name', undefined, '..', 'value', undefined ];
+  test.identical( upsSelector, exp );
+  var exp =
+  [
+    '/',
+    '/a',
+    '/a/name',
+    '/a/name',
+    '/a/name/..',
+    '/a/name/../..',
+    '/a/name/../../b',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name/..',
+    '/a/name/../../b/name/../value'
+  ]
+  test.identical( upsPath, exp );
+
+  var exp = [ 8, 7, 6, 6, 5, 4, 3, 2, 2, 1, 0 ];
+  test.identical( dwsLevel, exp );
+  var exp = [ 2, 1, 2, 2, 1, 0, 1, 2, 2, 1, 0 ];
+  test.identical( dwsAbsoluteLevel, exp );
+  var exp = [ undefined, 'value', '..', undefined, 'name', 'b', '..', '..', undefined, 'name', 'a' ];
+  test.identical( dwsSelector, exp );
+  var exp =
+  [
+    '/a/name/../../b/name/../value',
+    '/a/name/../../b/name/..',
+    '/a/name/../../b/name',
+    '/a/name/../../b/name',
+    '/a/name/../../b',
+    '/a/name/../..',
+    '/a/name/..',
+    '/a/name',
+    '/a/name',
+    '/a',
+    '/'
+  ];
+  test.identical( dwsPath, exp );
+
+  /* */
+
+  function onUp( e, k, it )
+  {
+    upsLevel.push( it.level );
+    upsAbsoluteLevel.push( it.absoluteLevel );
+    upsSelector.push( it.selector );
+    upsPath.push( it.path );
+  }
+
+  function onDown0( e, k, it )
+  {
+
+    dwsLevel.push( it.level );
+    dwsAbsoluteLevel.push( it.absoluteLevel );
+    dwsSelector.push( it.selector );
+    dwsPath.push( it.path );
+
+  }
+
+  function onDown( e, k, it )
+  {
+
+    onDown0.apply( this, arguments );
+
+    if( !it.selector )
+    if( it.path === '/a/name' )
+    {
+      it.dst = it.reselect( '../../b/name' );
+    }
+
+    if( !it.selector )
+    if( it.path === '/a/name/../../b/name' )
+    {
+      it.dst = it.reselect( '../value' );
+    }
+
+  }
+
+  function onTerminal( e )
+  {
+    let it = this;
+
+    test.identical( arguments.length, 1 );
+
+    if( it.path === '/a/name' )
+    {
+      it.dst = it.reselect( '../../b/name' );
+    }
+
+    if( it.path === '/a/name/../../b/name' )
+    {
+      it.dst = it.reselect( '../value' );
+    }
+
+  }
+
+  function clean()
+  {
+    upsLevel.splice( 0 );
+    upsAbsoluteLevel.splice( 0 );
+    upsSelector.splice( 0 );
+    upsPath.splice( 0 );
+    dwsLevel.splice( 0 );
+    dwsAbsoluteLevel.splice( 0 );
+    dwsSelector.splice( 0 );
+    dwsPath.splice( 0 );
+  }
+
+  /* */
 
 }
 
@@ -2146,7 +2887,114 @@ function selectWithGlob( test )
 
 //
 
-function testPaths( test )
+function selectUndecorating( test )
+{
+
+  test.case = 'basic';
+  var src =
+  {
+    int : 0,
+    str : 'str',
+    arr : [ 1, 3 ],
+    map : { m1 : new Date( Date.UTC( 1990, 0, 0 ) ), m3 : 'str' },
+    set : new Set([ 1, 3 ]),
+    hash : new HashMap([ [ new Date( Date.UTC( 1990, 0, 0 ) ), function(){} ], [ 'm3', 'str' ] ]),
+  }
+
+  var exp = 'str';
+  var got = _.select
+  ({
+    src : src,
+    selector : '/Object::map/String::m3',
+    onSelectorUndecorate : _.selector.functor.onSelectorUndecorateDoubleColon(),
+  });
+  test.identical( got, exp );
+
+}
+
+//
+
+function selectIrregularSelector( test )
+{
+
+  test.case = 'basic';
+  var src =
+  {
+    int : 0,
+    str : 'str',
+    arr : [ 1, 3 ],
+    'int set' : { m1 : new Date( Date.UTC( 1990, 0, 0 ) ), 'm1/year' : 'str' },
+    set : new Set([ 1, 3 ]),
+    hash : new HashMap([ [ new Date( Date.UTC( 1990, 0, 0 ) ), function(){} ], [ 'm3', 'str' ] ]),
+  }
+
+  var exp = 'str';
+  var got = _.select( src, '"int set"/"m1/year"' );
+  test.identical( got, exp );
+
+}
+
+//
+
+function selectUnique( test )
+{
+
+  /* */
+
+  test.case = 'map';
+  var exp =
+  {
+    'a' : 'name1',
+    'b' : 'name2',
+    'c' : 'name2',
+    'd' : 'name1',
+    'e' : 'name1'
+  }
+  var src =
+  {
+    a : { name : 'name1', val : 1 },
+    b : { name : 'name2', val : 2 },
+    c : { name : 'name2', val : 3 },
+    d : { name : 'name1', val : 4 },
+    e : { name : 'name1', val : 5 },
+  }
+  var got = _.selectUnique( src, '*/name' );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'array';
+  var exp =
+  [
+    'name1',
+    'name2',
+  ]
+  var src =
+  [
+    { name : 'name1', val : 1 },
+    { name : 'name2', val : 2 },
+    { name : 'name2', val : 3 },
+    { name : 'name1', val : 4 },
+    { name : 'name1', val : 5 },
+  ]
+  var got = _.selectUnique( src, '*/name' );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'F32x';
+  var exp = new F32x([ 1, 2, 3 ]);
+  var src = new F32x([ 1, 1, 2, 2, 3, 1 ]);
+  var got = _.selectUnique( src, '/' );
+  test.identical( got, exp );
+
+  /* */
+
+}
+
+//
+
+function fieldPath( test )
 {
 
   let onUpBeginCounter = 0;
@@ -2231,7 +3079,7 @@ function selectWithGlobNonPrimitive( test )
   {
     let it = this;
 
-    _.assert( arguments.length === 0 ); debugger;
+    _.assert( arguments.length === 0 );
 
     if( _.arrayLike( it.src ) )
     {
@@ -2448,7 +3296,6 @@ var Self =
 
   name : 'Tools.base.l5.Selector',
   silencing : 1,
-  enabled : 1,
   routineTimeOut : 15000,
 
   context :
@@ -2457,8 +3304,11 @@ var Self =
 
   tests :
   {
+
     selectSingle,
+    selectSingleOptionUsingIndexedAccessToMap,
     selectTrivial,
+    selectUsingIndexedAccessToMap,
     selectFromInstance,
     selectMultiple,
     selectComposite,
@@ -2468,11 +3318,18 @@ var Self =
     selectMissing,
     selectSet,
     selectWithDown,
+    selectWithDownRemake,
+    reselect,
     selectWithGlob,
-    testPaths,
+    selectUndecorating,
+    selectIrregularSelector,
+    selectUnique,
+
+    fieldPath,
     selectWithGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
+
   }
 
 }
