@@ -333,17 +333,14 @@ function selectorChanged()
 
   _.assert( arguments.length === 0 );
 
-  // debugger;
   if( it.selector !== undefined )
   if( it.onSelectorUndecorate )
   {
-    // debugger;
     it.onSelectorUndecorate();
   }
 
   it.isRelative = it.selector === it.downToken;
   it.isTerminal = it.selector === undefined || it.selector === '/';
-  // it.isTerminal = it.selector === undefined || it.selector === '' || it.selector === '/';
 
   if( it.globing )
   {
