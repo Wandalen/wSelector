@@ -2994,6 +2994,34 @@ function selectUnique( test )
 
 //
 
+function selectThis( test )
+{ 
+  test.case = 'use onUpBegin to add support of <this> selector, wrap src into array and use 0 as selector'
+  function onUpBegin()
+  { 
+    let it = this;
+
+    if( it.selector === 'this' )
+    {
+      it.src = [ it.src ];
+      it.selector = 0;
+      
+      it.selectorChanged();
+      it.srcChanged();
+    }
+  }
+  var got = _.select
+  ({ 
+    src : { x : 1 }, 
+    selector : 'this', 
+    onUpBegin, 
+    missingAction : 'throw' 
+  });
+  test.identical( got, { x : 1 })
+}
+
+//
+
 function fieldPath( test )
 {
 
@@ -3324,6 +3352,7 @@ var Self =
     selectUndecorating,
     selectIrregularSelector,
     selectUnique,
+    selectThis,
 
     fieldPath,
     selectWithGlobNonPrimitive,
