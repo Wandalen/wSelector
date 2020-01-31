@@ -1240,7 +1240,7 @@ function onSelectorReplicate( src )
 function onSelectorUndecorate()
 {
   let it = this;
-  _.assert( _.strIs( it.selector ) );
+  _.assert( _.strIs( it.selector ) || _.numberIs( it.selector ) );
 }
 
 //
