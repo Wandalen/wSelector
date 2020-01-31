@@ -493,6 +493,9 @@ function selectComposite( test )
   function onSelectorReplicate( selector )
   {
     let it = this;
+
+    debugger;
+
     if( !_.strIs( selector ) )
     return;
 
@@ -516,7 +519,9 @@ function selectComposite( test )
   test.case = 'compositeSelecting : 0, custom onSelectorReplicate'; /* */
   var expected = [ 'Some test with inlined', 'b2', '.' ];
   var selector = 'Some test with inlined {b/b2}.';
+  debugger;
   var got = _.select({ src, selector, onSelectorReplicate, compositeSelecting : 0 });
+  debugger;
   test.identical( got, expected );
 
   test.case = 'compositeSelecting : 1'; /* */
@@ -3079,7 +3084,7 @@ function selectWithGlobNonPrimitive( test )
   {
     let it = this;
 
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0, 'Expects no arguments' );
 
     if( _.arrayLike( it.src ) )
     {

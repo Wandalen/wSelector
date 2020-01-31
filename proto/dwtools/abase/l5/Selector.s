@@ -48,63 +48,12 @@ _.assert( !!_realGlobal_ );
 // extend looker
 // --
 
-// function srcChanged()
-// {
-//
-//   it.selector = it.selectorArray[ it.level ];
-//
-// }
-
-// function srcChanged()
-// {
-//   let it = this;
-//
-//   _.assert( arguments.length === 0 );
-//
-//   if( _.arrayLike( it.src ) )
-//   {
-//     it.iterable = 'long-like';
-//   }
-//   else if( _.objectIs( it.src ) )
-//   {
-//     it.iterable = 'map-like';
-//   }
-//   else
-//   {
-//     it.iterable = false;
-//   }
-//
-// }
-
-// function look()
-// {
-//   let it = this;
-//
-//   if( !it.fast )
-//   _.assert( it.level >= 0 );
-//   _.assert( arguments.length === 0 );
-//
-//   it.visiting = it.canVisit();
-//   if( !it.visiting )
-//   return it;
-//
-//   it.visitUp();
-//
-//   it.ascending = it.canAscend();
-//   if( it.ascending )
-//   it.ascend();
-//
-//   it.visitDown();
-//   return it;
-// }
-
 function reselectIt( o )
 {
   let it = this;
 
   _.assert( arguments.length === 1 );
 
-  // let it2 = it.iterationRemake();
   let it2 = it.iterationMake();
 
   _.selector.selectSingleIt( it2, o ); /* xxx */
@@ -131,7 +80,7 @@ function start()
 {
   let it = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
   _.assert( _.intIs( it.iterator.selector ) || _.strIs( it.iterator.selector ) );
@@ -169,38 +118,6 @@ function start()
 
 }
 
-// //
-//
-// function iterationMake()
-// {
-//   let it = this;
-//   let newIt = it.iterationMakeAct();
-//
-//   // if( !it.fast )
-//   // newIt.logicalLevel = it.logicalLevel + 1; /* yyy : level and logicalLevel should have the same value if no reinit done */
-//
-//   // newIt.absoluteLevel += 1;
-//
-//   _.assert( arguments.length === 0 );
-//
-//   return newIt;
-// }
-//
-// //
-//
-// function iterationRemake()
-// {
-//   let it = this;
-//   let newIt = it.iterationMakeAct();
-//
-//   // if( !it.fast )
-//   // newIt.logicalLevel = it.logicalLevel;
-//
-//   _.assert( arguments.length === 0 );
-//
-//   return newIt;
-// }
-
 //
 
 function iterationReinit( selector )
@@ -210,18 +127,12 @@ function iterationReinit( selector )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( selector ) );
 
-  // _.assert( o.prevSelectIteration === null || o.prevSelectIteration === o.it );
-  // _.assert( o.src === null );
-
   _.assert( Self.iterationIs( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.toStrShort( it ) );
   _.assert( _.strIs( it.iterator.selector ) );
   if( it.iterator.selector === undefined )
   it.iterator.selector = '';
   _.assert( _.strIs( it.iterator.selector ) );
-  // o.src = it.iterator.src;
-  // o.selector = it.iterator.selector + _.strsShortest( it.iterator.upToken ) + o.selector;
   it.iterator.selector = it.iterator.selector + _.strsShortest( it.iterator.upToken ) + selector;
-  // o.prevSelectIteration = it;
 
 }
 
@@ -231,13 +142,11 @@ function iterableEval()
 {
   let it = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  // if( it.selector === undefined || it.selector === '' || it.selector === '/' )
   if( it.isTerminal )
   {
-    // debugger;
     it.iterable = false;
     it.ascendAct = it._termianlAscend;
   }
@@ -249,9 +158,6 @@ function iterableEval()
   }
   else if( it.isGlob )
   {
-    // debugger;
-    // it.iterable = 'glob';
-    // it.ascendAct = it._globAscend;
 
     if( _.longLike( it.src ) )
     {
@@ -286,27 +192,6 @@ function iterableEval()
     it.ascendAct = it._singleAscend;
   }
 
-/*
-
-  function ascend()
-  {
-    let it = this;
-
-    _.assert( arguments.length === 0 );
-
-    if( it.selector === undefined )
-    it._termianlAscend();
-    // else if( it.selector === it.downToken )
-    else if( it.isRelative )
-    it._relativeAscend();
-    else if( it.isGlob )
-    it._globAscend();
-    else
-    it._singleAscend();
-
-  }
-
-*/
 }
 
 //
@@ -331,7 +216,7 @@ function selectorChanged()
 {
   let it = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( it.selector !== undefined )
   if( it.onSelectorUndecorate )
@@ -389,7 +274,7 @@ function globParse()
 {
   let it = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( it.globing );
 
   let regexp = /(.*){?\*=(\d*)}?(.*)/;
@@ -515,21 +400,7 @@ function visitUp()
 {
   let it = this;
 
-  // it.selector = it.selectorArray[ it.level ];
-  // it.selectorChanged();
-
   it.visitUpBegin();
-
-  // // it.indexedAccessToMap(); // yyy
-  //
-  // // it.selector = it.selectorArray[ it.logicalLevel-1 ];
-  // // it.selector = it.selectorArray[ it.level ];
-  // // it.dst = it.src; /* yyy : remove */
-  //
-  // it.dstWriteDown = function dstWriteDown( eit )
-  // {
-  //   it.dst = eit.dst;
-  // }
 
   if( it.onUpBegin )
   it.onUpBegin.call( it );
@@ -537,12 +408,8 @@ function visitUp()
   if( it.dstWritingDown )
   {
 
-    // it.selectorChanged();
-
-    // if( it.selector === undefined )
     if( it.isTerminal )
     it.upTerminal();
-    // else if( it.selector === it.downToken )
     else if( it.isRelative )
     it.upRelative();
     else if( it.isGlob )
@@ -585,19 +452,6 @@ function visitUpBegin()
   }
 
   return Parent.visitUpBegin.apply( it, ... arguments );
-
-  // it.indexedAccessToMap(); //
-
-  // it.selector = it.selectorArray[ it.logicalLevel-1 ];
-  // it.selector = it.selectorArray[ it.level ];
-  // it.dst = it.src; /* yyy : remove */
-
-  // if( it.down && !it.fast )
-  // it.down.childrenCounter += 1;
-  //
-  // if( it.continue )
-  // it.srcChanged();
-
 }
 
 //
@@ -606,7 +460,6 @@ function upTerminal()
 {
   let it = this;
 
-  // it.continue = false;
   it.dst = it.src;
 
 }
@@ -645,6 +498,7 @@ function upGlob()
         selector : it.parsedSelector.glob,
         onEvaluate : ( e, k ) => k,
       });
+      it.iterable = null;
       it.srcChanged();
     }
   }
@@ -700,10 +554,8 @@ function visitDown()
   if( it.onDownBegin )
   it.onDownBegin.call( it );
 
-  // if( it.selector === undefined )
   if( it.isTerminal )
   it.downTerminal();
-  // else if( it.selector === it.downToken )
   else if( it.isRelative )
   it.downRelative();
   else if( it.isGlob )
@@ -814,41 +666,6 @@ function downSet()
 
 //
 
-// function ascend( onAscend )
-// function ascend()
-// {
-//   let it = this;
-//
-//   _.assert( arguments.length === 0 );
-//
-//   if( it.selector === undefined )
-//   it._termianlAscend();
-//   // else if( it.selector === it.downToken )
-//   else if( it.isRelative )
-//   it._relativeAscend();
-//   else if( it.isGlob )
-//   it._globAscend();
-//   else
-//   it._singleAscend();
-//
-// }
-//
-// //
-//
-// function _termianlAscend()
-// {
-//   let it = this;
-//
-//   _.assert( arguments.length === 0 );
-//   // _.assert( it.iterable === false );
-//   // _.assert( it.ascendAct === it._termianlAscend );
-//   // it.ascendAct( it.src );
-//
-//   it._termianlAscend( it.src );
-// }
-
-//
-
 function _relativeAscend()
 {
   let it = this;
@@ -860,7 +677,6 @@ function _relativeAscend()
   if( !dit )
   return it.errNoDownThrow();
 
-  // while( dit.selector === it.downToken || dit.selector === undefined || counter > 0 )
   while( dit.isRelative || dit.isTerminal || counter > 0 )
   {
     if( dit.selector === it.downToken )
@@ -872,7 +688,6 @@ function _relativeAscend()
     return it.errNoDownThrow();
   }
 
-  // _.assert( _.lookIterationIs( dit ) );
   _.assert( it.iterationIs( dit ) );
 
   it.visitPop();
@@ -880,7 +695,6 @@ function _relativeAscend()
 
   /* */
 
-  // debugger;
   let nit = it.iterationMake();
   nit.choose( undefined, it.selector );
   nit.src = dit.src;
@@ -888,19 +702,9 @@ function _relativeAscend()
   nit.absoluteLevel -= 2;
 
   nit.look();
-  // onAscend.call( it, nit );
 
   return true;
 }
-
-//
-
-// function _globAscend()
-// {
-//   let it = this;
-//   _.assert( arguments.length === 0 );
-//   Parent.ascend.call( it );
-// }
 
 //
 
@@ -910,56 +714,14 @@ function _singleAscend( src )
 
   _.assert( arguments.length === 1 );
 
-  // if( it.usingIndexedAccessToMap && !isNaN( _.numberFromStr( it.selector ) ) )
-  // if( _.objectLike( it.src ) || _.hashMapLike( it.src ) )
-  // {
-  //   debugger;
-  //   let q = _.numberFromStr( it.selector );
-  //   it.selector = _.mapKeys( it.src )[ q ]; /* yyy : move? */
-  //   if( it.selector === undefined )
-  //   return it.errDoesNotExistThrow();
-  // }
-
-  // if( _.primitiveIs( it.src ) )
-  // {
-  //   it.errDoesNotExistThrow();
-  // }
-  //
-  // // else if( it.selectOptions.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.selector ) ) )
-  // else if( it.usingIndexedAccessToMap && _.objectLike( it.src ) && !isNaN( _.numberFromStr( it.selector ) ) )
-  // {
-  //   debugger;
-  //   let q = _.numberFromStr( it.selector );
-  //   it.selector = _.mapKeys( it.src )[ q ];
-  //   if( it.selector === undefined )
-  //   return it.errDoesNotExistThrow();
-  // }
-  // else if( it.src[ it.selector ] === undefined )
-  // {
-  //   it.errDoesNotExistThrow();
-  // }
-  // else
-  // {
-  // }
-
-  // debugger;
-
-  // debugger;
   let eit = it.iterationMake().choose( undefined, it.selector );
-  // debugger;
 
   if( eit.src === undefined )
   {
-    // debugger;
-    // if( eit.setting )
-    // eit.errCantSetThrow();
-    // else
     eit.errDoesNotExistThrow();
-    // return;
   }
 
   eit.look();
-  // onAscend.call( it, eit );
 
 }
 
@@ -973,7 +735,6 @@ function selectSingle_pre( routine, args )
   let o = args[ 0 ]
   if( args.length === 2 )
   {
-    // if( _.lookIterationIs( args[ 0 ] ) )
     if( Self.iterationIs( args[ 0 ] ) )
     o = { it : args[ 0 ], selector : args[ 1 ] }
     else
@@ -1001,25 +762,11 @@ function selectSingle_pre( routine, args )
     o.selector = o.it.iterator.selector;
     o.prevSelectIteration = o.it;
 
-    // _.assert( o.prevSelectIteration === null || o.prevSelectIteration === o.it );
-    // _.assert( o.src === null );
-    // _.assert( Self.iterationIs( o.it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.toStrShort( o.it ) );
-    // _.assert( _.strIs( o.it.iterator.selector ) );
-    // if( o.it.iterator.selector === undefined )
-    // o.it.iterator.selector = '';
-    // _.assert( _.strIs( o.it.iterator.selector ) );
-    // o.src = o.it.iterator.src;
-    // o.selector = o.it.iterator.selector + _.strsShortest( o.it.iterator.upToken ) + o.selector;
-    // o.it.iterator.selector = o.selector;
-    // o.prevSelectIteration = o.it;
-    // /* yyy : move out */
-
   }
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
 
-  // let o2 = optionsFor( o );
   let o2 = o;
   if( o2.Looker === null )
   o2.Looker = Self;
@@ -1027,49 +774,9 @@ function selectSingle_pre( routine, args )
 
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
-
-  // if( _.numberIs( it.iterator.selector ) )
-  // it.iterator.selectorArray = [ it.iterator.selector ];
-  // else
-  // it.iterator.selectorArray = split( it.iterator.selector );
-
   _.assert( o.it === it || o.it === null );
 
   return it;
-
-  /* */
-
-  // function split( selector )
-  // {
-  //   let splits = _.strSplit
-  //   ({
-  //     src : selector,
-  //     delimeter : o.upToken,
-  //     preservingDelimeters : 0,
-  //     preservingEmpty : 1,
-  //     preservingQuoting : 0,
-  //     stripping : 1,
-  //   });
-  //
-  //   if( _.strBegins( selector, o.upToken ) )
-  //   splits.splice( 0, 1 );
-  //   if( _.strEnds( selector, o.upToken ) )
-  //   splits.pop();
-  //
-  //   return splits;
-  // }
-
-  /* */
-
-  // function optionsFor( o )
-  // {
-  //
-  //   let o2 = o;
-  //   if( o2.Looker === null )
-  //   o2.Looker = Self;
-  //   return o2;
-  // }
-
 }
 
 //
@@ -1079,9 +786,6 @@ function selectSingleIt_body( it )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.lookerIs( it.Looker ) );
   _.assert( it.looker === undefined );
-  // debugger;
-  // let it2 = _.look.body( it );
-  // _.assert( it === it2 );
   it.start();
   return it;
 }
@@ -1093,7 +797,6 @@ defaults.it = null;
 defaults.src = null;
 defaults.selector = null;
 defaults.missingAction = 'undefine';
-// defaults.missingAction = 'throw';
 defaults.preservingIteration = 0;
 defaults.usingIndexedAccessToMap = 0;
 defaults.globing = 1;
@@ -1164,12 +867,8 @@ let selectSingleIt = _.routineFromPreAndBody( selectSingle_pre, selectSingleIt_b
 
 function selectSingle_body( it )
 {
-  // let it2 = _.selectIt.body( it );
-  // _.assert( it2 === it )
   it.start();
   _.assert( arguments.length === 1, 'Expects single argument' );
-  // if( it.selectOptions.missingAction === 'error' && it.error )
-  // return it.error;
   if( it.missingAction === 'error' && it.error )
   return it.error;
   _.assert( it.error === null );
@@ -1296,7 +995,6 @@ function select_body( o )
     delete single.onSelectorUp;
     delete single.onSelectorDown;
     delete single.onSelectorReplicate;
-    // delete single.onSelectorUndecorate;
     delete single.recursive;
     delete single.dst;
     delete single.root;
@@ -1309,28 +1007,16 @@ function select_body( o )
     return single;
   }
 
-  // /* */
-  //
-  // function selectSingleFirst()
-  // {
-  //   let it = this;
-  //   _.assert( _.strIs( it.src ) );
-  //   let dst = selectSingle.call( it, [] );
-  //   return dst;
-  // }
-
   /* */
 
   function selectSingle( visited )
   {
     let it = this;
-    // let r = Object.create( null );
 
     _.assert( _.strIs( it.src ) );
     _.assert( arguments.length === 1 );
 
     let op = singleOptions.call( it );
-    // op.selector = o.onSelectorUndecorate.call( it );
     op.selector = it.src;
     op.visited = visited;
     op.selected = false;
@@ -1341,27 +1027,12 @@ function select_body( o )
     _.assert( _.strIs( op.selector ) );
     _.assert( !_.longHas( visited, op.selector ), () => `Loop selecting ${op.selector}` );
 
-    // visited.push( it.src );
     visited.push( op.selector );
-
-    // r.op = singleOptions.call( it );
-    // r.op.selector = it.src;
-    // r.op.selector = selector;
 
     _.assert( _.strIs( op.selector ) );
 
     op.result = _.selectSingle( op );
     op.selected = true;
-
-    // if( o.recursive && visited.length <= o.recursive )
-    // {
-    //   let selector2 = o.onSelectorReplicate.call( it, dst );
-    //   if( selector2 !== undefined )
-    //   {
-    //     it.src = selector2;
-    //     return selectSingle.call( it, visited );
-    //   }
-    // }
 
     return op;
   }
@@ -1381,16 +1052,11 @@ function select_body( o )
 
       if( _.strIs( selector ) )
       {
-        // let visited = [];
-        // do
         {
           it.src = selector;
+          it.iterable = null;
           it.srcChanged();
           let single = selectSingle.call( it, visited );
-          // if( single.selected )
-          // it.dst = single.result;
-          // it.continue = false;
-          // it.dstSetting = false;
           selector = undefined;
           if( single.result !== undefined && o.recursive && visited.length <= o.recursive )
           {
@@ -1411,7 +1077,6 @@ function select_body( o )
             it.dstSetting = false;
           }
         }
-        // while( _.strIs( selector ) );
       }
       else if( selector !== undefined )
       {
@@ -1422,24 +1087,13 @@ function select_body( o )
           it.composite = true;
         }
         it.src = selector;
+        it.iterable = null;
         it.srcChanged();
         selector = undefined;
       }
 
     }
     while( selector !== undefined );
-
-    // if( selector && selector.composite === _.select.composite )
-    // {
-    //   if( !it.compositeRoot )
-    //   it.compositeRoot = it;
-    //   it.composite = true;
-    // }
-    // else if( selector )
-    // {
-    //   it.continue = false;
-    //   it.dstSetting = false;
-    // }
 
     if( o.onSelectorUp )
     o.onSelectorUp.call( it, o );
@@ -1648,11 +1302,6 @@ function onSelectorComposite( fop )
       else
       return split[ 0 ] + split1 + split[ 2 ];
 
-      // if( fop.onSelectorReplicate.call( it, split[ 1 ] ) === undefined )
-      // return split.join( '' );
-      // else
-      // return split;
-
     });
 
     selector2 = selector2.map( ( split ) => _.arrayIs( split ) ? split.join( '' ) : split );
@@ -1713,12 +1362,9 @@ let Selector = Object.create( Parent );
 
 Selector.constructor = function Selector(){};
 Selector.Looker = Selector;
-// Selector.look = look;
 Selector.reselectIt = reselectIt;
 Selector.reselect = reselect;
 Selector.start = start;
-// Selector.iterationMake = iterationMake;
-// Selector.iterationRemake = iterationRemake;
 Selector.iterationReinit = iterationReinit;
 Selector.iterableEval = iterableEval;
 Selector.choose = choose;
@@ -1747,10 +1393,7 @@ Selector.downGlob = downGlob;
 Selector.downSingle = downSingle;
 Selector.downSet = downSet;
 
-// Selector.ascend = ascend;
-// Selector._termianlAscend = _termianlAscend;
 Selector._relativeAscend = _relativeAscend;
-// Selector._globAscend = _globAscend;
 Selector._singleAscend = _singleAscend;
 
 let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
