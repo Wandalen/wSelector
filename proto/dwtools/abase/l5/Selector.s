@@ -714,6 +714,9 @@ function _singleAscend( src )
 
   _.assert( arguments.length === 1 );
 
+  if( it.selector === 'C' )
+  debugger;
+
   let eit = it.iterationMake().choose( undefined, it.selector );
 
   if( eit.src === undefined )
@@ -935,7 +938,7 @@ function select_pre( routine, args )
   {
 
     if( o.onSelectorReplicate === onSelectorReplicate || o.onSelectorReplicate === null )
-    o.onSelectorReplicate = _.selector.functor.onSelectorComposite();
+    o.onSelectorReplicate = _.selector.functor.onSelectorReplicateComposite();
     if( o.onSelectorDown === null )
     o.onSelectorDown = _.selector.functor.onSelectorDownComposite();
 
@@ -1044,6 +1047,11 @@ function select_body( o )
     let it = this;
     let selector
     let visited = [];
+
+    if( o.selector === "path::out.*=1" )
+    debugger;
+    if( o.selector === "out.*=1" )
+    debugger;
 
     selector = o.onSelectorReplicate.call( it, it.src );
 
@@ -1245,10 +1253,10 @@ function onSelectorUndecorate()
 
 //
 
-function onSelectorComposite( fop )
+function onSelectorReplicateComposite( fop )
 {
 
-  fop = _.routineOptions( onSelectorComposite, arguments );
+  fop = _.routineOptions( onSelectorReplicateComposite, arguments );
   fop.prefix = _.arrayAs( fop.prefix );
   fop.postfix = _.arrayAs( fop.postfix );
   fop.onSelectorReplicate = fop.onSelectorReplicate || onSelectorReplicate;
@@ -1257,7 +1265,7 @@ function onSelectorComposite( fop )
   _.assert( _.strsAreAll( fop.postfix ) );
   _.assert( _.routineIs( fop.onSelectorReplicate ) );
 
-  return function onSelectorComposite( selector )
+  return function onSelectorReplicateComposite( selector )
   {
     let it = this;
 
@@ -1317,7 +1325,7 @@ function onSelectorComposite( fop )
 
 }
 
-onSelectorComposite.defaults =
+onSelectorReplicateComposite.defaults =
 {
   prefix : '{',
   postfix : '}',
@@ -1423,7 +1431,7 @@ IterationPreserve.absoluteLevel = 0;
 let composite = Symbol.for( 'composite' );
 var FunctorExtnesion =
 {
-  onSelectorComposite,
+  onSelectorReplicateComposite,
   onSelectorDownComposite,
   onSelectorUndecorateDoubleColon,
 }

@@ -558,7 +558,7 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite(),
     onSelectorDown : _.selector.functor.onSelectorDownComposite(),
   });
   test.identical( got, expected );
@@ -580,7 +580,7 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 0,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite(),
   });
   test.identical( got, expected );
 
@@ -596,7 +596,7 @@ function selectComposite( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite(),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite(),
   });
   test.identical( got, expected );
 
@@ -858,7 +858,7 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -892,7 +892,7 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -907,7 +907,7 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate, isStrippedSelector : 0 }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate, isStrippedSelector : 0 }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -926,7 +926,7 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate, isStrippedSelector : 1 }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate, isStrippedSelector : 1 }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -945,7 +945,7 @@ function selectDecoratedInfix( test )
     src,
     selector,
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1152,7 +1152,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : Infinity,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1168,7 +1168,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 0,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1184,7 +1184,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1200,7 +1200,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 2,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1231,7 +1231,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : Infinity,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1247,7 +1247,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 0,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1263,7 +1263,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1279,7 +1279,7 @@ function selectRecursive( test )
     selector,
     compositeSelecting : 1,
     recursive : 2,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, expected );
@@ -1324,7 +1324,7 @@ function selectRecursive( test )
     selector : '{::result/::dir/::userX} !',
     compositeSelecting : 1,
     recursive : Infinity,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, exp );
@@ -1339,7 +1339,7 @@ function selectRecursive( test )
     src : src,
     selector : '{::result/::dir/::userX} !',
     compositeSelecting : 1,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, exp );
@@ -1355,7 +1355,7 @@ function selectRecursive( test )
     selector : '{::result/::dir/::userX} !',
     compositeSelecting : 1,
     recursive : 0,
-    onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+    onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
     onSelectorUndecorate,
   });
   test.identical( got, exp );
@@ -1372,7 +1372,7 @@ function selectRecursive( test )
       selector : '{result::dir/userX} !',
       compositeSelecting : 1,
       recursive : Infinity,
-      onSelectorReplicate : _.selector.functor.onSelectorComposite({ onSelectorReplicate }),
+      onSelectorReplicate : _.selector.functor.onSelectorReplicateComposite({ onSelectorReplicate }),
       onSelectorUndecorate,
       missingAction : 'throw',
     });
