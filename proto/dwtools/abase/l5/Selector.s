@@ -884,257 +884,7 @@ _.routineExtend( selectSingle_body, selectSingleIt );
 
 /**
  * @summary Selects elements from source object( src ) using provided pattern( selector ).
- * @description Short-cur for {@link module:Tools/base/Selector.Tools( module::Selector ).selectSingle _.selectSingleIt }. Returns found element(s) instead of iterator.
- * @param {} src Source entity.
- * @param {String} selector Pattern that matches against elements in a entity.
- *
- * @example //select element with key 'a1'
- * _.selectSingle( { a1 : 1, a2 : 2 }, 'a1' ); // 1
- *
- * @example //select any that starts with 'a'
- * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*' ); // { a1 : 1, a2 : 1 }
- *
- * @example //select with constraint, only one element should be selected
- * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=1' ); // error
- *
- * @example //select with constraint, two elements
- * _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=2' ); // { a1 : 1, a2 : 1 }
- *
- * @example //select inner element using path selector
- * _.selectSingle( { a : { b : { c : 1 } } }, 'a/b' ); //{ c : 1 }
- *
- * @example //select value of each property with name 'x'
- * _.selectSingle( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' ); //{a: 1, b: 2, c: 3}
- *
- * @example // select root
- * _.selectSingle( { a : { b : { c : 1 } } }, '/' );
- *
- * @function selectSingle
- * @memberof module:Tools/base/Selector.Tools( module::Selector )
-*/
-
-let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
-
-//
-
-function select_pre( routine, args )
-{
-
-  let o = args[ 0 ]
-  if( args.length === 2 )
-  {
-    if( Self.iterationIs( args[ 0 ] ) )
-    o = { it : args[ 0 ], selector : args[ 1 ] }
-    else
-    o = { src : args[ 0 ], selector : args[ 1 ] }
-  }
-
-  _.routineOptionsPreservingUndefines( routine, o );
-
-  if( o.root === null )
-  o.root = o.src;
-
-  if( o.compositeSelecting )
-  {
-
-    if( o.onSelectorReplicate === onSelectorReplicate || o.onSelectorReplicate === null )
-    o.onSelectorReplicate = _.selector.functor.onSelectorReplicateComposite();
-    if( o.onSelectorDown === null )
-    o.onSelectorDown = _.selector.functor.onSelectorDownComposite();
-
-    _.assert( _.routineIs( o.onSelectorReplicate ) );
-    _.assert( _.routineIs( o.onSelectorDown ) );
-
-  }
-
-  return o;
-}
-
-//
-
-function select_body( o )
-{
-
-  _.assert( !o.recursive || !!o.onSelectorReplicate, () => 'For recursive selection onSelectorReplicate should be defined' );
-  _.assert( o.it === null || o.it.constructor === Self.constructor );
-
-  return multipleSelect( o.selector );
-
-  /* */
-
-  function multipleSelect( selector )
-  {
-    let o2 =
-    {
-      src : selector,
-      onUp,
-      onDown,
-    }
-
-    o2.iterationPreserve = Object.create( null );
-    o2.iterationPreserve.composite = false;
-    o2.iterationPreserve.compositeRoot = null;
-
-    o2.iteratorExtension = Object.create( null );
-    o2.iteratorExtension.selectMultipleOptions = o;
-
-    let it = _.replicateIt( o2 );
-
-    return it.dst;
-  }
-
-  /* */
-
-  function singleOptions()
-  {
-    let it = this;
-    let single = _.mapExtend( null, o );
-    single.replicateIteration = it;
-
-    single.selector = null;
-    single.visited = null;
-    single.selected = false;
-
-    delete single.onSelectorUp;
-    delete single.onSelectorDown;
-    delete single.onSelectorReplicate;
-    delete single.recursive;
-    delete single.dst;
-    delete single.root;
-    delete single.compositeSelecting;
-    delete single.compositePrefix;
-    delete single.compositePostfix;
-
-    _.assert( !single.it || single.it.constructor === Self.constructor );
-
-    return single;
-  }
-
-  /* */
-
-  function selectSingle( visited )
-  {
-    let it = this;
-
-    _.assert( _.strIs( it.src ) );
-    _.assert( arguments.length === 1 );
-
-    let op = singleOptions.call( it );
-    op.selector = it.src;
-    op.visited = visited;
-    op.selected = false;
-
-    if( _.longHas( visited, op.selector ) )
-    return op;
-
-    _.assert( _.strIs( op.selector ) );
-    _.assert( !_.longHas( visited, op.selector ), () => `Loop selecting ${op.selector}` );
-
-    visited.push( op.selector );
-
-    _.assert( _.strIs( op.selector ) );
-
-    op.result = _.selectSingle( op );
-    op.selected = true;
-
-    return op;
-  }
-
-  /* */
-
-  function onUp()
-  {
-    let it = this;
-    let selector
-    let visited = [];
-
-    if( o.selector === "path::out.*=1" )
-    debugger;
-    if( o.selector === "out.*=1" )
-    debugger;
-
-    selector = o.onSelectorReplicate.call( it, it.src );
-
-    do
-    {
-
-      if( _.strIs( selector ) )
-      {
-        {
-          it.src = selector;
-          it.iterable = null;
-          it.srcChanged();
-          let single = selectSingle.call( it, visited );
-          selector = undefined;
-          if( single.result !== undefined && o.recursive && visited.length <= o.recursive )
-          {
-            selector = o.onSelectorReplicate.call( it, single.result );
-            if( selector === undefined )
-            {
-              if( single.selected )
-              it.dst = single.result;
-              it.continue = false;
-              it.dstSetting = false;
-            }
-          }
-          else
-          {
-            if( single.selected )
-            it.dst = single.result;
-            it.continue = false;
-            it.dstSetting = false;
-          }
-        }
-      }
-      else if( selector !== undefined )
-      {
-        if( selector && selector.composite === _.select.composite )
-        {
-          if( !it.compositeRoot )
-          it.compositeRoot = it;
-          it.composite = true;
-        }
-        it.src = selector;
-        it.iterable = null;
-        it.srcChanged();
-        selector = undefined;
-      }
-
-    }
-    while( selector !== undefined );
-
-    if( o.onSelectorUp )
-    o.onSelectorUp.call( it, o );
-  }
-
-  /* */
-
-  function onDown()
-  {
-    let it = this;
-    if( o.onSelectorDown )
-    o.onSelectorDown.call( it, o );
-  }
-
-  /* */
-
-}
-
-_.routineExtend( select_body, selectSingle.body );
-
-var defaults = select_body.defaults;
-defaults.root = null;
-defaults.onSelectorUp = null;
-defaults.onSelectorDown = null;
-defaults.onSelectorReplicate = onSelectorReplicate;
-defaults.onSelectorUndecorate = onSelectorUndecorate;
-defaults.recursive = 0;
-defaults.compositeSelecting = 0;
-
-//
-
-/**
- * @summary Selects elements from source object( src ) using provided pattern( selector ).
+ * @description Short-cur for {@link module:Tools/base/Selector.Tools( module::Selector ).select _.selectSingleIt }. Returns found element(s) instead of iterator.
  * @param {} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
@@ -1159,17 +909,11 @@ defaults.compositeSelecting = 0;
  * @example // select root
  * _.select( { a : { b : { c : 1 } } }, '/' );
  *
- * @example // select from array
- * _.selectSingle( [ 'a', 'b', 'c' ], '2' ); // 'c'
- *
- * @example // select second element from each string of array
- * _.selectSingle( [ 'ax', 'by', 'cz' ], '*\/1' ); // [ 'x', 'y', 'z' ]
- *
  * @function select
  * @memberof module:Tools/base/Selector.Tools( module::Selector )
 */
 
-let select = _.routineFromPreAndBody( select_pre, select_body );
+let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
 
 //
 
@@ -1236,11 +980,11 @@ let selectUnique = _.routineFromPreAndBody( selectSingle.pre, selectUnique_body 
 
 //
 
-function onSelectorReplicate( src )
+function onSelectorReplicate( o )
 {
   let it = this;
-  if( _.strIs( src ) )
-  return src;
+  if( _.strIs( o.selector ) )
+  return o.selector;
 }
 
 //
@@ -1249,102 +993,6 @@ function onSelectorUndecorate()
 {
   let it = this;
   _.assert( _.strIs( it.selector ) || _.numberIs( it.selector ) );
-}
-
-//
-
-function onSelectorReplicateComposite( fop )
-{
-
-  fop = _.routineOptions( onSelectorReplicateComposite, arguments );
-  fop.prefix = _.arrayAs( fop.prefix );
-  fop.postfix = _.arrayAs( fop.postfix );
-  fop.onSelectorReplicate = fop.onSelectorReplicate || onSelectorReplicate;
-
-  _.assert( _.strsAreAll( fop.prefix ) );
-  _.assert( _.strsAreAll( fop.postfix ) );
-  _.assert( _.routineIs( fop.onSelectorReplicate ) );
-
-  return function onSelectorReplicateComposite( selector )
-  {
-    let it = this;
-
-    if( !_.strIs( selector ) )
-    return;
-
-    let selector2 = _.strSplitFast
-    ({
-      src : selector,
-      delimeter : _.arrayAppendArrays( [], [ fop.prefix, fop.postfix ] ),
-    });
-
-    if( selector2[ 0 ] === '' )
-    selector2.splice( 0, 1 );
-    if( selector2[ selector2.length-1 ] === '' )
-    selector2.pop();
-
-    if( selector2.length < 3 )
-    {
-      if( fop.isStrippedSelector )
-      return fop.onSelectorReplicate.call( it, selector );
-      else
-      return;
-    }
-
-    if( selector2.length === 3 )
-    if( _.strsEquivalentAny( fop.prefix, selector2[ 0 ] ) && _.strsEquivalentAny( fop.postfix, selector2[ 2 ] ) )
-    return fop.onSelectorReplicate.call( it, selector2[ 1 ] );
-
-    selector2 = _.strSplitsCoupledGroup({ splits : selector2, prefix : '{', postfix : '}' });
-
-    if( fop.onSelectorReplicate )
-    selector2 = selector2.map( ( split ) =>
-    {
-      if( !_.arrayIs( split ) )
-      return split;
-      _.assert( split.length === 3 );
-
-      let split1 = fop.onSelectorReplicate.call( it, split[ 1 ] );
-      if( split1 === undefined )
-      return split.join( '' );
-      else
-      return split[ 0 ] + split1 + split[ 2 ];
-
-    });
-
-    selector2 = selector2.map( ( split ) => _.arrayIs( split ) ? split.join( '' ) : split );
-    selector2.composite = _.select.composite;
-
-    return selector2;
-  }
-
-  function onSelectorReplicate( selector )
-  {
-    return selector;
-  }
-
-}
-
-onSelectorReplicateComposite.defaults =
-{
-  prefix : '{',
-  postfix : '}',
-  onSelectorReplicate : null,
-  isStrippedSelector : 0, /* treat selector beyond affixes like "pre::c/c2" as selector */
-}
-
-//
-
-function onSelectorDownComposite( fop )
-{
-  return function onSelectorDownComposite()
-  {
-    let it = this;
-    if( it.continue && _.arrayIs( it.dst ) && it.src.composite === _.select.composite )
-    {
-      it.dst = _.strJoin( it.dst );
-    }
-  }
 }
 
 //
@@ -1428,11 +1076,8 @@ IterationPreserve.absoluteLevel = 0;
 // declare
 // --
 
-let composite = Symbol.for( 'composite' );
-var FunctorExtnesion =
+var FunctorExtension =
 {
-  onSelectorReplicateComposite,
-  onSelectorDownComposite,
   onSelectorUndecorateDoubleColon,
 }
 
@@ -1441,24 +1086,21 @@ let SelectorExtension =
 
   selectSingleIt,
   selectSingle,
-  select,
   selectSet,
   selectUnique,
 
   onSelectorUndecorate,
-  onSelectorReplicate,
-  composite,
 
 }
 
-let SupplementSelect =
-{
-
-  onSelectorUndecorate,
-  onSelectorReplicate,
-  composite,
-
-}
+// let SupplementSelect =
+// {
+//
+//   onSelectorUndecorate,
+//   // onSelectorReplicate,
+//   composite,
+//
+// }
 
 let SupplementTools =
 {
@@ -1467,7 +1109,8 @@ let SupplementTools =
 
   selectSingleIt,
   selectSingle,
-  select,
+  select : selectSingle,
+
   selectSet,
   selectUnique,
 
@@ -1476,8 +1119,14 @@ let SupplementTools =
 let Self = Selector;
 _.mapSupplement( _, SupplementTools );
 _.mapSupplement( _.selector, SelectorExtension );
-_.mapSupplement( _.selector.functor, FunctorExtnesion );
-_.mapSupplement( select, SupplementSelect );
+_.mapSupplement( _.selector.functor, FunctorExtension );
+// _.mapSupplement( select, SupplementSelect ); // xxx
+
+if( _.accessor && _.accessor.forbid )
+{
+  _.accessor.forbid( _.select, { composite : 'composite' } );
+  _.accessor.forbid( _.selector, { composite : 'composite' } );
+}
 
 // --
 // export
