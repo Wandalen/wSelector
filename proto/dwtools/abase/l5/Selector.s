@@ -147,51 +147,123 @@ function iterableEval()
 
   if( it.isTerminal )
   {
-    it.iterable = false;
-    it.ascendAct = it._termianlAscend;
+    // it.iterable = false;
+    it.iterable = 0;
+    // it.ascendAct = it._termianlAscend;
   }
   else if( it.isRelative )
   {
     debugger;
-    it.iterable = 'relative';
-    it.ascendAct = it._relativeAscend;
+    it.iterable = _.selector.containerNameToIdMap.relative;
+    // it.iterable = 'relative';
+    // it.ascendAct = it._relativeAscend;
   }
   else if( it.isGlob )
   {
 
     if( _.longLike( it.src ) )
     {
-      it.iterable = 'long-like';
-      it.ascendAct = it._longAscend;
+      it.iterable = _.selector.containerNameToIdMap.long;
+      // it.iterable = 'long-like';
+      // it.ascendAct = it._longAscend;
     }
     else if( _.objectIs( it.src ) )
     {
-      it.iterable = 'map-like';
-      it.ascendAct = it._mapAscend;
+      it.iterable = _.selector.containerNameToIdMap.map;
+      // it.iterable = 'map-like';
+      // it.ascendAct = it._mapAscend;
     }
     else if( _.hashMapLike( it.src ) )
     {
-      it.iterable = 'hash-map-like';
-      it.ascendAct = it._hashMapAscend;
+      it.iterable = _.selector.containerNameToIdMap.hashMap;
+      // it.iterable = 'hash-map-like';
+      // it.ascendAct = it._hashMapAscend;
     }
     else if( _.setLike( it.src ) )
     {
-      it.iterable = 'set-like';
-      it.ascendAct = it._setAscend;
+      it.iterable = _.selector.containerNameToIdMap.set;
+      // it.iterable = 'set-like';
+      // it.ascendAct = it._setAscend;
     }
     else
     {
-      it.iterable = false;
-      it.ascendAct = it._termianlAscend;
+      it.iterable = 0;
+      // it.iterable = false;
+      // it.ascendAct = it._termianlAscend;
     }
 
   }
   else
   {
-    it.iterable = 'single';
-    it.ascendAct = it._singleAscend;
+    it.iterable = _.selector.containerNameToIdMap.single;
+    // it.iterable = 'single';
+    // it.ascendAct = it._singleAscend;
   }
 
+  _.assert( it.iterable >= 0 );
+}
+
+//
+
+function ascendEval()
+{
+  let it = this;
+
+  _.assert( arguments.length === 0, 'Expects no arguments' );
+  _.assert( _.boolIs( it.isTerminal ) );
+
+  it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
+
+  // if( it.isTerminal )
+  // {
+  //   // it.iterable = false;
+  //   // it.iterable = 0;
+  //   // it.ascendAct = it._termianlAscend;
+  //   it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
+  // }
+  // else if( it.isRelative )
+  // {
+  //   debugger;
+  //   it.iterable = 'relative';
+  //   it.ascendAct = it._relativeAscend;
+  // }
+  // else if( it.isGlob )
+  // {
+  //
+  //   if( _.longLike( it.src ) )
+  //   {
+  //     it.iterable = 'long-like';
+  //     it.ascendAct = it._longAscend;
+  //   }
+  //   else if( _.objectIs( it.src ) )
+  //   {
+  //     it.iterable = 'map-like';
+  //     it.ascendAct = it._mapAscend;
+  //   }
+  //   else if( _.hashMapLike( it.src ) )
+  //   {
+  //     it.iterable = 'hash-map-like';
+  //     it.ascendAct = it._hashMapAscend;
+  //   }
+  //   else if( _.setLike( it.src ) )
+  //   {
+  //     it.iterable = 'set-like';
+  //     it.ascendAct = it._setAscend;
+  //   }
+  //   else
+  //   {
+  //     it.iterable = false;
+  //     it.ascendAct = it._termianlAscend;
+  //   }
+  //
+  // }
+  // else
+  // {
+  //   it.iterable = 'single';
+  //   it.ascendAct = it._singleAscend;
+  // }
+
+  _.assert( _.routineIs( it.ascendAct ) );
 }
 
 //
@@ -338,6 +410,7 @@ function errNoDownThrow()
 function errCantSet()
 {
   let it = this;
+  debugger;
   let err = _.err
   (
     'Cant set', _.strQuote( it.key )
@@ -503,31 +576,19 @@ function upGlob()
     }
   }
 
-  if( it.iterable === 'long-like' )
+  // if( it.iterable === 'long-like' )
+  if( it.iterable === _.selector.containerNameToIdMap.long )
   {
     it.dst = [];
-    it.dstWriteDown = function( eit )
-    {
-      if( it.missingAction === 'ignore' && eit.dst === undefined )
-      return;
-      if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
-      it.dst.push( eit );
-      else
-      it.dst.push( eit.dst );
-    }
+    it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
+    // it.dstWriteDown = it.dstWriteDownLong;
   }
-  else if( it.iterable === 'map-like' )
+  // else if( it.iterable === 'map-like' )
+  else if( it.iterable === _.selector.containerNameToIdMap.map )
   {
     it.dst = Object.create( null );
-    it.dstWriteDown = function( eit )
-    {
-      if( it.missingAction === 'ignore' && eit.dst === undefined )
-      return;
-      if( it.preservingIteration )
-      it.dst[ eit.key ] = eit;
-      else
-      it.dst[ eit.key ] = eit.dst;
-    }
+    it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
+    // it.dstWriteDown = it.dstWriteDownMap;
   }
   else /* qqq : not implemented for other structures, please implement */
   {
@@ -662,6 +723,32 @@ function downSet()
     it.errCantSetThrow();
   }
 
+}
+
+//
+
+function dstWriteDownLong( eit )
+{
+  let it = this;
+  if( it.missingAction === 'ignore' && eit.dst === undefined )
+  return;
+  if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
+  it.dst.push( eit );
+  else
+  it.dst.push( eit.dst );
+}
+
+//
+
+function dstWriteDownMap( eit )
+{
+  let it = this;
+  if( it.missingAction === 'ignore' && eit.dst === undefined )
+  return;
+  if( it.preservingIteration )
+  it.dst[ eit.key ] = eit;
+  else
+  it.dst[ eit.key ] = eit.dst;
 }
 
 //
@@ -1023,6 +1110,7 @@ Selector.reselect = reselect;
 Selector.start = start;
 Selector.iterationReinit = iterationReinit;
 Selector.iterableEval = iterableEval;
+Selector.ascendEval = ascendEval;
 Selector.choose = choose;
 Selector.selectorChanged = selectorChanged;
 Selector.indexedAccessToMap = indexedAccessToMap;
@@ -1048,6 +1136,9 @@ Selector.downRelative = downRelative;
 Selector.downGlob = downGlob;
 Selector.downSingle = downSingle;
 Selector.downSet = downSet;
+
+Selector.dstWriteDownLong = dstWriteDownLong;
+Selector.dstWriteDownMap = dstWriteDownMap;
 
 Selector._relativeAscend = _relativeAscend;
 Selector._singleAscend = _singleAscend;
@@ -1076,6 +1167,35 @@ IterationPreserve.absoluteLevel = 0;
 // declare
 // --
 
+let last = _.looker.containerNameToIdMap.last;
+let containerNameToIdMap =
+{
+  ... _.looker.containerNameToIdMap,
+  relative : last+1,
+  single : last+2,
+  last : last+2,
+}
+
+let containerIdToNameMap =
+{
+  ... _.looker.containerIdToNameMap,
+  [ last+1 ] : 'relative',
+  [ last+2 ] : 'single',
+}
+
+let containerIdToAscendMap =
+{
+  ... _.looker.containerIdToAscendMap,
+  [ last+1 ] : _relativeAscend,
+  [ last+2 ] : _singleAscend,
+}
+
+let containerIdToWriteDownMap =
+{
+  1 : dstWriteDownLong,
+  2 : dstWriteDownMap,
+}
+
 var FunctorExtension =
 {
   onSelectorUndecorateDoubleColon,
@@ -1083,6 +1203,11 @@ var FunctorExtension =
 
 let SelectorExtension =
 {
+
+  containerNameToIdMap,
+  containerIdToNameMap,
+  containerIdToAscendMap,
+  containerIdToWriteDownMap,
 
   selectSingleIt,
   selectSingle,

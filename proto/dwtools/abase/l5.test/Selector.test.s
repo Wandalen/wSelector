@@ -3118,16 +3118,30 @@ function selectWithGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = 'long-like';
+      it.iterable = _.looker.containerNameToIdMap.long;
     }
     else if( _.mapLike( it.src ) )
     {
-      it.iterable = 'map-like';
+      it.iterable = _.looker.containerNameToIdMap.map;
     }
     else
     {
-      it.iterable = false;
+      it.iterable = 0;
+      // it.iterable = false;
     }
+
+    // if( _.arrayLike( it.src ) )
+    // {
+    //   it.iterable = 'long-like';
+    // }
+    // else if( _.mapLike( it.src ) )
+    // {
+    //   it.iterable = 'map-like';
+    // }
+    // else
+    // {
+    //   it.iterable = false;
+    // }
 
   }
 
