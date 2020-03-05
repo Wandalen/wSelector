@@ -3336,6 +3336,97 @@ function selectWithCallback( test )
 
 }
 
+//
+
+function selectContainerType( test )
+{
+  try
+  {
+
+    let type = Object.create( null );
+    type.name = 'ContainerForTest';
+    type._while = _while;
+    type._elementGet = _elementGet;
+    type._elementSet = _elementSet;
+    type._is = _is;
+
+    _.container.typeDeclare( type );
+
+    test.description = 'basic';
+    var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+    var exp = 2;
+    var got = _.select( src1, '1' );
+    test.identical( got, exp );
+
+    test.description = '2 levels';
+    var a = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+    var src2 = { a : a, b : 'bb' }
+    var exp = 2;
+    var got = _.select( src2, 'a/1' );
+    test.identical( got, exp );
+
+    test.description = 'object';
+    var a1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+    var a2 = new objectMake();
+    _.mapExtend( a2, a1 );
+    var src2 = { a : a2, b : 'bb' }
+    var exp = 2;
+    var got = _.select( src2, 'a/1' );
+    test.identical( got, exp );
+
+    _.container.typeUndeclare( 'ContainerForTest' );
+
+    test.description = 'undeclared';
+    var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+    var exp = undefined;
+    var got = _.select( src1, '1' );
+    test.identical( got, exp );
+
+  }
+  catch( err )
+  {
+    _.container.typeUndeclare( 'ContainerForTest' );
+    throw err;
+  }
+
+  function objectMake()
+  {
+  }
+
+  function _is( src )
+  {
+    return !!src.eGet;
+  }
+
+  function _elementSet( container, key, val )
+  {
+    return container.eSet( key, val );
+  }
+
+  function _elementGet( container, key )
+  {
+    return container.eGet( key );
+  }
+
+  function _while( container, onEach )
+  {
+    for( let k = 0 ; k < container.elements.length ; k++ )
+    onEach( container.elements[ k ], k, container );
+  }
+
+  function eSet( k, v )
+  {
+    this.elements[ k ] = v;
+  }
+
+  function eGet( k )
+  {
+    debugger;
+    return this.elements[ k ];
+  }
+
+}
+
 // --
 // declare
 // --
@@ -3381,6 +3472,7 @@ var Self =
     selectWithGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
+    selectContainerType,
 
   }
 

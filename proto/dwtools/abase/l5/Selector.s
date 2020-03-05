@@ -145,59 +145,55 @@ function iterableEval()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  if( it.isTerminal )
-  {
-    // it.iterable = false;
-    it.iterable = 0;
-    // it.ascendAct = it._termianlAscend;
-  }
-  else if( it.isRelative )
+  if( _global_.debugger )
+  debugger;
+
+  let type = _.container.typeOf( it.src );
+  if( type )
+  it.type = type;
+
+  if( it.isRelative )
   {
     debugger;
     it.iterable = _.selector.containerNameToIdMap.relative;
-    // it.iterable = 'relative';
-    // it.ascendAct = it._relativeAscend;
+  }
+  else if( it.isTerminal )
+  {
+    it.iterable = 0;
   }
   else if( it.isGlob )
   {
 
-    if( _.longLike( it.src ) )
+    if( type )
+    {
+      debugger;
+      it.iterable = _.selector.containerNameToIdMap.custom;
+    }
+    else if( _.longLike( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.long;
-      // it.iterable = 'long-like';
-      // it.ascendAct = it._longAscend;
     }
     else if( _.objectIs( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.map;
-      // it.iterable = 'map-like';
-      // it.ascendAct = it._mapAscend;
     }
     else if( _.hashMapLike( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.hashMap;
-      // it.iterable = 'hash-map-like';
-      // it.ascendAct = it._hashMapAscend;
     }
     else if( _.setLike( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.set;
-      // it.iterable = 'set-like';
-      // it.ascendAct = it._setAscend;
     }
     else
     {
       it.iterable = 0;
-      // it.iterable = false;
-      // it.ascendAct = it._termianlAscend;
     }
 
   }
   else
   {
     it.iterable = _.selector.containerNameToIdMap.single;
-    // it.iterable = 'single';
-    // it.ascendAct = it._singleAscend;
   }
 
   _.assert( it.iterable >= 0 );
@@ -213,55 +209,6 @@ function ascendEval()
   _.assert( _.boolIs( it.isTerminal ) );
 
   it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
-
-  // if( it.isTerminal )
-  // {
-  //   // it.iterable = false;
-  //   // it.iterable = 0;
-  //   // it.ascendAct = it._termianlAscend;
-  //   it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
-  // }
-  // else if( it.isRelative )
-  // {
-  //   debugger;
-  //   it.iterable = 'relative';
-  //   it.ascendAct = it._relativeAscend;
-  // }
-  // else if( it.isGlob )
-  // {
-  //
-  //   if( _.longLike( it.src ) )
-  //   {
-  //     it.iterable = 'long-like';
-  //     it.ascendAct = it._longAscend;
-  //   }
-  //   else if( _.objectIs( it.src ) )
-  //   {
-  //     it.iterable = 'map-like';
-  //     it.ascendAct = it._mapAscend;
-  //   }
-  //   else if( _.hashMapLike( it.src ) )
-  //   {
-  //     it.iterable = 'hash-map-like';
-  //     it.ascendAct = it._hashMapAscend;
-  //   }
-  //   else if( _.setLike( it.src ) )
-  //   {
-  //     it.iterable = 'set-like';
-  //     it.ascendAct = it._setAscend;
-  //   }
-  //   else
-  //   {
-  //     it.iterable = false;
-  //     it.ascendAct = it._termianlAscend;
-  //   }
-  //
-  // }
-  // else
-  // {
-  //   it.iterable = 'single';
-  //   it.ascendAct = it._singleAscend;
-  // }
 
   _.assert( _.routineIs( it.ascendAct ) );
 }
@@ -801,9 +748,6 @@ function _singleAscend( src )
 
   _.assert( arguments.length === 1 );
 
-  if( it.selector === 'C' )
-  debugger;
-
   let eit = it.iterationMake().choose( undefined, it.selector );
 
   if( eit.src === undefined )
@@ -1218,15 +1162,6 @@ let SelectorExtension =
 
 }
 
-// let SupplementSelect =
-// {
-//
-//   onSelectorUndecorate,
-//   // onSelectorReplicate,
-//   composite,
-//
-// }
-
 let SupplementTools =
 {
 
@@ -1245,7 +1180,6 @@ let Self = Selector;
 _.mapSupplement( _, SupplementTools );
 _.mapSupplement( _.selector, SelectorExtension );
 _.mapSupplement( _.selector.functor, FunctorExtension );
-// _.mapSupplement( select, SupplementSelect ); // xxx
 
 if( _.accessor && _.accessor.forbid )
 {
