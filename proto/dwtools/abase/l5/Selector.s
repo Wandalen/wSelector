@@ -221,6 +221,14 @@ function choose( e, k )
 
   let result = Parent.choose.call( it, ... arguments );
 
+  if( it.creating && it.src === undefined && it.selectorArray[ it.level ] !== undefined )
+  {
+    let key = _.numberFromStrMaybe( it.key );
+    it.src = Object.create( null );
+    if( it.down )
+    it.down.src[ it.key ] = it.src;
+  }
+
   if( !it.fast )
   {
     it.absoluteLevel = it.absoluteLevel+1;
@@ -523,19 +531,15 @@ function upGlob()
     }
   }
 
-  // if( it.iterable === 'long-like' )
   if( it.iterable === _.selector.containerNameToIdMap.long )
   {
     it.dst = [];
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
-    // it.dstWriteDown = it.dstWriteDownLong;
   }
-  // else if( it.iterable === 'map-like' )
   else if( it.iterable === _.selector.containerNameToIdMap.map )
   {
     it.dst = Object.create( null );
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
-    // it.dstWriteDown = it.dstWriteDownMap;
   }
   else /* qqq : not implemented for other structures, please implement */
   {
@@ -663,12 +667,23 @@ function downSet()
 
   if( it.setting && it.isTerminal )
   {
-    /* qqq : implement and cover for all type of containers */
+    /* qqq2 : implement and cover for all type of containers */
     if( it.down && !_.primitiveIs( it.down.src ) && it.key !== undefined )
     it.down.src[ it.key ] = it.set;
     else
     it.errCantSetThrow();
   }
+  // else if( it.creating && it.src === undefined )
+  // {
+  //   let key = _.numberFromStrMaybe( it.key );
+  //   if( _.numberIs( key ) )
+  //   it.src = [];
+  //   else
+  //   it.src = Object.create( null );
+  //   if( it.down )
+  //   it.down.src[ it.key ] = it.src;
+  //   debugger;
+  // }
 
 }
 
@@ -800,6 +815,8 @@ function selectSingle_pre( routine, args )
 
   if( o.setting === null && o.set !== null )
   o.setting = 1;
+  if( o.creating === null )
+  o.creating = !!o.setting;
 
   let o2 = o;
   if( o2.Looker === null )
@@ -847,6 +864,7 @@ defaults.selected = null;
 
 defaults.set = null;
 defaults.setting = null;
+defaults.creating = null;
 
 defaults.onUpBegin = null;
 defaults.onUpEnd = null;

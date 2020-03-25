@@ -2174,7 +2174,6 @@ function selectSet( test )
 
   var src = {};
   var expected = { a : 'c' };
-
   var got = _.select
   ({
     src,
@@ -2190,7 +2189,6 @@ function selectSet( test )
 
   var src = {};
   var expected = { '1' : {} };
-
   var got = _.select
   ({
     src,
@@ -2226,7 +2224,6 @@ function selectSet( test )
 
   var src = { a : '1', b : '1' };
   var expected = { a : '1', b : '2' };
-
   var got = _.select
   ({
     src,
@@ -2317,6 +2314,7 @@ function selectSet( test )
     selector : '/a/b',
     set : 'x',
     missingAction : 'ignore',
+    creating : 0,
   });
 
   test.identical( got, undefined );
@@ -2332,6 +2330,7 @@ function selectSet( test )
     selector : '/a/b',
     set : 'x',
     missingAction : 'undefine',
+    creating : 0,
   });
 
   test.identical( got, undefined );
@@ -2346,6 +2345,7 @@ function selectSet( test )
     selector : '/a/b',
     set : 'x',
     missingAction : 'error',
+    creating : 0,
   });
 
   test.is( _.errIs( got ) );
@@ -2393,6 +2393,193 @@ function selectSet( test )
   }));
 
   test.close( 'throwing' );
+
+}
+
+//
+
+function selectSetOptionCreating( test )
+{
+
+  /* */
+
+  test.case = 'single level, creating:0';
+
+  var src =
+  {
+  }
+
+  var set =
+  {
+    q : 'which',
+    a : [ 'a', 'b' ],
+  }
+
+  var got = _.selectSet
+  ({
+    src,
+    set,
+    selector : '1',
+    creating : 0,
+  });
+
+  var exp = undefined;
+  test.identical( got, exp );
+
+  var exp =
+  {
+    '1' :
+    {
+      q : 'which',
+      a : [ 'a', 'b' ],
+    }
+  }
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = 'single level, creating:1';
+
+  var src =
+  {
+  }
+
+  var set =
+  {
+    q : 'which',
+    a : [ 'a', 'b' ],
+  }
+
+  var got = _.selectSet
+  ({
+    src,
+    set,
+    selector : '1',
+    creating : 1,
+  });
+
+  var exp = undefined;
+  test.identical( got, exp );
+
+  var exp =
+  {
+    '1' :
+    {
+      q : 'which',
+      a : [ 'a', 'b' ],
+    }
+  }
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = 'two levels, creating:0';
+
+  var src =
+  {
+  }
+
+  var set =
+  {
+    q : 'which',
+    a : [ 'a', 'b' ],
+  }
+
+  var got = _.selectSet
+  ({
+    src,
+    set,
+    selector : 'str/1',
+    creating : 0,
+  });
+
+  var exp = undefined;
+  test.identical( got, exp );
+
+  var exp =
+  {
+  }
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = 'two levels, creating:1';
+
+  var src =
+  {
+  }
+
+  var set =
+  {
+    q : 'which',
+    a : [ 'a', 'b' ],
+  }
+
+  var got = _.selectSet
+  ({
+    src,
+    set,
+    selector : 'str/1',
+    creating : 1,
+  });
+
+  var exp = undefined;
+  test.identical( got, exp );
+
+  var exp =
+  {
+    'str' :
+    {
+      '1' :
+      {
+        q : 'which',
+        a : [ 'a', 'b' ],
+      }
+    }
+  }
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = 'several levels, creating:default';
+
+  var src =
+  {
+  }
+
+  var set =
+  {
+    q : 'which',
+    a : [ 'a', 'b' ],
+  }
+
+  var got = _.selectSet
+  ({
+    src,
+    set,
+    selector : 'Full-2020-3-23/inquiry/1',
+  });
+
+  var exp = undefined;
+  test.identical( got, exp );
+
+  var exp =
+  {
+    'Full-2020-3-23' :
+    {
+      'inquiry' :
+      {
+        '1' :
+        {
+          q : 'which',
+          a : [ 'a', 'b' ],
+        }
+      }
+    }
+  }
+  test.identical( src, exp );
+
+  /* */
 
 }
 
@@ -3459,6 +3646,7 @@ var Self =
 
     selectMissing,
     selectSet,
+    selectSetOptionCreating,
     selectWithDown,
     selectWithDownRemake,
     reselect,
