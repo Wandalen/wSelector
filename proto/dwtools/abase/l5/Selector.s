@@ -28,7 +28,7 @@ qqq : cover select with glob using test routine filesFindGlob of test suite File
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../Tools.s' );
+  let _ = require( '../../../dwtools/Tools.s' );
 
   _.include( 'wLooker' );
   _.include( 'wReplicator' );
