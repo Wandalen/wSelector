@@ -14,7 +14,7 @@
 
 /**
  * Collection of routines to select a sub-structure from a complex data structure.
-  @namespace Tools( module::Selector )
+  @namespace Tools.Selector 
   @memberof module:Tools/base/Selector
 */
 
