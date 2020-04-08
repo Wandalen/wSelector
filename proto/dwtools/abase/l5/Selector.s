@@ -16,7 +16,7 @@
  * Collection of routines to select a sub-structure from a complex data structure.
   @namespace "Tools.selector"
   @extends Tools
-  @memberof module:Tools/base/Selector
+  @module Tools/base/Selector
 */
 
 /* Problems :
@@ -911,7 +911,8 @@ defaults.onSelectorUndecorate = null;
  * console.log( it.dst )
  *
  * @function selectSingleIt
- * @memberof module:Tools/base/Selector.Tools.selector
+ * @module Tools/base/Selector
+ * @namespace Tools.selector
 */
 
 let selectSingleIt = _.routineFromPreAndBody( selectSingle_pre, selectSingleIt_body );
@@ -960,7 +961,8 @@ _.routineExtend( selectSingle_body, selectSingleIt );
  * _.select( { a : { b : { c : 1 } } }, '/' );
  *
  * @function select
- * @memberof module:Tools/base/Selector.Tools.selector
+ * @module Tools/base/Selector
+ * @namespace Tools.selector
 */
 
 let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
@@ -981,7 +983,8 @@ let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body 
    console.log( src.a ); //1
  *
  * @function selectSet
- * @memberof module:Tools/base/Selector.Tools.selector
+ * @module Tools/base/Selector
+ * @namespace Tools.selector
 */
 
 let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
@@ -998,7 +1001,8 @@ defaults.setting = 1;
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @function select
- * @memberof module:Tools/base/Selector.Tools.selector
+ * @module Tools/base/Selector
+ * @namespace Tools.selector
 */
 
 function selectUnique_body( o )
