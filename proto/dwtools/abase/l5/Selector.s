@@ -146,8 +146,8 @@ function iterableEval()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  if( _global_.debugger )
-  debugger;
+  // if( _global_.debugger )
+  // debugger;
 
   let type = _.container.typeOf( it.src );
   if( type )
