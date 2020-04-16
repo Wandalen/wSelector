@@ -14,7 +14,7 @@
 
 /**
  * Collection of routines to select a sub-structure from a complex data structure.
-  @namespace "Tools.selector"
+  @namespace Tools.selector
   @extends Tools
   @module Tools/base/Selector
 */
@@ -879,7 +879,7 @@ defaults.onSelectorUndecorate = null;
 /**
  * @summary Selects elements from source object( src ) using provided pattern( selector ).
  * @description Returns iterator with result of selection
- * @param {} src Source entity.
+ * @param {*} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @example //select element with key 'a1'
@@ -936,7 +936,7 @@ _.routineExtend( selectSingle_body, selectSingleIt );
 /**
  * @summary Selects elements from source object( src ) using provided pattern( selector ).
  * @description Short-cur for {@link module:Tools/base/Selector.Tools.selector.select _.selectSingleIt }. Returns found element(s) instead of iterator.
- * @param {} src Source entity.
+ * @param {*} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @example //select element with key 'a1'
@@ -972,9 +972,9 @@ let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body 
 /**
  * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.selectSingle _.selectSingle }. Sets value of element selected by pattern ( o.selector ).
  * @param {Object} o Options map
- * @param {} o.src Source entity
+ * @param {*} o.src Source entity
  * @param {String} o.selector Pattern to select element(s).
- * @param {} o.set=null Entity to set.
+ * @param {*} o.set=null Entity to set.
  * @param {Boolean} o.setting=1 Allows to set value for a property or create a new property if needed.
  *
  * @example
@@ -997,7 +997,7 @@ defaults.setting = 1;
 
 /**
  * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.selectSingle _.selectSingle }. Returns only unique elements.
- * @param {} src Source entity.
+ * @param {*} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @function select
