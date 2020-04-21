@@ -517,25 +517,33 @@ function selectFromInstance( test )
 //
 //   /* */
 //
-//   test.case = 'compositeSelecting : 0, custom onSelectorReplicate'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 0, custom onSelectorReplicate';
 //   var expected = [ 'Some test with inlined', 'b2', '.' ];
 //   var selector = 'Some test with inlined {b/b2}.';
 //   var got = _.select({ src, selector, onSelectorReplicate, compositeSelecting : 0 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1';
 //   var expected = 'Some test with inlined b2.';
 //   var selector = 'Some test with inlined {b/b2}.';
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, array'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, array';
 //   var expected = [ 'Some test with inlined c21 and b2.', 'Some test with inlined c22 and b2.' ];
 //   var selector = 'Some test with inlined {c/c2} and {b/b2}.';
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, array + number + boolean'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, array + number + boolean';
 //   var expected =
 //   [
 //     'Some test with inlined c21 and 1 and false.',
@@ -545,7 +553,9 @@ function selectFromInstance( test )
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 0, set manually'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 0, set manually';
 //   var expected =
 //   [
 //     'Some test with inlined c21 and 1 and false.',
@@ -562,7 +572,9 @@ function selectFromInstance( test )
 //   });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 0, set manually only onSelectorReplicate'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 0, set manually only onSelectorReplicate';
 //   var expected =
 //   [
 //     'Some test with inlined ',
@@ -583,7 +595,9 @@ function selectFromInstance( test )
 //   });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, set manually only onSelectorReplicate'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, set manually only onSelectorReplicate';
 //   var expected =
 //   [
 //     'Some test with inlined c21 and 1 and false.',
@@ -599,7 +613,9 @@ function selectFromInstance( test )
 //   });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, vector of array + vector of number + vector of boolean'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, vector of array + vector of number + vector of boolean';
 //   var expected =
 //   [
 //     'This is combination of bools true, a string is, a numbers 1 and strings or.',
@@ -609,13 +625,17 @@ function selectFromInstance( test )
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, empty vector'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, empty vector';
 //   var expected = [];
 //   var selector = 'This is empty {complex/empty}.';
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
 //   test.identical( got, expected );
 //
-//   test.case = 'compositeSelecting : 1, string and empty vector'; /* */
+//   /* */
+
+   test.case = 'compositeSelecting : 1, string and empty vector';
 //   var expected = [];
 //   var selector = 'This is combination a string {complex/string} and empty {complex/empty}.';
 //   var got = _.select({ src, selector, compositeSelecting : 1 });
@@ -652,14 +672,18 @@ function selectFromInstance( test )
 //
 //   test.open( 'primitive' );
 //
-//   test.case = 'first level'; /* */
+//   /* */
+
+   test.case = 'first level';
 //   var expected = { map : { name : 'name1' }, value : 13 };
 //   var selector = '{a}';
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, expected );
 //   test.is( got === src.a );
 //
-//   test.case = 'second level'; /* */
+//   /* */
+
+   test.case = 'second level';
 //   var expected = { name : 'name1' };
 //   var selector = '{a/map}';
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -672,13 +696,17 @@ function selectFromInstance( test )
 //
 //   test.open( 'primitive, lack of fixes' );
 //
-//   test.case = 'first level, lack of fixes'; /* */
+//   /* */
+
+   test.case = 'first level, lack of fixes';
 //   var expected = 'a';
 //   var selector = 'a';
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, expected );
 //
-//   test.case = 'second level, lack of fixes'; /* */
+//   /* */
+
+   test.case = 'second level, lack of fixes';
 //   var expected = 'a/map';
 //   var selector = 'a/map';
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -690,7 +718,9 @@ function selectFromInstance( test )
 //
 //   test.open( 'array' );
 //
-//   test.case = 'first level selector'; /* */
+//   /* */
+
+   test.case = 'first level selector';
 //   var expected = [ { b1 : 1, b2 : 'b2' }, { c1 : 1, c2 : 'c2' } ];
 //   var selector = [ '{b}', '{c}' ];
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -698,7 +728,9 @@ function selectFromInstance( test )
 //   test.is( got[ 0 ] === src.b );
 //   test.is( got[ 1 ] === src.c );
 //
-//   test.case = 'second level selector'; /* */
+//   /* */
+
+   test.case = 'second level selector';
 //   var expected = [ 'b2', { c1 : 1, c2 : 'c2' } ];
 //   var selector = [ '{b/b2}', '{c}' ];
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -706,7 +738,9 @@ function selectFromInstance( test )
 //   test.is( got[ 0 ] === src.b.b2 );
 //   test.is( got[ 1 ] === src.c );
 //
-//   test.case = 'complex selector'; /* */
+//   /* */
+
+   test.case = 'complex selector';
 //   var expected = [ 'b2', { a : { c1 : 1, c2 : 'c2' }, b : { name : 'name1' } } ];
 //   var selector = [ '{b/b2}', { a : '{c}', b : '{a/map}' } ];
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -721,21 +755,27 @@ function selectFromInstance( test )
 //
 //   test.open( 'array, lack of fixes' );
 //
-//   test.case = 'first level selector'; /* */
+//   /* */
+
+   test.case = 'first level selector';
 //   var selector = [ 'b', 'c' ];
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, selector );
 //   test.is( got !== selector );
 //
-//   test.case = 'second level selector'; /* */
+//   /* */
+
+   test.case = 'second level selector';
 //   var selector = [ 'b/b2', 'c' ];
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, selector );
 //   test.is( got !== selector );
 //
-//   test.case = 'complex selector'; /* */
+//   /* */
+
+   test.case = 'complex selector';
 //   var selector = [ 'b/b2', { a : 'c', b : 'a/map' } ];
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -748,7 +788,9 @@ function selectFromInstance( test )
 //
 //   test.open( 'map' );
 //
-//   test.case = 'first level selector'; /* */
+//   /* */
+
+   test.case = 'first level selector';
 //   var expected = { b : { b1 : 1, b2 : 'b2' }, c: { c1 : 1, c2 : 'c2' } };
 //   var selector = { b : '{b}', c : '{c}' };
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -756,7 +798,9 @@ function selectFromInstance( test )
 //   test.is( got.b === src.b );
 //   test.is( got.c === src.c );
 //
-//   test.case = 'second level selector'; /* */
+//   /* */
+
+   test.case = 'second level selector';
 //   var expected = { b2 : 'b2', c : { c1 : 1, c2 : 'c2' } };
 //   var selector = { b2 : '{b/b2}', c : '{c}' };
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -764,7 +808,9 @@ function selectFromInstance( test )
 //   test.is( got.b2 === src.b.b2 );
 //   test.is( got.c === src.c );
 //
-//   test.case = 'complex selector'; /* */
+//   /* */
+
+   test.case = 'complex selector';
 //   var expected = { b : 'b2', array : [ { c1 : 1, c2 : 'c2' }, { name : 'name1' } ] };
 //   var selector = { b : '{b/b2}', array : [ '{c}', '{a/map}' ] };
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -779,21 +825,27 @@ function selectFromInstance( test )
 //
 //   test.open( 'map, lack of fixes' );
 //
-//   test.case = 'first level selector'; /* */
+//   /* */
+
+   test.case = 'first level selector';
 //   var selector = { b : 'b', c : 'c' };
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, selector );
 //   test.is( got !== selector );
 //
-//   test.case = 'second level selector'; /* */
+//   /* */
+
+   test.case = 'second level selector';
 //   var selector = { b2 : 'b/b2', c : 'c' };
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, selector );
 //   test.is( got !== selector );
 //
-//   test.case = 'complex selector'; /* */
+//   /* */
+
+   test.case = 'complex selector';
 //   var selector = { b : 'b/b2', array : [ 'c', 'a/map' ] };
 //   var expected = selector;
 //   var got = _.select({ src, selector, onSelectorReplicate });
@@ -806,21 +858,27 @@ function selectFromInstance( test )
 //
 //   test.open( 'mixed lack of fixes' );
 //
-//   test.case = 'first level selector'; /* */
+//   /* */
+
+   test.case = 'first level selector';
 //   var expected = { b : 'b', c : { c1 : 1, c2 : 'c2' } };
 //   var selector = { b : 'b', c : '{c}' };
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, expected );
 //   test.is( got.c === src.c );
 //
-//   test.case = 'second level selector'; /* */
+//   /* */
+
+   test.case = 'second level selector';
 //   var expected = { b2 : 'b2', c : 'c' };
 //   var selector = { b2 : '{b/b2}', c : 'c' };
 //   var got = _.select({ src, selector, onSelectorReplicate });
 //   test.identical( got, expected );
 //   test.is( got.b2 === src.b.b2 );
 //
-//   test.case = 'complex selector'; /* */
+//   /* */
+
+   test.case = 'complex selector';
 //   var expected = { b : 'b2', array : [ 'c', { name : 'name1' } ] };
 //   var selector = { b : '{b/b2}', array : [ 'c', '{a/map}' ] };
 //   var got = _.select({ src, selector, onSelectorReplicate });
