@@ -1,6 +1,6 @@
 {
   "name" : "wselector",
-  "version" : "0.3.160",
+  "version" : "0.3.161",
   "description" : "Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>",
   "license" : "MIT",
@@ -18,11 +18,11 @@
   },
   "dependencies" :
   {
-    "wTools" : "beta",
-    "wlooker" : "beta",
-    "wreplicator" : "beta",
-    "wpathtools" : "beta"
+    "wTools" : "alpha",
+    "wlooker" : "alpha",
+    "wreplicator" : "alpha",
+    "wpathtools" : "alpha"
   },
-  "devDependencies" : { "wTesting" : "beta" },
+  "devDependencies" : { "wTesting" : "alpha" },
   "keywords" : [ "wTools" ]
 }
