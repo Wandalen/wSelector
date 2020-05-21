@@ -151,7 +151,7 @@ function iterableEval()
 
   let type = _.container.typeOf( it.src );
   if( type )
-  it.type = type;
+  it.containerType = type;
 
   if( it.isRelative )
   {
@@ -1214,7 +1214,7 @@ if( _.accessor && _.accessor.forbid )
 // export
 // --
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = _;
 
 })();
