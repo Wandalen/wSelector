@@ -146,16 +146,12 @@ function iterableEval()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  // if( _global_.debugger )
-  // debugger;
-
   let type = _.container.typeOf( it.src );
   if( type )
   it.containerType = type;
 
   if( it.isRelative )
   {
-    debugger;
     it.iterable = _.selector.containerNameToIdMap.relative;
   }
   else if( it.isTerminal )
@@ -410,7 +406,6 @@ function errDoesNotExistThrow()
   }
   else
   {
-    debugger;
     let err = it.errDoesNotExist();
     it.dst = undefined;
     it.iterator.error = err;
