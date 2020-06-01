@@ -516,7 +516,7 @@ function upGlob()
   {
     if( it.iterable )
     {
-      it.src = _.path.globFilter
+      it.src = _.path.globShortFilter
       ({
         src : it.src,
         selector : it.parsedSelector.glob,
