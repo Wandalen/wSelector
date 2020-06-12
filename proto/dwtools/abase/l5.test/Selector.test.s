@@ -27,44 +27,44 @@ test.case = '...' ...
 ...
 */
 
-function selectSingle( test )
+function select( test )
 {
 
   test.open( 'trivial' );
 
   /* */
 
-  var got = _.selectSingle( 'a', '' );
+  var got = _.select( 'a', '' );
   test.identical( got, undefined );
-  var got = _.selectSingle({ src : 'a', selector : '', missingAction : 'undefine' });
+  var got = _.select({ src : 'a', selector : '', missingAction : 'undefine' });
   test.identical( got, undefined );
   if( Config.debug )
-  test.shouldThrowErrorSync( () => _.selectSingle({ src : 'a', selector : '', missingAction : 'throw' }) );
+  test.shouldThrowErrorSync( () => _.select({ src : 'a', selector : '', missingAction : 'throw' }) );
   // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.selectSingle( 'a', '' ) );
-  var got = _.selectSingle( 'a', '/' );
+  // test.shouldThrowErrorSync( () => _.select( 'a', '' ) );
+  var got = _.select( 'a', '/' );
   test.identical( got, 'a' );
 
-  var got = _.selectSingle( undefined, '' );
+  var got = _.select( undefined, '' );
   test.identical( got, undefined );
-  var got = _.selectSingle({ src : undefined, selector : '', missingAction : 'undefine' });
+  var got = _.select({ src : undefined, selector : '', missingAction : 'undefine' });
   test.identical( got, undefined );
   if( Config.debug )
-  test.shouldThrowErrorSync( () => _.selectSingle({ src : undefined, selector : '', missingAction : 'throw' }) );
+  test.shouldThrowErrorSync( () => _.select({ src : undefined, selector : '', missingAction : 'throw' }) );
   // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.selectSingle( undefined, '' ) );
-  var got = _.selectSingle( undefined, '/' );
+  // test.shouldThrowErrorSync( () => _.select( undefined, '' ) );
+  var got = _.select( undefined, '/' );
   test.identical( got, undefined );
 
-  var got = _.selectSingle( null, '' );
+  var got = _.select( null, '' );
   test.identical( got, undefined );
-  var got = _.selectSingle({ src : null, selector : '', missingAction : 'undefine' });
+  var got = _.select({ src : null, selector : '', missingAction : 'undefine' });
   test.identical( got, undefined );
   if( Config.debug )
-  test.shouldThrowErrorSync( () => _.selectSingle({ src : null, selector : '', missingAction : 'throw' }) );
+  test.shouldThrowErrorSync( () => _.select({ src : null, selector : '', missingAction : 'throw' }) );
   // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.selectSingle( null, '' ) );
-  var got = _.selectSingle( null, '/' );
+  // test.shouldThrowErrorSync( () => _.select( null, '' ) );
+  var got = _.select( null, '/' );
   test.identical( got, null );
 
   /* */
@@ -75,7 +75,7 @@ function selectSingle( test )
     b : 13,
     c : 15,
   }
-  var got = _.selectSingle( src, 'b' );
+  var got = _.select( src, 'b' );
   test.identical( got, 13 );
 
   /* */
@@ -86,7 +86,7 @@ function selectSingle( test )
     b : 13,
     c : 15,
   }
-  var got = _.selectSingle( src, '/' );
+  var got = _.select( src, '/' );
   test.identical( got, src );
   test.is( got === src );
 
@@ -98,7 +98,7 @@ function selectSingle( test )
     b : 13,
     c : 15,
   }
-  var got = _.selectSingle
+  var got = _.select
   ({
     src : src,
     selector : '/',
@@ -116,7 +116,7 @@ function selectSingle( test )
     c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
     d : { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
-  var got = _.selectSingle( src, '*/name' );
+  var got = _.select( src, '*/name' );
   test.identical( got, { a : 'name1', b : 'name2', c : 'name3', d : 'name4' } );
 
   /* */
@@ -129,7 +129,7 @@ function selectSingle( test )
     { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   ]
 
-  var got = _.selectSingle( src, '*/name' );
+  var got = _.select( src, '*/name' );
   test.identical( got, [ 'name1', 'name2', 'name3', 'name4' ] );
 
   /* */
@@ -141,10 +141,10 @@ function selectSingle( test )
     c : { c1 : 1, c2 : 'c2' },
   }
 
-  var got = _.selectSingle( src, 'b/b2' );
+  var got = _.select( src, 'b/b2' );
   test.identical( got, 'b2' );
 
-  var got = _.selectSingle( src, 'b/b2/' );
+  var got = _.select( src, 'b/b2/' );
   test.identical( got, 'b2' );
 
   /* */
@@ -155,7 +155,7 @@ function selectSingle( test )
 
 //
 
-function selectSingleOptionUsingIndexedAccessToMap( test )
+function selectOptionUsingIndexedAccessToMap( test )
 {
 
   /* */
@@ -167,7 +167,7 @@ function selectSingleOptionUsingIndexedAccessToMap( test )
     c : { value : 25, date : 53 },
   }
 
-  var got = _.selectSingle
+  var got = _.select
   ({
     src,
     selector : '*/1',
@@ -184,7 +184,7 @@ function selectSingleOptionUsingIndexedAccessToMap( test )
     c : { value : 25, date : 53 },
   }
 
-  var got = _.selectSingle
+  var got = _.select
   ({
     src,
     selector : '1',
@@ -197,7 +197,7 @@ function selectSingleOptionUsingIndexedAccessToMap( test )
 
   var exp = { a : 'a', b : {} };
   var src = { a : 'a', b : 'b' };
-  var got = _.selectSingle
+  var got = _.select
   ({
     src,
     selector : '/1',
@@ -214,7 +214,7 @@ function selectSingleOptionUsingIndexedAccessToMap( test )
   {
 
     var src = { a : 'a' };
-    var got = _.selectSingle
+    var got = _.select
     ({
       src,
       selector : '/1',
@@ -1714,12 +1714,12 @@ function selectWithDownRemake( test )
     c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectSingleIt( src, 'a/name' );
+  var it = _.selectIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it = _.selectSingleIt( it.lastSelected.iterationMake(), '..' );
+  var it = _.selectIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it.dst, src.a );
   test.is( it.dst === src.a );
@@ -1733,18 +1733,18 @@ function selectWithDownRemake( test )
     c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectSingleIt( src, 'a/name' );
+  var it = _.selectIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
   test.is( it.dst === src.a.name );
 
-  var it2 = _.selectSingleIt( it.lastSelected.iterationMake(), '../../b/name' );
+  var it2 = _.selectIt( it.lastSelected.iterationMake(), '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.is( it2.dst === src.b.name );
   test.is( it !== it2 );
 
-  var it3 = _.selectSingleIt( it.lastSelected.iterationMake(), '..' );
+  var it3 = _.selectIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it3.dst, src.b );
   test.is( it3.dst === src.b );
@@ -1760,7 +1760,7 @@ function selectWithDownRemake( test )
     c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectSingleIt
+  var it = _.selectIt
   ({
     src : src,
     selector : 'a/name',
@@ -1806,7 +1806,7 @@ function reselect( test )
     c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectSingleIt
+  var it = _.selectIt
   ({
     src : src,
     selector : 'a/name',
@@ -1874,7 +1874,7 @@ function reselect( test )
     c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
-  var it = _.selectSingleIt
+  var it = _.selectIt
   ({
     src : src,
     selector : 'a/name',
@@ -2595,8 +2595,8 @@ var Self =
   tests :
   {
 
-    selectSingle,
-    selectSingleOptionUsingIndexedAccessToMap,
+    select,
+    selectOptionUsingIndexedAccessToMap,
     selectTrivial,
     selectUsingIndexedAccessToMap,
     selectFromInstance,

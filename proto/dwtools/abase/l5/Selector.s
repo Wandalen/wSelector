@@ -57,7 +57,7 @@ function reselectIt( o )
 
   let it2 = it.iterationMake();
 
-  _.selector.selectSingleIt( it2, o ); /* xxx */
+  _.selector.selectIt( it2, o );
 
   return it2;
 }
@@ -774,7 +774,7 @@ function _singleAscend( src )
 // namespace
 // --
 
-function selectSingle_pre( routine, args )
+function select_pre( routine, args )
 {
 
   let o = args[ 0 ]
@@ -817,7 +817,7 @@ function selectSingle_pre( routine, args )
   let o2 = o;
   if( o2.Looker === null )
   o2.Looker = Self;
-  let it = _.look.pre( selectSingleIt_body, [ o2 ] );
+  let it = _.look.pre( selectIt_body, [ o2 ] );
 
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
@@ -828,7 +828,7 @@ function selectSingle_pre( routine, args )
 
 //
 
-function selectSingleIt_body( it )
+function selectIt_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.lookerIs( it.Looker ) );
@@ -837,7 +837,7 @@ function selectSingleIt_body( it )
   return it;
 }
 
-var defaults = selectSingleIt_body.defaults = _.mapExtend( null, _.look.defaults );
+var defaults = selectIt_body.defaults = _.mapExtend( null, _.look.defaults );
 
 defaults.Looker = null;
 defaults.it = null;
@@ -878,43 +878,43 @@ defaults.onSelectorUndecorate = null;
  * @param {String} selector Pattern that matches against elements in a entity.
  *
  * @example //select element with key 'a1'
- * let it = _.selectSingleIt( { a1 : 1, a2 : 2 }, 'a1' );
+ * let it = _.selectIt( { a1 : 1, a2 : 2 }, 'a1' );
  * console.log( it.dst )//1
  *
  * @example //select any that starts with 'a'
- * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*' );
+ * let it = _.select( { a1 : 1, a2 : 2 }, 'a*' );
  * console.log( it.dst ) // { a1 : 1, a2 : 1 }
  *
  * @example //select with constraint, only one element should be selected
- * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=1' );
+ * let it = _.select( { a1 : 1, a2 : 2 }, 'a*=1' );
  * console.log( it.error ) // error
  *
  * @example //select with constraint, two elements
- * let it = _.selectSingle( { a1 : 1, a2 : 2 }, 'a*=2' );
+ * let it = _.select( { a1 : 1, a2 : 2 }, 'a*=2' );
  * console.log( it.dst ) // { a1 : 1, a2 : 1 }
  *
  * @example //select inner element using path selector
- * let it = _.selectSingle( { a : { b : { c : 1 } } }, 'a/b' );
+ * let it = _.select( { a : { b : { c : 1 } } }, 'a/b' );
  * console.log( it.dst ) //{ c : 1 }
  *
  * @example //select value of each property with name 'x'
- * let it = _.selectSingle( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' );
+ * let it = _.select( { a : { x : 1 }, b : { x : 2 }, c : { x : 3 } }, '*\/x' );
  * console.log( it.dst ) //{a: 1, b: 2, c: 3}
  *
  * @example // select root
- * let it = _.selectSingle( { a : { b : { c : 1 } } }, '/' );
+ * let it = _.select( { a : { b : { c : 1 } } }, '/' );
  * console.log( it.dst )
  *
- * @function selectSingleIt
+ * @function selectIt
  * @module Tools/base/Selector
  * @namespace Tools.selector
 */
 
-let selectSingleIt = _.routineFromPreAndBody( selectSingle_pre, selectSingleIt_body );
+let selectIt = _.routineFromPreAndBody( select_pre, selectIt_body );
 
 //
 
-function selectSingle_body( it )
+function select_body( it )
 {
   it.start();
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -924,13 +924,13 @@ function selectSingle_body( it )
   return it.dst;
 }
 
-_.routineExtend( selectSingle_body, selectSingleIt );
+_.routineExtend( select_body, selectIt );
 
 //
 
 /**
  * @summary Selects elements from source object( src ) using provided pattern( selector ).
- * @description Short-cur for {@link module:Tools/base/Selector.Tools.selector.select _.selectSingleIt }. Returns found element(s) instead of iterator.
+ * @description Short-cur for {@link module:Tools/base/Selector.Tools.selector.select _.selectIt }. Returns found element(s) instead of iterator.
  * @param {*} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
@@ -960,12 +960,12 @@ _.routineExtend( selectSingle_body, selectSingleIt );
  * @namespace Tools.selector
 */
 
-let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body );
+let select = _.routineFromPreAndBody( select_pre, select_body );
 
 //
 
 /**
- * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.selectSingle _.selectSingle }. Sets value of element selected by pattern ( o.selector ).
+ * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.select _.select }. Sets value of element selected by pattern ( o.selector ).
  * @param {Object} o Options map
  * @param {*} o.src Source entity
  * @param {String} o.selector Pattern to select element(s).
@@ -982,7 +982,7 @@ let selectSingle = _.routineFromPreAndBody( selectSingle_pre, selectSingle_body 
  * @namespace Tools.selector
 */
 
-let selectSet = _.routineFromPreAndBody( selectSingle.pre, selectSingle.body );
+let selectSet = _.routineFromPreAndBody( select.pre, select.body );
 
 var defaults = selectSet.defaults;
 defaults.set = null;
@@ -991,7 +991,7 @@ defaults.setting = 1;
 //
 
 /**
- * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.selectSingle _.selectSingle }. Returns only unique elements.
+ * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.select _.select }. Returns only unique elements.
  * @param {*} src Source entity.
  * @param {String} selector Pattern that matches against elements in a entity.
  *
@@ -1004,7 +1004,7 @@ function selectUnique_body( o )
 {
   _.assert( arguments.length === 1 );
 
-  let selected = _.selectSingle.body( o );
+  let selected = _.select.body( o );
 
   let result = _.replicate({ src : selected, onUp });
 
@@ -1014,18 +1014,19 @@ function selectUnique_body( o )
   {
     if( _.longLike( it.src ) )
     {
-      // if( _.arrayIs( it.src ) )
-      it.src = _.longOnce( it.src );
-      // else
-      // it.src = _.longOnce( null, it.src ); /* xxx : uncomment later */
+      if( _.arrayIs( it.src ) )
+      it.src = _.longOnce_( it.src );
+      else
+      it.src = _.longOnce_( null, it.src );
+      // it.src = _.longOnce( it.src );
     }
   }
 
 }
 
-_.routineExtend( selectUnique_body, selectSingle.body );
+_.routineExtend( selectUnique_body, select.body );
 
-let selectUnique = _.routineFromPreAndBody( selectSingle.pre, selectUnique_body );
+let selectUnique = _.routineFromPreAndBody( select.pre, selectUnique_body );
 
 //
 
@@ -1171,8 +1172,8 @@ let SelectorExtension =
   containerIdToAscendMap,
   containerIdToWriteDownMap,
 
-  selectSingleIt,
-  selectSingle,
+  selectIt,
+  select,
   selectSet,
   selectUnique,
 
@@ -1185,9 +1186,9 @@ let SupplementTools =
 
   Selector,
 
-  selectSingleIt,
-  selectSingle,
-  select : selectSingle,
+  selectIt,
+  select,
+  select : select,
 
   selectSet,
   selectUnique,
