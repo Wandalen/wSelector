@@ -635,10 +635,9 @@ function downGlob()
     debugger;
     let err = _.ErrorLooking
     (
-      'Select constraint ' + _.strQuote( currentSelector ) + ' failed'
-      + ', got ' + length + ' elements'
-      + ' for selector ' + _.strQuote( it.selector )
-      + '\nAt : ' + _.strQuote( it.path )
+        `Select constraint "${ currentSelector }" failed with ${ length } elements`
+      + `\nSelector "${ it.iterator.selector }"`
+      + `\nAt : "${ it.path }"`
     );
     if( it.onQuantitativeFail )
     it.onQuantitativeFail.call( it, err );
