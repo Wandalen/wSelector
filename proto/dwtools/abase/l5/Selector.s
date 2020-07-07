@@ -664,9 +664,16 @@ function downSet()
   {
     /* qqq2 : implement and cover for all type of containers */
     if( it.down && !_.primitiveIs( it.down.src ) && it.key !== undefined )
-    it.down.src[ it.key ] = it.set;
+    {
+      if( it.set === undefined )
+      delete it.down.src[ it.key ];
+      else
+      it.down.src[ it.key ] = it.set;
+    }
     else
-    it.errCantSetThrow();
+    {
+      it.errCantSetThrow();
+    }
   }
   // else if( it.creating && it.src === undefined )
   // {

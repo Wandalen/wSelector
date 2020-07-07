@@ -40,8 +40,6 @@ function select( test )
   test.identical( got, undefined );
   if( Config.debug )
   test.shouldThrowErrorSync( () => _.select({ src : 'a', selector : '', missingAction : 'throw' }) );
-  // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.select( 'a', '' ) );
   var got = _.select( 'a', '/' );
   test.identical( got, 'a' );
 
@@ -51,8 +49,6 @@ function select( test )
   test.identical( got, undefined );
   if( Config.debug )
   test.shouldThrowErrorSync( () => _.select({ src : undefined, selector : '', missingAction : 'throw' }) );
-  // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.select( undefined, '' ) );
   var got = _.select( undefined, '/' );
   test.identical( got, undefined );
 
@@ -62,8 +58,6 @@ function select( test )
   test.identical( got, undefined );
   if( Config.debug )
   test.shouldThrowErrorSync( () => _.select({ src : null, selector : '', missingAction : 'throw' }) );
-  // if( Config.debug )
-  // test.shouldThrowErrorSync( () => _.select( null, '' ) );
   var got = _.select( null, '/' );
   test.identical( got, null );
 
@@ -1234,6 +1228,21 @@ function selectSet( test )
 
   /* */
 
+  var expected = { 'dir' : {  'b' : 'dir/b' } }
+  var src = { 'dir' : {  'a' : 'dir/a', 'b' : 'dir/b' } }
+  var got = _.select
+  ({
+    src,
+    selector : '/dir/a',
+    set : undefined,
+  });
+
+  test.identical( got, 'dir/a' );
+  test.identical( src, expected );
+
+  /* */
+
+  var expected = { 'a' : 'x' }
   var src = {}
   var got = _.select
   ({
