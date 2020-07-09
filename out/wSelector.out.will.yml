@@ -115,7 +115,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: ../proto/dwtools/abase/l5/Selector.s
+        path: ../proto/wtools/abase/l5/Selector.s
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -125,13 +125,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/proto/dwtools/abase/l5/Selector.s'
+        path: '{path::out.*=1}/source/proto/wtools/abase/l5/Selector.s'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/proto/dwtools/abase/l5/Selector.s'
+        path: '{path::out.*=1}/source/proto/wtools/abase/l5/Selector.s'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug
@@ -158,15 +158,15 @@ module:
         path:
           - ../proto
           - ../proto/Integration.test.s
-          - ../proto/dwtools
-          - ../proto/dwtools/Tools.s
-          - ../proto/dwtools/abase
-          - ../proto/dwtools/abase/l5
-          - ../proto/dwtools/abase/l5/Selector.s
-          - ../proto/dwtools/abase/l5.test
-          - ../proto/dwtools/abase/l5.test/Selector.test.s
-          - ../proto/dwtools/amid
-          - ../proto/dwtools/atop
+          - ../proto/wtools
+          - ../proto/wtools/Tools.s
+          - ../proto/wtools/abase
+          - ../proto/wtools/abase/l5
+          - ../proto/wtools/abase/l5/Selector.s
+          - ../proto/wtools/abase/l5.test
+          - ../proto/wtools/abase/l5.test/Selector.test.s
+          - ../proto/wtools/amid
+          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
@@ -915,7 +915,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: proto/dwtools/abase/l5/Selector.s
+        path: proto/wtools/abase/l5/Selector.s
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -925,13 +925,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/proto/dwtools/abase/l5/Selector.s'
+        path: '{path::out.*=1}/source/proto/wtools/abase/l5/Selector.s'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/proto/dwtools/abase/l5/Selector.s'
+        path: '{path::out.*=1}/source/proto/wtools/abase/l5/Selector.s'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug
