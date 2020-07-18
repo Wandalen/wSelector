@@ -2593,7 +2593,7 @@ function selectContainerType( test )
 let Self =
 {
 
-  name : 'Tools.base.l5.Selector',
+  name : 'Tools.l5.Selector',
   silencing : 1,
   routineTimeOut : 15000,
 
