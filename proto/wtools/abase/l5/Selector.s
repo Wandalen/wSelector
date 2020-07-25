@@ -9,8 +9,7 @@
 */
 
 /**
- * @file l5/Selector.s.
- */
+ *  */
 
 /**
  * Collection of routines to select a sub-structure from a complex data structure.
