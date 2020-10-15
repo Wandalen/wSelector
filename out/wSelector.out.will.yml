@@ -17,7 +17,7 @@ module:
       name: wSelector
       org: noorg
       description: >-
-        Collection of routines to select a sub-structure from a complex data
+        Collection of cross-platform routines to select a sub-structure from a complex data
         structure. Use the module to transform a data structure with the help of
         a short query string.
       enabled: 1
@@ -817,7 +817,7 @@ module:
       name: wSelector
       org: noorg
       description: >-
-        Collection of routines to select a sub-structure from a complex data
+        Collection of cross-platform routines to select a sub-structure from a complex data
         structure. Use the module to transform a data structure with the help of
         a short query string.
       enabled: 1

@@ -4,7 +4,7 @@
 
 
 /**
- * Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short selector string.
+ * Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short selector string.
   @module Tools/base/Selector
 */
 
@@ -12,7 +12,7 @@
  *  */
 
 /**
- * Collection of routines to select a sub-structure from a complex data structure.
+ * Collection of cross-platform routines to select a sub-structure from a complex data structure.
   @namespace Tools.selector
   @extends Tools
   @module Tools/base/Selector
@@ -779,7 +779,7 @@ function _singleAscend( src )
 // namespace
 // --
 
-function select_pre( routine, args )
+function select_head( routine, args )
 {
 
   let o = args[ 0 ]
@@ -822,7 +822,7 @@ function select_pre( routine, args )
   let o2 = o;
   if( o2.Looker === null )
   o2.Looker = Self;
-  let it = _.look.pre( selectIt_body, [ o2 ] );
+  let it = _.look.head( selectIt_body, [ o2 ] );
 
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
@@ -915,7 +915,7 @@ defaults.onSelectorUndecorate = null;
  * @namespace Tools.selector
 */
 
-let selectIt = _.routineFromPreAndBody( select_pre, selectIt_body );
+let selectIt = _.routineUnite( select_head, selectIt_body );
 
 //
 
@@ -965,7 +965,7 @@ _.routineExtend( select_body, selectIt );
  * @namespace Tools.selector
 */
 
-let select = _.routineFromPreAndBody( select_pre, select_body );
+let select = _.routineUnite( select_head, select_body );
 
 //
 
@@ -987,7 +987,7 @@ let select = _.routineFromPreAndBody( select_pre, select_body );
  * @namespace Tools.selector
 */
 
-let selectSet = _.routineFromPreAndBody( select.pre, select.body );
+let selectSet = _.routineUnite( select.head, select.body );
 
 var defaults = selectSet.defaults;
 defaults.set = null;
@@ -1031,7 +1031,7 @@ function selectUnique_body( o )
 
 _.routineExtend( selectUnique_body, select.body );
 
-let selectUnique = _.routineFromPreAndBody( select.pre, selectUnique_body );
+let selectUnique = _.routineUnite( select.head, selectUnique_body );
 
 //
 

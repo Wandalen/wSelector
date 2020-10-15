@@ -2,7 +2,7 @@
 about :
 
   name : 'wSelector'
-  description : 'Collection of routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.'
+  description : 'Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.'
   version : '0.4.0'
   enabled : 1
   interpreters :
