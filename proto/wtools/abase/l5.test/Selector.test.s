@@ -82,7 +82,7 @@ function select( test )
   }
   var got = _.select( src, '/' );
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -99,7 +99,7 @@ function select( test )
     upToken : [ '/', './' ],
   });
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -185,7 +185,7 @@ function selectOptionUsingIndexedAccessToMap( test )
     usingIndexedAccessToMap : 1,
   });
   test.identical( got, { value : 25, date : 53 } );
-  test.is( got === src.c );
+  test.true( got === src.c );
 
   /* */
 
@@ -361,7 +361,7 @@ function selectFromInstance( test )
   var expected = 'logger';
   var got = _.select( src, 'name' );
   test.identical( got, expected );
-  test.is( got === expected );
+  test.true( got === expected );
 
 }
 
@@ -493,7 +493,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -511,7 +511,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -535,7 +535,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -559,7 +559,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -687,7 +687,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -705,7 +705,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -729,7 +729,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -753,7 +753,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -826,7 +826,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   test.shouldThrowErrorSync( () => _.select
   ({
@@ -851,7 +851,7 @@ function selectMissing( test )
   })
 
   test.identical( got, src );
-  test.is( got !== src );
+  test.true( got !== src );
 
   test.shouldThrowErrorSync( () => _.select
   ({
@@ -889,7 +889,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   test.shouldThrowErrorSync( () => _.select
   ({
@@ -934,7 +934,7 @@ function selectMissing( test )
   })
 
   test.identical( got, expected );
-  test.is( got !== src );
+  test.true( got !== src );
 
   /* */
 
@@ -956,7 +956,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   var got = _.select
@@ -966,7 +966,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   var got = _.select
@@ -975,7 +975,7 @@ function selectMissing( test )
     selector : '*/x',
     missingAction : 'error',
   });
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   var got = _.select
@@ -985,7 +985,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   var src =
@@ -1001,7 +1001,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   var src =
@@ -1017,7 +1017,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got === src );
+  test.true( got === src );
 
   var src =
   {
@@ -1032,7 +1032,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.is( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.ErrorLooking );
   console.log( got );
 
   /* */
@@ -1252,7 +1252,7 @@ function selectSet( test )
     missingAction : 'error',
   });
 
-  test.is( _.errIs( got ) );
+  test.true( _.errIs( got ) );
   test.identical( src, expected );
 
   /* */
@@ -1321,7 +1321,7 @@ function selectSet( test )
     creating : 0,
   });
 
-  test.is( _.errIs( got ) );
+  test.true( _.errIs( got ) );
   test.identical( src, expected );
 
   /* */
@@ -1571,11 +1571,11 @@ function selectWithDown( test )
   }
 
   var got = _.select( src, '' );
-  test.is( got === undefined );
+  test.true( got === undefined );
 
   var got = _.select( src, '/' );
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -1589,7 +1589,7 @@ function selectWithDown( test )
   var got = _.select( src, '/' );
 
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -1603,7 +1603,7 @@ function selectWithDown( test )
   var got = _.select( src, 'a/..' );
 
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -1617,7 +1617,7 @@ function selectWithDown( test )
   var got = _.select( src, 'a/name/..' );
 
   test.identical( got, src.a );
-  test.is( got === src.a );
+  test.true( got === src.a );
 
   /* */
 
@@ -1631,7 +1631,7 @@ function selectWithDown( test )
   var got = _.select( src, 'a/name/../..' );
 
   test.identical( got, src );
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -1645,7 +1645,7 @@ function selectWithDown( test )
   var got = _.select( src, 'a/name/../../a/name' );
 
   test.identical( got, src.a.name );
-  test.is( got === src.a.name );
+  test.true( got === src.a.name );
 
   /* */
 
@@ -1659,7 +1659,7 @@ function selectWithDown( test )
   var got = _.select( src, 'a/../a/../a/name' );
 
   test.identical( got, src.a.name );
-  test.is( got === src.a.name );
+  test.true( got === src.a.name );
 
   /* */
 
@@ -1670,7 +1670,7 @@ function selectWithDown( test )
 
   var got = _.select( src, 'a/b/c/../../b/../b/c/d' );
 
-  test.is( got === src.a.b.c.d );
+  test.true( got === src.a.b.c.d );
 
   /* */
 
@@ -1681,7 +1681,7 @@ function selectWithDown( test )
 
   var got = _.select( src, 'a/b/c/../../b/../b/c' );
 
-  test.is( got === src.a.b.c );
+  test.true( got === src.a.b.c );
 
   /* */
 
@@ -1692,7 +1692,7 @@ function selectWithDown( test )
 
   var got = _.select( src, 'a/b/c/../../b/../b/c/..' );
 
-  test.is( got === src.a.b );
+  test.true( got === src.a.b );
 
   /* */
 
@@ -1703,7 +1703,7 @@ function selectWithDown( test )
 
   var got = _.select( src, 'a/b/c/../../b/../b/c/../../..' );
 
-  test.is( got === src );
+  test.true( got === src );
 
   /* */
 
@@ -1726,12 +1726,12 @@ function selectWithDownRemake( test )
   var it = _.selectIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
-  test.is( it.dst === src.a.name );
+  test.true( it.dst === src.a.name );
 
   var it = _.selectIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it.dst, src.a );
-  test.is( it.dst === src.a );
+  test.true( it.dst === src.a );
 
   /* */
 
@@ -1745,19 +1745,19 @@ function selectWithDownRemake( test )
   var it = _.selectIt( src, 'a/name' );
 
   test.identical( it.dst, src.a.name );
-  test.is( it.dst === src.a.name );
+  test.true( it.dst === src.a.name );
 
   var it2 = _.selectIt( it.lastSelected.iterationMake(), '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
-  test.is( it2.dst === src.b.name );
-  test.is( it !== it2 );
+  test.true( it2.dst === src.b.name );
+  test.true( it !== it2 );
 
   var it3 = _.selectIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it3.dst, src.b );
-  test.is( it3.dst === src.b );
-  test.is( it3 !== it2 );
+  test.true( it3.dst === src.b );
+  test.true( it3 !== it2 );
 
   /* */
 
@@ -1777,7 +1777,7 @@ function selectWithDownRemake( test )
   });
 
   test.identical( it.dst, src.b.name );
-  test.is( it.dst === src.b.name );
+  test.true( it.dst === src.b.name );
 
   function onRemakeDown( e, k, it )
   {
@@ -2033,22 +2033,22 @@ function selectWithGlob( test )
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
   var got = _.select( src, '*Y' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY && got.ccY === src.ccY );
+  test.true( got.aaY === src.aaY && got.ccY === src.ccY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*Y' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, '*a*' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
 }
 
@@ -2319,20 +2319,20 @@ function selectWithGlobNonPrimitive( test )
   var expected = '';
   var got = _.select( src, 'Composes/name' );
   test.identical( got, expected );
-  test.is( got === expected );
+  test.true( got === expected );
 
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
   var expected = 'eventHandlerAppend';
   var got = _.select( src, 'eventHandlerAppend/name' );
   test.identical( got, expected );
-  test.is( got === expected );
+  test.true( got === expected );
 
   test.case = '**';
   var src = 'abc';
   var expected = undefined;
   var got = _.select({ src, selector : '**' });
-  test.is( got === expected );
+  test.true( got === expected );
 
   test.close( 'trivial' );
 
@@ -2372,9 +2372,9 @@ function selectWithGlobNonPrimitive( test )
   var src = new _.Logger();
   var expected = src;
   var got = _.select( src, '**' );
-  test.is( got !== expected );
-  test.is( _.mapIs( got ) );
-  test.is( _.entityLength( got ) > 10 );
+  test.true( got !== expected );
+  test.true( _.mapIs( got ) );
+  test.true( _.entityLength( got ) > 10 );
 
 
   test.case = 'Composes/name';
@@ -2382,21 +2382,21 @@ function selectWithGlobNonPrimitive( test )
   var expected = '';
   var got = _.select( src, 'Composes/name' );
   test.identical( got, expected );
-  test.is( got === expected );
+  test.true( got === expected );
 
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
   var expected = 'eventHandlerAppend';
   var got = _.select( src, 'eventHandlerAppend/name' );
   test.identical( got, expected );
-  test.is( got === expected );
+  test.true( got === expected );
 
   var src = new _.Logger({ name : 'logger' });
   var expected = src;
   var got = _.select( src, '**/name' );
-  test.is( got !== expected );
-  test.is( _.mapIs( got ) );
-  test.is( _.entityLength( got ) > 10 );
+  test.true( got !== expected );
+  test.true( _.mapIs( got ) );
+  test.true( _.entityLength( got ) > 10 );
 
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
@@ -2435,22 +2435,22 @@ function selectWithAssert( test )
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*=1' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
   var got = _.select( src, '*=2Y' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY && got.ccY === src.ccY );
+  test.true( got.aaY === src.aaY && got.ccY === src.ccY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*=1Y' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
   var expected = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, '*a*=1' );
   test.identical( got, expected );
-  test.is( got.aaY === src.aaY );
+  test.true( got.aaY === src.aaY );
 
   /* */
 
