@@ -1,4 +1,5 @@
-( function _Selector_test_s_() {
+( function _Selector_test_s_()
+{
 
 'use strict';
 
@@ -94,7 +95,7 @@ function select( test )
   }
   var got = _.select
   ({
-    src : src,
+    src,
     selector : '/',
     upToken : [ '/', './' ],
   });
@@ -107,7 +108,7 @@ function select( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
+    c : { name : 'name3', value : 55, buffer : new F32x([ 1, 2, 3 ]) },
     d : { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
   var got = _.select( src, '*/name' );
@@ -119,7 +120,7 @@ function select( test )
   [
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
-    { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
+    { name : 'name3', value : 55, buffer : new F32x([ 1, 2, 3 ]) },
     { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   ]
 
@@ -283,7 +284,7 @@ function selectTrivial( test )
   {
     a : { name : 'name1', value : 13 },
     b : { name : 'name2', value : 77 },
-    c : { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
+    c : { name : 'name3', value : 55, buffer : new F32x([ 1, 2, 3 ]) },
     d : { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   }
 
@@ -296,7 +297,7 @@ function selectTrivial( test )
   [
     { name : 'name1', value : 13 },
     { name : 'name2', value : 77 },
-    { name : 'name3', value : 55, buffer : new F32x([ 1,2,3 ]) },
+    { name : 'name3', value : 55, buffer : new F32x([ 1, 2, 3 ]) },
     { name : 'name4', value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
   ]
 
@@ -1771,7 +1772,7 @@ function selectWithDownRemake( test )
 
   var it = _.selectIt
   ({
-    src : src,
+    src,
     selector : 'a/name',
     onDown : onRemakeDown,
   });
@@ -1817,10 +1818,10 @@ function reselect( test )
 
   var it = _.selectIt
   ({
-    src : src,
+    src,
     selector : 'a/name',
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
   });
 
   test.identical( it.dst, src.b.value );
@@ -1885,11 +1886,11 @@ function reselect( test )
 
   var it = _.selectIt
   ({
-    src : src,
+    src,
     selector : 'a/name',
-    onUp : onUp,
+    onUp,
     onDown : onDown0,
-    onTerminal : onTerminal,
+    onTerminal,
   });
 
   test.identical( it.dst, src.b.value );
@@ -2071,7 +2072,7 @@ function selectUndecorating( test )
   var exp = 'str';
   var got = _.select
   ({
-    src : src,
+    src,
     selector : '/Object::map/String::m3',
     onSelectorUndecorate : _.selector.functor.onSelectorUndecorateDoubleColon(),
   });
@@ -2087,12 +2088,12 @@ function selectIrregularSelector( test )
   test.case = 'basic';
   var src =
   {
-    int : 0,
-    str : 'str',
-    arr : [ 1, 3 ],
-    'int set' : { m1 : new Date( Date.UTC( 1990, 0, 0 ) ), 'm1/year' : 'str' },
-    set : new Set([ 1, 3 ]),
-    hash : new HashMap([ [ new Date( Date.UTC( 1990, 0, 0 ) ), function(){} ], [ 'm3', 'str' ] ]),
+    'int' : 0,
+    'str' : 'str',
+    'arr' : [ 1, 3 ],
+    'int set' : { 'm1' : new Date( Date.UTC( 1990, 0, 0 ) ), 'm1/year' : 'str' },
+    'set' : new Set([ 1, 3 ]),
+    'hash' : new HashMap([ [ new Date( Date.UTC( 1990, 0, 0 ) ), function(){} ], [ 'm3', 'str' ] ]),
   }
 
   var exp = 'str';
@@ -2241,7 +2242,7 @@ function fieldPath( test )
   }
   var got = _.select
   ({
-    src : src,
+    src,
     selector : '/d/b',
     upToken : [ '/', './' ],
     onUpBegin,
@@ -2520,7 +2521,7 @@ function selectContainerType( test )
 
     test.description = '2 levels';
     var a = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-    var src2 = { a : a, b : 'bb' }
+    var src2 = { a, b : 'bb' }
     var exp = 2;
     var got = _.select( src2, 'a/1' );
     test.identical( got, exp );

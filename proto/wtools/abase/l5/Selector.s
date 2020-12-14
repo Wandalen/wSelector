@@ -1,4 +1,5 @@
-( function _Selector_s_() {
+( function _Selector_s_()
+{
 
 'use strict';
 
@@ -634,7 +635,7 @@ function downGlob()
     debugger;
     let err = _.ErrorLooking
     (
-        `Select constraint "${ currentSelector }" failed with ${ length } elements`
+      `Select constraint "${ currentSelector }" failed with ${ length } elements`
       + `\nSelector "${ it.iterator.selector }"`
       + `\nAt : "${ it.path }"`
     );
@@ -1193,7 +1194,6 @@ let SupplementTools =
 
   selectIt,
   select,
-  select : select,
 
   selectSet,
   selectUnique,
