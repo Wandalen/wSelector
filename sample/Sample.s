@@ -9,5 +9,5 @@ let structure =
   d : { name : 'name4', value : 25, date : new Date() },
 }
 
-let selected = _.entitySelect( structure, '*.name' );
+let selected = _.select( structure, '*.name' );
 console.log( selected );
