@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wSelector.out
 consistency:
-  wSelector.out.will.yml: &ref_0
-    hash: 8a18274e7ae806a7a2edf0e20aab4196
-    size: 38629
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 16181828af64a774835b93dd552206c5
     size: 1830
-  ../.im.will.yml: &ref_2
-    hash: e470bdd57aa59a276f917145bd23ede6
-    size: 5151
+  ../.im.will.yml: &ref_1
+    hash: c45da002305d7e32d3199c177cdd5345
+    size: 5259
 module:
   wSelector.out:
     about:
@@ -22,18 +19,18 @@ module:
         with the help of a short query string.
       enabled: 1
       version: 0.4.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
       npm.name: wselector
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -192,6 +189,12 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
+        autoExporting: 0
+        enabled: 0
+        criterion:
+          development: 1
+      eslint:
+        path: 'npm:///eslint#7.1.0'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -703,24 +706,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -809,9 +794,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wSelector.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wSelector
@@ -822,20 +806,13 @@ module:
         with the help of a short query string.
       enabled: 1
       version: 0.4.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
+      contributors: *ref_4
       npm.name: wselector
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -969,6 +946,12 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
+        autoExporting: 0
+        enabled: 0
+        criterion:
+          development: 1
+      eslint:
+        path: 'npm:///eslint#7.1.0'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -1508,6 +1491,5 @@ module:
         hash: 16181828af64a774835b93dd552206c5
         size: 1830
       ../.im.will.yml:
-        hash: e470bdd57aa59a276f917145bd23ede6
-        size: 5151
-      wSelector.out.will.yml: *ref_0
+        hash: c45da002305d7e32d3199c177cdd5345
+        size: 5259
