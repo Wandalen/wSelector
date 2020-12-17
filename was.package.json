@@ -23,6 +23,6 @@
     "wreplicator" : "",
     "wpathtools" : ""
   },
-  "devDependencies" : { "wTesting" : "" },
+  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0" },
   "keywords" : [ "wTools" ]
 }
