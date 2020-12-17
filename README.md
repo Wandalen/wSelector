@@ -1,5 +1,5 @@
 
-# module::Selector [![status](https://github.com/Wandalen/wSelector/workflows/publish/badge.svg)](https://github.com/Wandalen/wSelector/actions?query=workflow%3Apublish) [![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
+# module::Selector [![status](https://github.com/Wandalen/wSelector/workflows/publish/badge.svg)](https://github.com/Wandalen/wSelector/actions?query=workflow%3Apublish) [![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
 
 Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
 
