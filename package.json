@@ -1,28 +1,37 @@
 {
-  "name" : "wselector",
-  "version" : "0.3.213",
-  "description" : "Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "license" : "MIT",
-  "main" : "proto/wtools/abase/l5/Selector.s",
-  "files" : [ "proto/wtools/abase/l5", "proto/wtools/Tools.s", "out" ],
-  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wSelector.git"
+  "name": "wselector",
+  "version": "0.3.214",
+  "description": "Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "license": "MIT",
+  "main": "proto/wtools/abase/l5/Selector.s",
+  "files": [
+    "proto/wtools/abase/l5",
+    "proto/wtools/Tools.s",
+    "out"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-3",
+    "docgen": "wdocgen proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wSelector/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wSelector.git"
   },
-  "dependencies" :
-  {
-    "wTools" : "alpha",
-    "wlooker" : "alpha",
-    "wreplicator" : "alpha",
-    "wpathtools" : "alpha"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wSelector/issues"
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "alpha" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "wTools": "alpha",
+    "wlooker": "alpha",
+    "wreplicator": "alpha",
+    "wpathtools": "alpha"
+  },
+  "devDependencies": {
+    "eslint": "7.1.0",
+    "wTesting": "alpha"
+  },
+  "keywords": [
+    "wTools"
+  ]
 }
