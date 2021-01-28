@@ -626,7 +626,7 @@ function downGlob()
 
   _.assert( it.globing );
 
-  let length = _.entityLength( it.dst );
+  let length = _.entityLengthOf( it.dst );
   if( length !== it.parsedSelector.limit )
   {
     let currentSelector = it.selector;
