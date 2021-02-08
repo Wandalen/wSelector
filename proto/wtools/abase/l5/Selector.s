@@ -305,11 +305,7 @@ function globParse()
   let match = it.selector.match( regexp );
   it.parsedSelector = it.parsedSelector || Object.create( null );
 
-  if( !match )
-  {
-    it.parsedSelector.glob = it.selector;
-  }
-  else
+  if( match )
   {
     _.sure( _.strCount( it.selector, '=' ) <= 1, () => 'Does not support selector with several assertions, like ' + _.strQuote( it.selector ) );
     it.parsedSelector.glob = match[ 1 ] + '*' + match[ 3 ];
@@ -318,6 +314,10 @@ function globParse()
       it.parsedSelector.limit = _.numberFromStr( match[ 2 ] );
       _.sure( !isNaN( it.parsedSelector.limit ) && it.parsedSelector.limit >= 0, () => 'Epects non-negative number after "=" in ' + _.strQuote( it.selector ) );
     }
+  }
+  else
+  {
+    it.parsedSelector.glob = it.selector;
   }
 
 }
