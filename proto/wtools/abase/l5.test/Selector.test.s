@@ -2281,7 +2281,7 @@ function selectWithGlobNonPrimitive( test )
     {
       it.iterable = _.looker.containerNameToIdMap.long;
     }
-    else if( _.mapLike( it.src ) )
+    else if( _.auxiliary.is( it.src ) )
     {
       it.iterable = _.looker.containerNameToIdMap.map;
     }
@@ -2295,7 +2295,7 @@ function selectWithGlobNonPrimitive( test )
     // {
     //   it.iterable = 'long-like';
     // }
-    // else if( _.mapLike( it.src ) )
+    // else if( _.auxiliary.is( it.src ) )
     // {
     //   it.iterable = 'map-like';
     // }
