@@ -1229,8 +1229,8 @@ function selectSet( test )
 
   /* */
 
-  var expected = { 'dir' : {  'b' : 'dir/b' } }
-  var src = { 'dir' : {  'a' : 'dir/a', 'b' : 'dir/b' } }
+  var expected = { 'dir' : { 'b' : 'dir/b' } }
+  var src = { 'dir' : { 'a' : 'dir/a', 'b' : 'dir/b' } }
   var got = _.select
   ({
     src,
