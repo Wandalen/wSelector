@@ -2279,7 +2279,7 @@ function selectWithGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = _.looker.containerNameToIdMap.partible;
+      it.iterable = _.looker.containerNameToIdMap.countable;
     }
     else if( _.auxiliary.is( it.src ) )
     {

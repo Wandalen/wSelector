@@ -168,7 +168,7 @@ function iterableEval()
     }
     else if( _.longLike( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.partible;
+      it.iterable = _.selector.containerNameToIdMap.countable;
     }
     else if( _.objectIs( it.src ) )
     {
@@ -528,7 +528,7 @@ function upGlob()
     }
   }
 
-  if( it.iterable === _.selector.containerNameToIdMap.partible )
+  if( it.iterable === _.selector.containerNameToIdMap.countable )
   {
     it.dst = [];
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
