@@ -168,11 +168,11 @@ function iterableEval()
     }
     else if( _.longLike( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.long;
+      it.iterable = _.selector.containerNameToIdMap.partible;
     }
     else if( _.objectIs( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.map;
+      it.iterable = _.selector.containerNameToIdMap.auxiliary;
     }
     else if( _.hashMapLike( it.src ) )
     {
@@ -528,12 +528,12 @@ function upGlob()
     }
   }
 
-  if( it.iterable === _.selector.containerNameToIdMap.long )
+  if( it.iterable === _.selector.containerNameToIdMap.partible )
   {
     it.dst = [];
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
   }
-  else if( it.iterable === _.selector.containerNameToIdMap.map )
+  else if( it.iterable === _.selector.containerNameToIdMap.auxiliary )
   {
     it.dst = Object.create( null );
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]

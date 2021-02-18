@@ -2279,30 +2279,16 @@ function selectWithGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = _.looker.containerNameToIdMap.long;
+      it.iterable = _.looker.containerNameToIdMap.partible;
     }
     else if( _.auxiliary.is( it.src ) )
     {
-      it.iterable = _.looker.containerNameToIdMap.map;
+      it.iterable = _.looker.containerNameToIdMap.auxiliary;
     }
     else
     {
       it.iterable = 0;
-      // it.iterable = false;
     }
-
-    // if( _.arrayLike( it.src ) )
-    // {
-    //   it.iterable = 'long-like';
-    // }
-    // else if( _.auxiliary.is( it.src ) )
-    // {
-    //   it.iterable = 'map-like';
-    // }
-    // else
-    // {
-    //   it.iterable = false;
-    // }
 
   }
 
