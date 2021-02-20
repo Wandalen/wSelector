@@ -343,7 +343,7 @@ function errNoDown()
 function errNoDownThrow()
 {
   let it = this;
-  it.continue = false;
+  it.continue = false; debugger;
   if( it.missingAction === 'undefine' || it.missingAction === 'ignore' )
   {
     it.dst = undefined;
@@ -517,7 +517,7 @@ function upGlob()
   {
     if( it.iterable )
     {
-      it.src = _.path.globShortFilter
+      it.src = _.path.globShortFilter /* xxx : use srcOriginal */
       ({
         src : it.src,
         selector : it.parsedSelector.glob,
@@ -805,7 +805,8 @@ function select_head( routine, args )
 
   if( o.it )
   {
-    o.it.iterationReinit( o.selector );
+    debugger;
+    o.it.iterationReinit( o.selector ); /* xxx : rename */
 
     _.assert( o.prevSelectIteration === null || o.prevSelectIteration === o.it );
     _.assert( o.src === null );
@@ -821,14 +822,14 @@ function select_head( routine, args )
   if( o.creating === null )
   o.creating = !!o.setting;
 
-  let o2 = o;
-  if( o2.Looker === null )
-  o2.Looker = Self;
-  let it = _.look.head( selectIt_body, [ o2 ] );
+  if( o.Looker === null )
+  o.Looker = Self;
+  let it = _.look.head( selectIt_body, [ o ] );
 
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
-  _.assert( o.it === it || o.it === null );
+  _.assert( o.it === it ); /* yyy */
+  // _.assert( o === Object.getPrototypeOf( it ) );
 
   return it;
 }
@@ -838,7 +839,9 @@ function select_head( routine, args )
 function selectIt_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.lookerIs( it.Looker ) );
+  debugger;
+  _.assert( _.looker.is( it.Looker ) );
+  _.assert( _.looker.iterationIs( it ) );
   _.assert( it.looker === undefined );
   it.start();
   return it;
@@ -924,7 +927,7 @@ let selectIt = _.routineUnite( select_head, selectIt_body );
 function select_body( it )
 {
   it.start();
-  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' ); /* xxx : move to start? */
   if( it.missingAction === 'error' && it.error )
   return it.error;
   _.assert( it.error === null );

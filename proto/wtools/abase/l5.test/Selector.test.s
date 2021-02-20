@@ -2299,44 +2299,49 @@ function selectWithGlobNonPrimitive( test )
 
   /* */
 
-  test.open( 'trivial' );
+  // test.open( 'trivial' );
+  //
+  // test.case = 'Composes/name';
+  // var src = new _.Logger({ name : 'logger' });
+  // var expected = '';
+  // var got = _.select( src, 'Composes/name' );
+  // test.identical( got, expected );
+  // test.true( got === expected );
+  //
+  // test.case = 'eventHandlerAppend/name';
+  // var src = new _.Logger({ name : 'logger' });
+  // var expected = 'eventHandlerAppend';
+  // var got = _.select( src, 'eventHandlerAppend/name' );
+  // test.identical( got, expected );
+  // test.true( got === expected );
+  //
+  // test.case = '**';
+  // var src = 'abc';
+  // var expected = undefined;
+  // var got = _.select({ src, selector : '**' });
+  // test.true( got === expected );
+  //
+  // test.close( 'trivial' );
+  //
+  // /* */
+  //
+  // test.open( 'only maps' );
 
-  test.case = 'Composes/name';
-  var src = new _.Logger({ name : 'logger' });
-  var expected = '';
-  var got = _.select( src, 'Composes/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
-
-  test.case = 'eventHandlerAppend/name';
-  var src = new _.Logger({ name : 'logger' });
-  var expected = 'eventHandlerAppend';
-  var got = _.select( src, 'eventHandlerAppend/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
-
-  test.case = '**';
-  var src = 'abc';
-  var expected = undefined;
-  var got = _.select({ src, selector : '**' });
-  test.true( got === expected );
-
-  test.close( 'trivial' );
-
-  /* */
-
-  test.open( 'only maps' );
-
-  test.case = 'should not throw error if continue set to false in onUpBegin';
-  var src = new _.Logger();
-  var expected = undefined;
-  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
+  // xxx
+  // test.case = 'should not throw error if continue set to false in onUpBegin';
+  // var src = new _.Logger();
+  // var expected = undefined;
+  // test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
+  debugger;
   var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Looker : Selector2 });
+  debugger;
   test.identical( got, expected );
+
+  debugger; return; xxx
 
   test.case = '**';
   var src = new _.Logger();
