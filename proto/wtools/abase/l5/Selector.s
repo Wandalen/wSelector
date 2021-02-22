@@ -214,7 +214,7 @@ function reselectIt()
   let it = this;
 
   _.assert( arguments.length === 1 );
-  _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.toStrShort( it )}` );
+  _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}` );
   _.assert( it.selector !== null, () => `Iteration is not looked` );
 
   let it2 = it.iterationMake();
@@ -294,7 +294,7 @@ function iteratorSelectorReset( selector )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( selector ) );
 
-  _.assert( Self.iterationProper( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.toStrShort( it ) );
+  _.assert( Self.iterationProper( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.entity.exportStringShort( it ) );
   _.assert( _.strIs( it.iterator.selector ) );
   if( it.iterator.selector === undefined )
   it.iterator.selector = '';
@@ -533,7 +533,7 @@ function errNoDown()
     'Cant go down', _.strQuote( it.selector ),
     '\nbecause', _.strQuote( it.selector ), 'does not exist',
     '\nat', _.strQuote( it.path ),
-    '\nin container\n', _.toStrShort( it.src )
+    '\nin container\n', _.entity.exportStringShort( it.src )
   );
   return err;
 }
@@ -590,7 +590,7 @@ function errDoesNotExist()
     'Cant select', _.strQuote( it.selector ),
     '\nbecause', _.strQuote( it.selector ), 'does not exist',
     'at', _.strQuote( it.path ),
-    '\nin container', _.toStrShort( it.src )
+    '\nin container', _.entity.exportStringShort( it.src )
   );
   return err;
 }
