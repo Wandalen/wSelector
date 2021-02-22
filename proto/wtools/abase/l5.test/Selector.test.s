@@ -1729,7 +1729,9 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  var it = _.selectIt( it.lastSelected.iterationMake(), '..' );
+  // var it = _.selectIt( it.lastSelected.iterationMake(), '..' );
+  // var it = it.lastSelected.iterationMake().reselect( '..' );
+  var it = it.lastSelected.reselectIt( '..' );
 
   test.identical( it.dst, src.a );
   test.true( it.dst === src.a );
@@ -1748,13 +1750,15 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  var it2 = _.selectIt( it.lastSelected.iterationMake(), '../../b/name' );
+  // var it2 = _.selectIt( it.lastSelected.iterationMake(), '../../b/name' );
+  var it2 = it.lastSelected.reselectIt( '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.true( it2.dst === src.b.name );
   test.true( it !== it2 );
 
-  var it3 = _.selectIt( it.lastSelected.iterationMake(), '..' );
+  var it3 = it.lastSelected.reselectIt( '..' );
+  // var it3 = _.selectIt( it.lastSelected.iterationMake(), '..' );
 
   test.identical( it3.dst, src.b );
   test.true( it3.dst === src.b );
@@ -1784,7 +1788,8 @@ function selectWithDownRemake( test )
   {
     if( it.path === '/a/name' )
     {
-      it.dst = _.select( it.lastSelected.iterationMake(), '../../b/name' );
+      it.dst = it.lastSelected.reselect( '../../b/name' );
+      // it.dst = _.select( it.lastSelected.iterationMake(), '../../b/name' );
     }
   }
 
@@ -1792,6 +1797,7 @@ function selectWithDownRemake( test )
 
 //
 
+/* qqq : rewrite all similar tests using mapper */
 function reselect( test )
 {
   let upsLevel = [];
@@ -2164,20 +2170,8 @@ function selectUnique( test )
 
 function selectThis( test )
 {
+
   test.case = 'use onUpBegin to add support of <this> selector, wrap src into array and use 0 as selector'
-  function onUpBegin()
-  {
-    let it = this;
-
-    if( it.selector === 'this' )
-    {
-      it.src = [ it.src ];
-      it.selector = 0;
-
-      it.selectorChanged();
-      it.srcChanged();
-    }
-  }
   var got = _.select
   ({
     src : { x : 1 },
@@ -2186,6 +2180,19 @@ function selectThis( test )
     missingAction : 'throw'
   });
   test.identical( got, { x : 1 })
+
+  function onUpBegin()
+  {
+    let it = this;
+    if( it.selector === 'this' )
+    {
+      it.src = [ it.src ];
+      it.selector = 0;
+      it.iterationSelectorChanged();
+      it.srcChanged();
+    }
+  }
+
 }
 
 //
@@ -2266,32 +2273,6 @@ function fieldPath( test )
 function selectWithGlobNonPrimitive( test )
 {
 
-  function onUpBegin()
-  {
-    this.continue = false;
-  }
-
-  function srcChanged()
-  {
-    let it = this;
-
-    _.assert( arguments.length === 0, 'Expects no arguments' );
-
-    if( _.arrayLike( it.src ) )
-    {
-      it.iterable = _.looker.containerNameToIdMap.countable;
-    }
-    else if( _.auxiliary.is( it.src ) )
-    {
-      it.iterable = _.looker.containerNameToIdMap.auxiliary;
-    }
-    else
-    {
-      it.iterable = 0;
-    }
-
-  }
-
   let Selector2 = _.mapExtend( null, _.Selector );
   Selector2.Looker = Selector2;
   let Iterator = Selector2.Iterator = _.mapExtend( null, Selector2.Iterator );
@@ -2299,49 +2280,44 @@ function selectWithGlobNonPrimitive( test )
 
   /* */
 
-  // test.open( 'trivial' );
-  //
-  // test.case = 'Composes/name';
-  // var src = new _.Logger({ name : 'logger' });
-  // var expected = '';
-  // var got = _.select( src, 'Composes/name' );
-  // test.identical( got, expected );
-  // test.true( got === expected );
-  //
-  // test.case = 'eventHandlerAppend/name';
-  // var src = new _.Logger({ name : 'logger' });
-  // var expected = 'eventHandlerAppend';
-  // var got = _.select( src, 'eventHandlerAppend/name' );
-  // test.identical( got, expected );
-  // test.true( got === expected );
-  //
-  // test.case = '**';
-  // var src = 'abc';
-  // var expected = undefined;
-  // var got = _.select({ src, selector : '**' });
-  // test.true( got === expected );
-  //
-  // test.close( 'trivial' );
-  //
-  // /* */
-  //
-  // test.open( 'only maps' );
+  test.open( 'trivial' );
 
-  // xxx
-  // test.case = 'should not throw error if continue set to false in onUpBegin';
-  // var src = new _.Logger();
-  // var expected = undefined;
-  // test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
+  test.case = 'Composes/name';
+  var src = new _.Logger({ name : 'logger' });
+  var expected = '';
+  var got = _.select( src, 'Composes/name' );
+  test.identical( got, expected );
+  test.true( got === expected );
+
+  test.case = 'eventHandlerAppend/name';
+  var src = new _.Logger({ name : 'logger' });
+  var expected = 'eventHandlerAppend';
+  var got = _.select( src, 'eventHandlerAppend/name' );
+  test.identical( got, expected );
+  test.true( got === expected );
+
+  test.case = '**';
+  var src = 'abc';
+  var expected = undefined;
+  var got = _.select({ src, selector : '**' });
+  test.true( got === expected );
+
+  test.close( 'trivial' );
+
+  /* */
+
+  test.open( 'only maps' );
+
+  test.case = 'should not throw error if continue set to false in onUpBegin';
+  var src = new _.Logger();
+  var expected = undefined;
+  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var expected = undefined;
-  debugger;
   var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Looker : Selector2 });
-  debugger;
   test.identical( got, expected );
-
-  debugger; return; xxx
 
   test.case = '**';
   var src = new _.Logger();
@@ -2403,6 +2379,34 @@ function selectWithGlobNonPrimitive( test )
   test.identical( got, expected );
 
   test.close( 'not only maps' );
+
+  /* */
+
+  function onUpBegin()
+  {
+    this.continue = false;
+  }
+
+  function srcChanged()
+  {
+    let it = this;
+
+    _.assert( arguments.length === 0, 'Expects no arguments' );
+
+    if( _.arrayLike( it.src ) )
+    {
+      it.iterable = _.looker.containerNameToIdMap.countable;
+    }
+    else if( _.aux.is( it.src ) )
+    {
+      it.iterable = _.looker.containerNameToIdMap.aux;
+    }
+    else
+    {
+      it.iterable = 0;
+    }
+
+  }
 
 }
 
@@ -2488,95 +2492,95 @@ function selectWithCallback( test )
 
 }
 
+// //
 //
-
-function selectContainerType( test )
-{
-  try
-  {
-
-    let type = Object.create( null );
-    type.name = 'ContainerForTest';
-    type._while = _while;
-    type._elementGet = _elementGet;
-    type._elementSet = _elementSet;
-    type._is = _is;
-
-    _.container.typeDeclare( type );
-
-    test.description = 'basic';
-    var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-    var exp = 2;
-    var got = _.select( src1, '1' );
-    test.identical( got, exp );
-
-    test.description = '2 levels';
-    var a = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-    var src2 = { a, b : 'bb' }
-    var exp = 2;
-    var got = _.select( src2, 'a/1' );
-    test.identical( got, exp );
-
-    test.description = 'object';
-    var a1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-    var a2 = new objectMake();
-    _.mapExtend( a2, a1 );
-    var src2 = { a : a2, b : 'bb' }
-    var exp = 2;
-    var got = _.select( src2, 'a/1' );
-    test.identical( got, exp );
-
-    _.container.typeUndeclare( 'ContainerForTest' );
-
-    test.description = 'undeclared';
-    var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-    var exp = undefined;
-    var got = _.select( src1, '1' );
-    test.identical( got, exp );
-
-  }
-  catch( err )
-  {
-    _.container.typeUndeclare( 'ContainerForTest' );
-    throw err;
-  }
-
-  function objectMake()
-  {
-  }
-
-  function _is( src )
-  {
-    return !!src.eGet;
-  }
-
-  function _elementSet( container, key, val )
-  {
-    return container.eSet( key, val );
-  }
-
-  function _elementGet( container, key )
-  {
-    return container.eGet( key );
-  }
-
-  function _while( container, onEach )
-  {
-    for( let k = 0 ; k < container.elements.length ; k++ )
-    onEach( container.elements[ k ], k, container );
-  }
-
-  function eSet( k, v )
-  {
-    this.elements[ k ] = v;
-  }
-
-  function eGet( k )
-  {
-    return this.elements[ k ];
-  }
-
-}
+// function selectContainerType( test )
+// {
+//   try
+//   {
+//
+//     let type = Object.create( null );
+//     type.name = 'ContainerForTest';
+//     type._while = _while;
+//     type._elementGet = _elementGet;
+//     type._elementSet = _elementSet;
+//     type._is = _is;
+//
+//     _.container.typeDeclare( type );
+//
+//     test.description = 'basic';
+//     var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+//     var exp = 2;
+//     var got = _.select( src1, '1' );
+//     test.identical( got, exp );
+//
+//     test.description = '2 levels';
+//     var a = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+//     var src2 = { a, b : 'bb' }
+//     var exp = 2;
+//     var got = _.select( src2, 'a/1' );
+//     test.identical( got, exp );
+//
+//     test.description = 'object';
+//     var a1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+//     var a2 = new objectMake();
+//     _.mapExtend( a2, a1 );
+//     var src2 = { a : a2, b : 'bb' }
+//     var exp = 2;
+//     var got = _.select( src2, 'a/1' );
+//     test.identical( got, exp );
+//
+//     _.container.typeUndeclare( 'ContainerForTest' );
+//
+//     test.description = 'undeclared';
+//     var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
+//     var exp = undefined;
+//     var got = _.select( src1, '1' );
+//     test.identical( got, exp );
+//
+//   }
+//   catch( err )
+//   {
+//     _.container.typeUndeclare( 'ContainerForTest' );
+//     throw err;
+//   }
+//
+//   function objectMake()
+//   {
+//   }
+//
+//   function _is( src )
+//   {
+//     return !!src.eGet;
+//   }
+//
+//   function _elementSet( container, key, val )
+//   {
+//     return container.eSet( key, val );
+//   }
+//
+//   function _elementGet( container, key )
+//   {
+//     return container.eGet( key );
+//   }
+//
+//   function _while( container, onEach )
+//   {
+//     for( let k = 0 ; k < container.elements.length ; k++ )
+//     onEach( container.elements[ k ], k, container );
+//   }
+//
+//   function eSet( k, v )
+//   {
+//     this.elements[ k ] = v;
+//   }
+//
+//   function eGet( k )
+//   {
+//     return this.elements[ k ];
+//   }
+//
+// }
 
 // --
 // declare
@@ -2618,7 +2622,7 @@ let Self =
     selectWithGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
-    selectContainerType,
+    // selectContainerType, /* yyy */
 
   }
 

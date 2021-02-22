@@ -46,20 +46,195 @@ _.selector.functor = _.selector.functor || Object.create( null );
 _.assert( !!_realGlobal_ );
 
 // --
+// declare looker
+// --
+
+let Defaults = _.mapExtend( null, _.look.defaults );
+
+Defaults.Looker = null;
+// Defaults.it = null;
+Defaults.src = null;
+Defaults.selector = null;
+Defaults.missingAction = 'undefine';
+Defaults.preservingIteration = 0;
+Defaults.usingIndexedAccessToMap = 0;
+Defaults.globing = 1;
+Defaults.revisiting = 2;
+Defaults.absoluteLevel = 0;
+Defaults.upToken = '/';
+Defaults.downToken = '..';
+
+// Defaults.replicateIteration = null;
+Defaults.prevSelectIteration = null;
+
+Defaults.visited = null;
+Defaults.selected = null;
+
+Defaults.set = null;
+Defaults.setting = null;
+Defaults.creating = null;
+
+Defaults.onUpBegin = null;
+Defaults.onUpEnd = null;
+Defaults.onDownBegin = null;
+Defaults.onDownEnd = null;
+Defaults.onQuantitativeFail = null;
+Defaults.onSelectorUndecorate = null;
+
+let Selector = Object.create( Parent );
+
+Selector.constructor = function Selector(){};
+Selector.Looker = Selector;
+Selector.optionsFromArguments = optionsFromArguments;
+Selector.optionsForm = optionsForm;
+Selector.optionsToIteration = optionsToIteration;
+Selector.reselectIt = reselectIt;
+Selector.reselect = reselect;
+Selector.start = start;
+Selector._iterationMakeAct = _iterationMakeAct;
+Selector.iteratorSelectorReset = iteratorSelectorReset;
+Selector.iterableEval = iterableEval;
+Selector.ascendEval = ascendEval;
+Selector.choose = choose;
+Selector.iteratorSelectorChanged = iteratorSelectorChanged;
+Selector.iterationSelectorChanged = iterationSelectorChanged;
+Selector.indexedAccessToMap = indexedAccessToMap;
+Selector.globParse = globParse;
+
+Selector.errNoDown = errNoDown;
+Selector.errNoDownThrow = errNoDownThrow;
+Selector.errCantSet = errCantSet;
+Selector.errCantSetThrow = errCantSetThrow;
+Selector.errDoesNotExist = errDoesNotExist;
+Selector.errDoesNotExistThrow = errDoesNotExistThrow;
+
+Selector.visitUp = visitUp;
+Selector.visitUpBegin = visitUpBegin;
+Selector.upTerminal = upTerminal;
+Selector.upRelative = upRelative;
+Selector.upGlob = upGlob;
+Selector.upSingle = upSingle;
+
+Selector.visitDown = visitDown;
+Selector.downTerminal = downTerminal;
+Selector.downRelative = downRelative;
+Selector.downGlob = downGlob;
+Selector.downSingle = downSingle;
+Selector.downSet = downSet;
+
+Selector.dstWriteDownLong = dstWriteDownLong;
+Selector.dstWriteDownMap = dstWriteDownMap;
+
+Selector._relativeAscend = _relativeAscend;
+Selector._singleAscend = _singleAscend;
+
+let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
+
+Iterator.selectorArray = null;
+// Iterator.replicateIteration = null;
+Iterator.result = null;
+
+let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
+
+Iteration.dst = null;
+Iteration.selector = null;
+Iteration.absoluteLevel = 0;
+Iteration.parsedSelector = null;
+Iteration.isRelative = null;
+Iteration.isGlob = null;
+Iteration.isTerminal = null;
+Iteration.dstWritingDown = true;
+Iteration.dstWriteDown = null;
+
+let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
+IterationPreserve.absoluteLevel = 0;
+
+// --
 // extend looker
 // --
 
-function reselectIt( o )
+function optionsFromArguments( args )
+{
+  // debugger;
+  let o = args[ 0 ];
+
+  if( args.length === 2 )
+  {
+    o = { src : args[ 0 ], selector : args[ 1 ] }
+  }
+
+  _.assert( args.length === 1 || args.length === 2 );
+  _.assert( arguments.length === 1 );
+  _.assert( _.mapIs( o ) );
+
+  return o;
+}
+
+//
+
+function optionsForm( routine, o )
+{
+  Parent.optionsForm.call( this, routine, o );
+
+  _.assert( _.mapIs( o ) );
+  _.assert( arguments.length === 2 );
+  _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
+  _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
+  _.assert( _.strIs( o.selector ) );
+  _.assert( _.strIs( o.downToken ) );
+  _.assert( _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
+  _.assert( o.selectorArray === undefined );
+  _.assert( o.it === undefined );
+
+  if( o.setting === null && o.set !== null )
+  o.setting = 1;
+  if( o.creating === null )
+  o.creating = !!o.setting;
+
+  if( o.Looker === null )
+  o.Looker = Self;
+
+  return o;
+}
+
+//
+
+function optionsToIteration( o )
+{
+  let it = Parent.optionsToIteration.call( this, o );
+  _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
+  _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
+  return it;
+}
+
+//
+
+function reselectIt()
 {
   let it = this;
 
   _.assert( arguments.length === 1 );
+  _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.toStrShort( it )}` );
+  _.assert( it.selector !== null, () => `Iteration is not looked` );
 
   let it2 = it.iterationMake();
+  let args = _.longSlice( arguments );
+  if( args.length === 1 && !_.objectIs( args[ 0 ] ) )
+  args = [ it.src, args[ 0 ] ];
+  let o = Self.optionsFromArguments( args );
+  o.Looker = o.Looker || it.Looker || Self;
 
-  _.selector.selectIt( it2, o );
+  _.assert( _.mapIs( o ) );
+  _.assertMapHasOnly( o, { src : null, selector : null, Looker : null }, 'Implemented only for options::selector' );
+  _.assert( _.strIs( o.selector ) );
+  _.assert( _.strIs( it2.iterator.selector ) );
 
-  return it2;
+  it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
+  it2.iteratorSelectorChanged();
+  it2.prevSelectIteration = it;
+  it2.look();
+
+  return it2.lastSelected;
 }
 
 //
@@ -83,52 +258,43 @@ function start()
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
-  _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
+  _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
   _.assert( _.intIs( it.iterator.selector ) || _.strIs( it.iterator.selector ) );
   _.assert( !!it.upToken );
-  _.assert( it.iterationIs( it ) )
+  _.assert( it.iterationProper( it ) );
 
-  if( _.intIs( it.iterator.selector ) )
-  it.iterator.selectorArray = [ it.iterator.selector ];
-  else
-  it.iterator.selectorArray = split( it.iterator.selector );
+  it.iteratorSelectorChanged();
 
-  return it.look();
+  // debugger;
+  let result = it.look();
+  // debugger;
 
-  /* */
-
-  function split( selector )
-  {
-    let splits = _.strSplit
-    ({
-      src : selector,
-      delimeter : it.upToken,
-      preservingDelimeters : 0,
-      preservingEmpty : 1,
-      preservingQuoting : 0,
-      stripping : 1,
-    });
-
-    if( _.strBegins( selector, it.upToken ) )
-    splits.splice( 0, 1 );
-    if( _.strEnds( selector, it.upToken ) )
-    splits.pop();
-
-    return splits;
-  }
-
+  it.iterator.result = it.dst;
+  if( it.missingAction === 'error' && it.error )
+  return it.error;
+  _.assert( it.error === null );
+  return it.dst;
 }
 
 //
 
-function iterationReinit( selector )
+function _iterationMakeAct()
+{
+  let it = this;
+  let newIt = Parent._iterationMakeAct.call( it );
+  return newIt;
+}
+
+//
+
+function iteratorSelectorReset( selector )
 {
   let it = this;
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( selector ) );
 
-  _.assert( Self.iterationIs( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.toStrShort( it ) );
+  _.assert( Self.iterationProper( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.toStrShort( it ) );
   _.assert( _.strIs( it.iterator.selector ) );
   if( it.iterator.selector === undefined )
   it.iterator.selector = '';
@@ -146,9 +312,9 @@ function iterableEval()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  let type = _.container.typeOf( it.src );
-  if( type )
-  it.containerType = type;
+  // let type = _.container.typeOf( it.src );
+  // if( type )
+  // it.containerType = type;
 
   if( it.isRelative )
   {
@@ -161,18 +327,19 @@ function iterableEval()
   else if( it.isGlob )
   {
 
-    if( type )
-    {
-      debugger;
-      it.iterable = _.selector.containerNameToIdMap.custom;
-    }
-    else if( _.longLike( it.src ) )
+    // if( type )
+    // {
+    //   debugger;
+    //   it.iterable = _.selector.containerNameToIdMap.custom;
+    // }
+    // else
+    if( _.longLike( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.countable;
     }
     else if( _.objectIs( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.auxiliary;
+      it.iterable = _.selector.containerNameToIdMap.aux;
     }
     else if( _.hashMapLike( it.src ) )
     {
@@ -236,7 +403,42 @@ function choose( e, k )
 
 //
 
-function selectorChanged()
+function iteratorSelectorChanged()
+{
+  let it = this;
+
+  if( _.intIs( it.iterator.selector ) )
+  it.iterator.selectorArray = [ it.iterator.selector ];
+  else
+  it.iterator.selectorArray = split( it.iterator.selector );
+
+  /* */
+
+  function split( selector )
+  {
+    let splits = _.strSplit
+    ({
+      src : selector,
+      delimeter : it.upToken,
+      preservingDelimeters : 0,
+      preservingEmpty : 1,
+      preservingQuoting : 0,
+      stripping : 1,
+    });
+
+    if( _.strBegins( selector, it.upToken ) )
+    splits.splice( 0, 1 );
+    if( _.strEnds( selector, it.upToken ) )
+    splits.pop();
+
+    return splits;
+  }
+
+}
+
+//
+
+function iterationSelectorChanged()
 {
   let it = this;
 
@@ -286,8 +488,6 @@ function indexedAccessToMap()
   {
     let q = _.numberFromStr( it.selector );
     it.selector = _.mapKeys( it.src )[ q ];
-    // if( it.selector === undefined )
-    // return it.errDoesNotExistThrow();
   }
 
 }
@@ -343,7 +543,7 @@ function errNoDown()
 function errNoDownThrow()
 {
   let it = this;
-  it.continue = false; debugger;
+  it.continue = false;
   if( it.missingAction === 'undefine' || it.missingAction === 'ignore' )
   {
     it.dst = undefined;
@@ -353,6 +553,7 @@ function errNoDownThrow()
     let err = it.errNoDown();
     it.dst = undefined;
     it.iterator.error = err;
+    debugger;
     if( it.missingAction === 'throw' )
     throw err;
   }
@@ -469,7 +670,7 @@ function visitUpBegin()
   _.assert( it.visiting );
 
   it.selector = it.selectorArray[ it.level ];
-  it.selectorChanged();
+  it.iterationSelectorChanged();
 
   it.dstWriteDown = function dstWriteDown( eit )
   {
@@ -517,7 +718,7 @@ function upGlob()
   {
     if( it.iterable )
     {
-      it.src = _.path.globShortFilter /* xxx : use srcOriginal */
+      it.src = _.path.globShortFilter
       ({
         src : it.src,
         selector : it.parsedSelector.glob,
@@ -533,7 +734,7 @@ function upGlob()
     it.dst = [];
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
   }
-  else if( it.iterable === _.selector.containerNameToIdMap.auxiliary )
+  else if( it.iterable === _.selector.containerNameToIdMap.aux )
   {
     it.dst = Object.create( null );
     it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
@@ -676,17 +877,6 @@ function downSet()
       it.errCantSetThrow();
     }
   }
-  // else if( it.creating && it.src === undefined )
-  // {
-  //   let key = _.numberFromStrMaybe( it.key );
-  //   if( _.numberIs( key ) )
-  //   it.src = [];
-  //   else
-  //   it.src = Object.create( null );
-  //   if( it.down )
-  //   it.down.src[ it.key ] = it.src;
-  //   debugger;
-  // }
 
 }
 
@@ -740,7 +930,7 @@ function _relativeAscend()
     return it.errNoDownThrow();
   }
 
-  _.assert( it.iterationIs( dit ) );
+  _.assert( it.iterationProper( dit ) );
 
   it.visitPop();
   dit.visitPop();
@@ -783,54 +973,11 @@ function _singleAscend( src )
 
 function select_head( routine, args )
 {
-
-  let o = args[ 0 ]
-  if( args.length === 2 )
-  {
-    if( Self.iterationIs( args[ 0 ] ) )
-    o = { it : args[ 0 ], selector : args[ 1 ] }
-    else
-    o = { src : args[ 0 ], selector : args[ 1 ] }
-  }
-
+  let o = Self.optionsFromArguments( args );
+  o.Looker = o.Looker || routine.defaults.Looker || Self;
   _.routineOptionsPreservingUndefines( routine, o );
-  _.assert( arguments.length === 2 );
-  _.assert( args.length === 1 || args.length === 2 );
-  _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
-  _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
-  _.assert( _.strIs( o.selector ) );
-  _.assert( _.strIs( o.downToken ) );
-  _.assert( _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
-  _.assert( o.selectorArray === undefined );
-
-  if( o.it )
-  {
-    debugger;
-    o.it.iterationReinit( o.selector ); /* xxx : rename */
-
-    _.assert( o.prevSelectIteration === null || o.prevSelectIteration === o.it );
-    _.assert( o.src === null );
-
-    o.src = o.it.iterator.src;
-    o.selector = o.it.iterator.selector;
-    o.prevSelectIteration = o.it;
-
-  }
-
-  if( o.setting === null && o.set !== null )
-  o.setting = 1;
-  if( o.creating === null )
-  o.creating = !!o.setting;
-
-  if( o.Looker === null )
-  o.Looker = Self;
-  let it = _.look.head( selectIt_body, [ o ] );
-
-  _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
-  _.assert( Object.hasOwnProperty.call( it, 'selector' ) );
-  _.assert( o.it === it ); /* yyy */
-  // _.assert( o === Object.getPrototypeOf( it ) );
-
+  o.Looker.optionsForm( routine, o );
+  let it = o.Looker.optionsToIteration( o );
   return it;
 }
 
@@ -839,7 +986,6 @@ function select_head( routine, args )
 function selectIt_body( it )
 {
   _.assert( arguments.length === 1, 'Expects single argument' );
-  debugger;
   _.assert( _.looker.is( it.Looker ) );
   _.assert( _.looker.iterationIs( it ) );
   _.assert( it.looker === undefined );
@@ -847,37 +993,7 @@ function selectIt_body( it )
   return it;
 }
 
-var defaults = selectIt_body.defaults = _.mapExtend( null, _.look.defaults );
-
-defaults.Looker = null;
-defaults.it = null;
-defaults.src = null;
-defaults.selector = null;
-defaults.missingAction = 'undefine';
-defaults.preservingIteration = 0;
-defaults.usingIndexedAccessToMap = 0;
-defaults.globing = 1;
-defaults.revisiting = 2;
-defaults.absoluteLevel = 0;
-defaults.upToken = '/';
-defaults.downToken = '..';
-
-defaults.replicateIteration = null;
-defaults.prevSelectIteration = null;
-
-defaults.visited = null;
-defaults.selected = null;
-
-defaults.set = null;
-defaults.setting = null;
-defaults.creating = null;
-
-defaults.onUpBegin = null;
-defaults.onUpEnd = null;
-defaults.onDownBegin = null;
-defaults.onDownEnd = null;
-defaults.onQuantitativeFail = null;
-defaults.onSelectorUndecorate = null;
+var defaults = selectIt_body.defaults = Defaults;
 
 //
 
@@ -926,12 +1042,7 @@ let selectIt = _.routineUnite( select_head, selectIt_body );
 
 function select_body( it )
 {
-  it.start();
-  _.assert( arguments.length === 1, 'Expects single argument' ); /* xxx : move to start? */
-  if( it.missingAction === 'error' && it.error )
-  return it.error;
-  _.assert( it.error === null );
-  return it.dst;
+  return it.start();
 }
 
 _.routineExtend( select_body, selectIt );
@@ -1028,7 +1139,6 @@ function selectUnique_body( o )
       it.src = _.longOnce_( it.src );
       else
       it.src = _.longOnce_( null, it.src );
-      // it.src = _.longOnce( it.src );
     }
   }
 
@@ -1069,72 +1179,6 @@ function onSelectorUndecorateDoubleColon()
     it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
   }
 }
-
-// --
-// declare looker
-// --
-
-let Selector = Object.create( Parent );
-
-Selector.constructor = function Selector(){};
-Selector.Looker = Selector;
-Selector.reselectIt = reselectIt;
-Selector.reselect = reselect;
-Selector.start = start;
-Selector.iterationReinit = iterationReinit;
-Selector.iterableEval = iterableEval;
-Selector.ascendEval = ascendEval;
-Selector.choose = choose;
-Selector.selectorChanged = selectorChanged;
-Selector.indexedAccessToMap = indexedAccessToMap;
-Selector.globParse = globParse;
-
-Selector.errNoDown = errNoDown;
-Selector.errNoDownThrow = errNoDownThrow;
-Selector.errCantSet = errCantSet;
-Selector.errCantSetThrow = errCantSetThrow;
-Selector.errDoesNotExist = errDoesNotExist;
-Selector.errDoesNotExistThrow = errDoesNotExistThrow;
-
-Selector.visitUp = visitUp;
-Selector.visitUpBegin = visitUpBegin;
-Selector.upTerminal = upTerminal;
-Selector.upRelative = upRelative;
-Selector.upGlob = upGlob;
-Selector.upSingle = upSingle;
-
-Selector.visitDown = visitDown;
-Selector.downTerminal = downTerminal;
-Selector.downRelative = downRelative;
-Selector.downGlob = downGlob;
-Selector.downSingle = downSingle;
-Selector.downSet = downSet;
-
-Selector.dstWriteDownLong = dstWriteDownLong;
-Selector.dstWriteDownMap = dstWriteDownMap;
-
-Selector._relativeAscend = _relativeAscend;
-Selector._singleAscend = _singleAscend;
-
-let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
-
-Iterator.selectorArray = null;
-Iterator.replicateIteration = null;
-
-let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
-
-Iteration.dst = null;
-Iteration.selector = null;
-Iteration.absoluteLevel = 0;
-Iteration.parsedSelector = null;
-Iteration.isRelative = null;
-Iteration.isGlob = null;
-Iteration.isTerminal = null;
-Iteration.dstWritingDown = true;
-Iteration.dstWriteDown = null;
-
-let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
-IterationPreserve.absoluteLevel = 0;
 
 // --
 // declare
@@ -1181,6 +1225,11 @@ let SelectorExtension =
   containerIdToNameMap,
   containerIdToAscendMap,
   containerIdToWriteDownMap,
+
+  is : _.looker.is,
+  iteratorIs : _.looker.iteratorIs,
+  iterationIs : _.looker.iterationIs,
+  make : _.looker.make,
 
   selectIt,
   select,
