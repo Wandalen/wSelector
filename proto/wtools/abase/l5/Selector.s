@@ -85,6 +85,7 @@ let Selector = Object.create( Parent );
 
 Selector.constructor = function Selector(){};
 Selector.Looker = Selector;
+Selector.head = head;
 Selector.optionsFromArguments = optionsFromArguments;
 Selector.optionsForm = optionsForm;
 Selector.optionsToIteration = optionsToIteration;
@@ -153,9 +154,24 @@ IterationPreserve.absoluteLevel = 0;
 // extend looker
 // --
 
+function head( routine, args )
+{
+  _.assert( arguments.length === 2 );
+  let o = Self.optionsFromArguments( args );
+  o.Looker = o.Looker || routine.defaults.Looker || Self;
+  if( _.routineIs( routine ) ) /* xxx : remove "if" later */
+  _.routineOptionsPreservingUndefines( routine, o );
+  else if( routine !== null )
+  _.routineOptionsPreservingUndefines( null, o, routine );
+  o.Looker.optionsForm( routine, o );
+  let it = o.Looker.optionsToIteration( o );
+  return it;
+}
+
+//
+
 function optionsFromArguments( args )
 {
-  // debugger;
   let o = args[ 0 ];
 
   if( args.length === 2 )
@@ -973,12 +989,13 @@ function _singleAscend( src )
 
 function select_head( routine, args )
 {
-  let o = Self.optionsFromArguments( args );
-  o.Looker = o.Looker || routine.defaults.Looker || Self;
-  _.routineOptionsPreservingUndefines( routine, o );
-  o.Looker.optionsForm( routine, o );
-  let it = o.Looker.optionsToIteration( o );
-  return it;
+  return Self.head( routine, args );
+  // let o = Self.optionsFromArguments( args );
+  // o.Looker = o.Looker || routine.defaults.Looker || Self;
+  // _.routineOptionsPreservingUndefines( routine, o );
+  // o.Looker.optionsForm( routine, o );
+  // let it = o.Looker.optionsToIteration( o );
+  // return it;
 }
 
 //
