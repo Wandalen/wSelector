@@ -1275,11 +1275,11 @@ _.mapSupplement( _, SupplementTools );
 _.mapSupplement( _.selector, SelectorExtension );
 _.mapSupplement( _.selector.functor, FunctorExtension );
 
-if( _.accessor && _.accessor.forbid )
-{
-  _.accessor.forbid( _.select, { composite : 'composite' } );
-  _.accessor.forbid( _.selector, { composite : 'composite' } );
-}
+// if( _.accessor && _.accessor.forbid )
+// {
+//   _.accessor.forbid( _.select, { composite : 'composite' } );
+//   _.accessor.forbid( _.selector, { composite : 'composite' } );
+// }
 
 // --
 // export
