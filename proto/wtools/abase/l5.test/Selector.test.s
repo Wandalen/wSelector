@@ -2270,6 +2270,59 @@ function fieldPath( test )
 
 //
 
+function iteratorResult( test )
+{
+
+  /* */
+
+  test.case = 'control';
+
+  var src =
+  {
+    a : 'str',
+    b : [ 'str', { c : 13, d : [], e : {} } ],
+  }
+
+  var expected = 13;
+  var got = _.select( src, 'b/1/c' );
+  test.identical( got, expected );
+
+  var expected =
+  {
+    a : 'str',
+    b : [ 'str', { c : 13, d : [], e : {} } ],
+  }
+  test.identical( src, expected );
+
+  /* */
+
+  test.case = 'iterator.result';
+
+  var src =
+  {
+    a : 'str',
+    b : [ 'str', { c : 13, d : [], e : {} } ],
+  }
+
+  var expected = 13;
+  var it = _.select.head( _.select, [ src, 'b/1/c' ] );
+  var got = it.start();
+  test.true( got === it.result );
+  test.identical( it.result, expected );
+
+  var expected =
+  {
+    a : 'str',
+    b : [ 'str', { c : 13, d : [], e : {} } ],
+  }
+  test.identical( src, expected );
+
+  /* */
+
+}
+
+//
+
 function selectWithGlobNonPrimitive( test )
 {
 
@@ -2619,6 +2672,7 @@ let Self =
     selectThis,
 
     fieldPath,
+    iteratorResult,
     selectWithGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,

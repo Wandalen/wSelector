@@ -46,7 +46,7 @@ _.selector.functor = _.selector.functor || Object.create( null );
 _.assert( !!_realGlobal_ );
 
 // --
-// declare looker
+// relations
 // --
 
 let Defaults = _.mapExtend( null, _.look.defaults );
@@ -68,7 +68,7 @@ Defaults.downToken = '..';
 Defaults.prevSelectIteration = null;
 
 Defaults.visited = null;
-Defaults.selected = null;
+// Defaults.selected = null;
 
 Defaults.set = null;
 Defaults.setting = null;
@@ -80,75 +80,6 @@ Defaults.onDownBegin = null;
 Defaults.onDownEnd = null;
 Defaults.onQuantitativeFail = null;
 Defaults.onSelectorUndecorate = null;
-
-let Selector = Object.create( Parent );
-
-Selector.constructor = function Selector(){};
-Selector.Looker = Selector;
-Selector.head = head;
-Selector.optionsFromArguments = optionsFromArguments;
-Selector.optionsForm = optionsForm;
-Selector.optionsToIteration = optionsToIteration;
-Selector.reselectIt = reselectIt;
-Selector.reselect = reselect;
-Selector.start = start;
-Selector._iterationMakeAct = _iterationMakeAct;
-Selector.iteratorSelectorReset = iteratorSelectorReset;
-Selector.iterableEval = iterableEval;
-Selector.ascendEval = ascendEval;
-Selector.choose = choose;
-Selector.iteratorSelectorChanged = iteratorSelectorChanged;
-Selector.iterationSelectorChanged = iterationSelectorChanged;
-Selector.indexedAccessToMap = indexedAccessToMap;
-Selector.globParse = globParse;
-
-Selector.errNoDown = errNoDown;
-Selector.errNoDownThrow = errNoDownThrow;
-Selector.errCantSet = errCantSet;
-Selector.errCantSetThrow = errCantSetThrow;
-Selector.errDoesNotExist = errDoesNotExist;
-Selector.errDoesNotExistThrow = errDoesNotExistThrow;
-
-Selector.visitUp = visitUp;
-Selector.visitUpBegin = visitUpBegin;
-Selector.upTerminal = upTerminal;
-Selector.upRelative = upRelative;
-Selector.upGlob = upGlob;
-Selector.upSingle = upSingle;
-
-Selector.visitDown = visitDown;
-Selector.downTerminal = downTerminal;
-Selector.downRelative = downRelative;
-Selector.downGlob = downGlob;
-Selector.downSingle = downSingle;
-Selector.downSet = downSet;
-
-Selector.dstWriteDownLong = dstWriteDownLong;
-Selector.dstWriteDownMap = dstWriteDownMap;
-
-Selector._relativeAscend = _relativeAscend;
-Selector._singleAscend = _singleAscend;
-
-let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
-
-Iterator.selectorArray = null;
-// Iterator.replicateIteration = null;
-Iterator.result = null;
-
-let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
-
-Iteration.dst = null;
-Iteration.selector = null;
-Iteration.absoluteLevel = 0;
-Iteration.parsedSelector = null;
-Iteration.isRelative = null;
-Iteration.isGlob = null;
-Iteration.isTerminal = null;
-Iteration.dstWritingDown = true;
-Iteration.dstWriteDown = null;
-
-let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
-IterationPreserve.absoluteLevel = 0;
 
 // --
 // extend looker
@@ -281,15 +212,19 @@ function start()
 
   it.iteratorSelectorChanged();
 
-  // debugger;
   let result = it.look();
+
   // debugger;
+  if( !it.error )
+  it.selected = true;
 
   it.iterator.result = it.dst;
   if( it.missingAction === 'error' && it.error )
   return it.error;
   _.assert( it.error === null );
-  return it.dst;
+
+  // return it.dst;
+  return it;
 }
 
 //
@@ -990,12 +925,6 @@ function _singleAscend( src )
 function select_head( routine, args )
 {
   return Self.head( routine, args );
-  // let o = Self.optionsFromArguments( args );
-  // o.Looker = o.Looker || routine.defaults.Looker || Self;
-  // _.routineOptionsPreservingUndefines( routine, o );
-  // o.Looker.optionsForm( routine, o );
-  // let it = o.Looker.optionsToIteration( o );
-  // return it;
 }
 
 //
@@ -1059,7 +988,8 @@ let selectIt = _.routineUnite( select_head, selectIt_body );
 
 function select_body( it )
 {
-  return it.start();
+  it.start();
+  return it.result;
 }
 
 _.routineExtend( select_body, selectIt );
@@ -1198,8 +1128,81 @@ function onSelectorUndecorateDoubleColon()
 }
 
 // --
-// declare
+// relations
 // --
+
+let Selector = Object.create( Parent );
+
+Selector.constructor = function Selector(){};
+Selector.Looker = Selector;
+Selector.makeAndLook = selectIt;
+Selector.head = head;
+Selector.optionsFromArguments = optionsFromArguments;
+Selector.optionsForm = optionsForm;
+Selector.optionsToIteration = optionsToIteration;
+Selector.reselectIt = reselectIt;
+Selector.reselect = reselect;
+Selector.start = start;
+Selector._iterationMakeAct = _iterationMakeAct;
+Selector.iteratorSelectorReset = iteratorSelectorReset;
+Selector.iterableEval = iterableEval;
+Selector.ascendEval = ascendEval;
+Selector.choose = choose;
+Selector.iteratorSelectorChanged = iteratorSelectorChanged;
+Selector.iterationSelectorChanged = iterationSelectorChanged;
+Selector.indexedAccessToMap = indexedAccessToMap;
+Selector.globParse = globParse;
+
+Selector.errNoDown = errNoDown;
+Selector.errNoDownThrow = errNoDownThrow;
+Selector.errCantSet = errCantSet;
+Selector.errCantSetThrow = errCantSetThrow;
+Selector.errDoesNotExist = errDoesNotExist;
+Selector.errDoesNotExistThrow = errDoesNotExistThrow;
+
+Selector.visitUp = visitUp;
+Selector.visitUpBegin = visitUpBegin;
+Selector.upTerminal = upTerminal;
+Selector.upRelative = upRelative;
+Selector.upGlob = upGlob;
+Selector.upSingle = upSingle;
+
+Selector.visitDown = visitDown;
+Selector.downTerminal = downTerminal;
+Selector.downRelative = downRelative;
+Selector.downGlob = downGlob;
+Selector.downSingle = downSingle;
+Selector.downSet = downSet;
+
+Selector.dstWriteDownLong = dstWriteDownLong;
+Selector.dstWriteDownMap = dstWriteDownMap;
+
+Selector._relativeAscend = _relativeAscend;
+Selector._singleAscend = _singleAscend;
+
+let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
+
+Iterator.selectorArray = null;
+// Iterator.replicateIteration = null;
+Iterator.result = null; /* qqq : cover please */
+Iterator.selected = null; /* qqq : cover please */
+
+let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
+
+Iteration.dst = null;
+Iteration.selector = null;
+Iteration.absoluteLevel = 0;
+Iteration.parsedSelector = null;
+Iteration.isRelative = null;
+Iteration.isGlob = null;
+Iteration.isTerminal = null;
+Iteration.dstWritingDown = true;
+Iteration.dstWriteDown = null;
+
+let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
+IterationPreserve.absoluteLevel = 0;
+
+//
 
 let last = _.looker.containerNameToIdMap.last;
 let containerNameToIdMap =
