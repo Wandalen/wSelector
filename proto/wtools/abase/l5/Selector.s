@@ -68,7 +68,7 @@ Defaults.downToken = '..';
 Defaults.prevSelectIteration = null;
 
 Defaults.visited = null;
-// Defaults.selected = null;
+// Defaults.done = null;
 
 Defaults.set = null;
 Defaults.setting = null;
@@ -214,9 +214,10 @@ function start()
 
   let result = it.look();
 
-  _.assert( it.selected === null );
+  debugger;
+  _.assert( it.done === null );
   if( !it.error )
-  it.selected = true;
+  it.iterator.done = true;
 
   it.iterator.selectedResult = it.dst;
 
@@ -1194,7 +1195,7 @@ Iterator.selectorArray = null;
 // Iterator.replicateIteration = null;
 Iterator.result = null; /* qqq : cover please */
 Iterator.selectedResult = null; /* qqq : cover please */
-Iterator.selected = null; /* qqq : cover please */
+Iterator.done = null; /* qqq : cover please */ /* xxx : rename to done */
 
 let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
 
