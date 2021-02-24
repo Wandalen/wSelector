@@ -214,13 +214,21 @@ function start()
 
   let result = it.look();
 
-  // debugger;
+  _.assert( it.selected === null );
   if( !it.error )
   it.selected = true;
 
-  it.iterator.result = it.dst;
+  it.iterator.selectedResult = it.dst;
+
   if( it.missingAction === 'error' && it.error )
-  return it.error;
+  {
+    it.result = it.error;
+    return it;
+    // return it.error;
+  }
+
+  it.iterator.result = it.selectedResult;
+
   _.assert( it.error === null );
 
   // return it.dst;
@@ -1185,6 +1193,7 @@ let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
 Iterator.selectorArray = null;
 // Iterator.replicateIteration = null;
 Iterator.result = null; /* qqq : cover please */
+Iterator.selectedResult = null; /* qqq : cover please */
 Iterator.selected = null; /* qqq : cover please */
 
 let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
