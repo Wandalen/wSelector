@@ -90,7 +90,7 @@ function head( routine, args )
   _.assert( arguments.length === 2 );
   let o = Self.optionsFromArguments( args );
   o.Looker = o.Looker || routine.defaults.Looker || Self;
-  if( _.routineIs( routine ) ) /* xxx : remove "if" later */
+  if( _.routineIs( routine ) ) /* zzz : remove "if" later */
   _.routineOptionsPreservingUndefines( routine, o );
   else if( routine !== null )
   _.routineOptionsPreservingUndefines( null, o, routine );
