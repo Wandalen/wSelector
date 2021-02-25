@@ -2306,7 +2306,7 @@ function iteratorResult( test )
 
   var expected = 13;
   var it = _.select.head( _.select, [ src, 'b/1/c' ] );
-  var got = it.start();
+  var got = it.perform();
   test.true( got === it );
   test.identical( it.result, expected );
 

@@ -52,7 +52,6 @@ _.assert( !!_realGlobal_ );
 let Defaults = _.mapExtend( null, _.look.defaults );
 
 Defaults.Looker = null;
-// Defaults.it = null;
 Defaults.src = null;
 Defaults.selector = null;
 Defaults.missingAction = 'undefine';
@@ -63,17 +62,11 @@ Defaults.revisiting = 2;
 Defaults.absoluteLevel = 0;
 Defaults.upToken = '/';
 Defaults.downToken = '..';
-
-// Defaults.replicateIteration = null;
 Defaults.prevSelectIteration = null;
-
 Defaults.visited = null;
-// Defaults.done = null;
-
 Defaults.set = null;
 Defaults.setting = null;
 Defaults.creating = null;
-
 Defaults.onUpBegin = null;
 Defaults.onUpEnd = null;
 Defaults.onDownBegin = null;
@@ -125,8 +118,8 @@ function optionsForm( routine, o )
 
   _.assert( _.mapIs( o ) );
   _.assert( arguments.length === 2 );
-  _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
-  _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
+  // _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
+  // _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( o.downToken ) );
   _.assert( _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
@@ -179,7 +172,7 @@ function reselectIt()
   it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
   it2.iteratorSelectorChanged();
   it2.prevSelectIteration = it;
-  it2.look();
+  it2.iterate();
 
   return it2.lastSelected;
 }
@@ -199,7 +192,7 @@ function reselect( o )
 
 //
 
-function start()
+function perform()
 {
   let it = this;
 
@@ -212,9 +205,8 @@ function start()
 
   it.iteratorSelectorChanged();
 
-  let result = it.look();
+  let result = it.iterate();
 
-  debugger;
   _.assert( it.done === null );
   if( !it.error )
   it.iterator.done = true;
@@ -225,14 +217,12 @@ function start()
   {
     it.result = it.error;
     return it;
-    // return it.error;
   }
 
   it.iterator.result = it.selectedResult;
 
   _.assert( it.error === null );
 
-  // return it.dst;
   return it;
 }
 
@@ -272,10 +262,6 @@ function iterableEval()
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.boolIs( it.isTerminal ) );
 
-  // let type = _.container.typeOf( it.src );
-  // if( type )
-  // it.containerType = type;
-
   if( it.isRelative )
   {
     it.iterable = _.selector.containerNameToIdMap.relative;
@@ -287,12 +273,6 @@ function iterableEval()
   else if( it.isGlob )
   {
 
-    // if( type )
-    // {
-    //   debugger;
-    //   it.iterable = _.selector.containerNameToIdMap.custom;
-    // }
-    // else
     if( _.longLike( it.src ) )
     {
       it.iterable = _.selector.containerNameToIdMap.countable;
@@ -903,7 +883,7 @@ function _relativeAscend()
   nit.dst = undefined;
   nit.absoluteLevel -= 2;
 
-  nit.look();
+  nit.iterate();
 
   return true;
 }
@@ -923,7 +903,7 @@ function _singleAscend( src )
     eit.errDoesNotExistThrow();
   }
 
-  eit.look();
+  eit.iterate();
 
 }
 
@@ -944,7 +924,7 @@ function selectIt_body( it )
   _.assert( _.looker.is( it.Looker ) );
   _.assert( _.looker.iterationIs( it ) );
   _.assert( it.looker === undefined );
-  it.start();
+  it.perform();
   return it;
 }
 
@@ -997,7 +977,7 @@ let selectIt = _.routineUnite( select_head, selectIt_body );
 
 function select_body( it )
 {
-  it.start();
+  it.perform();
   return it.result;
 }
 
@@ -1144,14 +1124,14 @@ let Selector = Object.create( Parent );
 
 Selector.constructor = function Selector(){};
 Selector.Looker = Selector;
-Selector.makeAndLook = selectIt;
+Selector.performMaking = selectIt;
 Selector.head = head;
 Selector.optionsFromArguments = optionsFromArguments;
 Selector.optionsForm = optionsForm;
 Selector.optionsToIteration = optionsToIteration;
 Selector.reselectIt = reselectIt;
 Selector.reselect = reselect;
-Selector.start = start;
+Selector.perform = perform;
 Selector._iterationMakeAct = _iterationMakeAct;
 Selector.iteratorSelectorReset = iteratorSelectorReset;
 Selector.iterableEval = iterableEval;
@@ -1192,10 +1172,9 @@ Selector._singleAscend = _singleAscend;
 let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
 
 Iterator.selectorArray = null;
-// Iterator.replicateIteration = null;
 Iterator.result = null; /* qqq : cover please */
 Iterator.selectedResult = null; /* qqq : cover please */
-Iterator.done = null; /* qqq : cover please */ /* xxx : rename to done */
+Iterator.done = null; /* qqq : cover please */
 
 let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
 
@@ -1259,7 +1238,7 @@ let SelectorExtension =
   is : _.looker.is,
   iteratorIs : _.looker.iteratorIs,
   iterationIs : _.looker.iterationIs,
-  make : _.looker.make,
+  make : _.looker.define,
 
   selectIt,
   select,
@@ -1287,12 +1266,6 @@ let Self = Selector;
 _.mapSupplement( _, SupplementTools );
 _.mapSupplement( _.selector, SelectorExtension );
 _.mapSupplement( _.selector.functor, FunctorExtension );
-
-// if( _.accessor && _.accessor.forbid )
-// {
-//   _.accessor.forbid( _.select, { composite : 'composite' } );
-//   _.accessor.forbid( _.selector, { composite : 'composite' } );
-// }
 
 // --
 // export
