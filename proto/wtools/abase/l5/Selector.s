@@ -1230,15 +1230,17 @@ var FunctorExtension =
 let SelectorExtension =
 {
 
+  ... _.looker,
+
   containerNameToIdMap,
   containerIdToNameMap,
   containerIdToAscendMap,
   containerIdToWriteDownMap,
 
-  is : _.looker.is,
-  iteratorIs : _.looker.iteratorIs,
-  iterationIs : _.looker.iterationIs,
-  make : _.looker.define,
+  // is : _.looker.is,
+  // iteratorIs : _.looker.iteratorIs,
+  // iterationIs : _.looker.iterationIs,
+  // define : _.looker.define,
 
   selectIt,
   select,
@@ -1253,10 +1255,8 @@ let SupplementTools =
 {
 
   Selector,
-
   selectIt,
   select,
-
   selectSet,
   selectUnique,
 
