@@ -205,6 +205,7 @@ function perform()
 
   it.iteratorSelectorChanged();
 
+  _.debugger;
   let result = it.iterate();
 
   _.assert( it.done === null );
