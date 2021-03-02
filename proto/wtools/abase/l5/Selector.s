@@ -56,10 +56,9 @@ Defaults.src = null;
 Defaults.selector = null;
 Defaults.missingAction = 'undefine';
 Defaults.preservingIteration = 0;
-Defaults.usingIndexedAccessToMap = 0;
 Defaults.globing = 1;
 Defaults.revisiting = 2;
-Defaults.absoluteLevel = 0;
+// Defaults.absoluteLevel = null;
 Defaults.upToken = '/';
 Defaults.downToken = '..';
 Defaults.prevSelectIteration = null;
@@ -118,11 +117,13 @@ function optionsForm( routine, o )
 
   _.assert( _.mapIs( o ) );
   _.assert( arguments.length === 2 );
-  // _.assert( o.onUpBegin === null || _.routineIs( o.onUpBegin ) );
-  // _.assert( o.onDownBegin === null || _.routineIs( o.onDownBegin ) );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( o.downToken ) );
-  _.assert( _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction ), 'Unknown missing action', o.missingAction );
+  _.assert
+  (
+    _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction )
+    , `Unknown missing action ${o.missingAction}`
+  );
   _.assert( o.selectorArray === undefined );
   _.assert( o.it === undefined );
 
@@ -142,6 +143,8 @@ function optionsForm( routine, o )
 function optionsToIteration( o )
 {
   let it = Parent.optionsToIteration.call( this, o );
+  _.assert( it.absoluteLevel === null );
+  it.absoluteLevel = 0;
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
   return it;
@@ -152,6 +155,7 @@ function optionsToIteration( o )
 function reselectIt()
 {
   let it = this;
+  debugger;
 
   _.assert( arguments.length === 1 );
   _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}` );
@@ -169,12 +173,13 @@ function reselectIt()
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( it2.iterator.selector ) );
 
+  debugger;
   it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
   it2.iteratorSelectorChanged();
   it2.prevSelectIteration = it;
   it2.iterate();
 
-  return it2.lastSelected;
+  return it2.lastIt;
 }
 
 //
@@ -205,12 +210,17 @@ function perform()
 
   it.iteratorSelectorChanged();
 
-  _.debugger;
+  _.assert( it.state === 0 );
+  it.iterator.state = 1;
+
   let result = it.iterate();
 
-  _.assert( it.done === null );
-  if( !it.error )
-  it.iterator.done = true;
+  // _.assert( it.state === null );
+  // if( !it.error )
+  // it.iterator.state = true;
+
+  _.assert( it.state === 1 );
+  it.iterator.state = 2;
 
   it.iterator.selectedResult = it.dst;
 
@@ -222,7 +232,7 @@ function perform()
 
   it.iterator.result = it.selectedResult;
 
-  _.assert( it.error === null );
+  _.assert( it.error === null || it.error === true );
 
   return it;
 }
@@ -233,25 +243,8 @@ function _iterationMakeAct()
 {
   let it = this;
   let newIt = Parent._iterationMakeAct.call( it );
+  newIt.dst = undefined;
   return newIt;
-}
-
-//
-
-function iteratorSelectorReset( selector )
-{
-  let it = this;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( selector ) );
-
-  _.assert( Self.iterationProper( it ), () => 'Expects iteration of ' + Self.constructor.name + ' but got ' + _.entity.exportStringShort( it ) );
-  _.assert( _.strIs( it.iterator.selector ) );
-  if( it.iterator.selector === undefined )
-  it.iterator.selector = '';
-  _.assert( _.strIs( it.iterator.selector ) );
-  it.iterator.selector = it.iterator.selector + _.strsShortest( it.iterator.upToken ) + selector;
-
 }
 
 //
@@ -261,17 +254,17 @@ function iterableEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.isTerminal ) );
+  _.assert( _.boolIs( it.selectorIsTerminal ) );
 
-  if( it.isRelative )
+  if( it.selectorIsRelative )
   {
     it.iterable = _.selector.containerNameToIdMap.relative;
   }
-  else if( it.isTerminal )
+  else if( it.selectorIsTerminal )
   {
     it.iterable = 0;
   }
-  else if( it.isGlob )
+  else if( it.selectorIsGlob )
   {
 
     if( _.longLike( it.src ) )
@@ -311,7 +304,7 @@ function ascendEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.isTerminal ) );
+  _.assert( _.boolIs( it.selectorIsTerminal ) );
 
   it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
 
@@ -320,26 +313,88 @@ function ascendEval()
 
 //
 
-function choose( e, k )
+function selectorQuantitativeIs( src )
+{
+  let it = this;
+  if( !_.strIs( src ) )
+  return false;
+  if( !_.strBegins( src, it.quantitiveDelimeter ) )
+  return false;
+  return true;
+}
+
+//
+
+function selectorQuantitativeParse( src )
+{
+  let it = this;
+  if( !it.selectorQuantitativeIs( src ) )
+  return false;
+  let result = Object.create( null );
+  result.str = _.strRemoveBegin( src, it.quantitiveDelimeter );
+  result.number = _.numberFromStrMaybe( result.str );
+  _.assert( _.numberIs( result.number ), 'not tested' );
+  return result;
+}
+
+//
+
+function elementGet( src, k )
+{
+  let it = this;
+  let result;
+  _.assert( arguments.length === 2, 'Expects two argument' );
+  result = [ k, _.container.elementGet( src, k ) ];
+  return result;
+}
+
+//
+
+function chooseBegin( e, k )
 {
   let it = this;
 
-  let result = Parent.choose.call( it, ... arguments );
+  [ e, k ] = Parent.chooseBegin.call( it, ... arguments );
 
-  if( it.creating && it.src === undefined && it.selectorArray[ it.level ] !== undefined )
+  let q = it.selectorQuantitativeParse( k );
+  if( q )
   {
-    let key = _.numberFromStrMaybe( it.key );
-    it.src = Object.create( null );
-    if( it.down )
-    it.down.src[ it.key ] = it.src;
+    [ k, e ] = _.container.elementThGet( it.srcEffective, q.number );
   }
+
+  _.assert( arguments.length === 2, 'Expects two argument' );
+  _.assert( !!it.down );
 
   if( !it.fast )
   {
-    it.absoluteLevel = it.absoluteLevel+1;
+    it.absoluteLevel = it.down.absoluteLevel+1;
   }
 
-  return result;
+  return [ e, k ];
+}
+
+//
+
+function chooseEnd( e, k )
+{
+  let it = this;
+
+  _.assert( arguments.length === 2 );
+
+  if( it.creating )
+  if( e === undefined && it.selectorArray[ it.level+1 ] !== undefined ) /* xxx : use k? */
+  if( k !== undefined )
+  {
+    debugger;
+    /* yyy */
+    /* xxx : introduce containerMake() */
+    e = Object.create( null );
+    if( it.down )
+    it.down.src[ k ] = e;
+    /* xxx : use writeDown */
+  }
+
+  return Parent.chooseEnd.call( it, e, k );
 }
 
 //
@@ -385,50 +440,35 @@ function iterationSelectorChanged()
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
+  if( it.originalSelector === null )
+  it.originalSelector = it.selector;
+
   if( it.selector !== undefined )
   if( it.onSelectorUndecorate )
   {
     it.onSelectorUndecorate();
   }
 
-  it.isRelative = it.selector === it.downToken;
-  it.isTerminal = it.selector === undefined || it.selector === '/';
+  it.selectorIsRelative = it.selector === it.downToken;
+  it.selectorIsTerminal = it.selector === undefined || it.selector === '/';
 
-  if( it.globing )
+  if( it.globing && it.selectorIsGlob === null )
   {
 
-    let isGlob;
-    if( _.path && _.path.isGlob )
-    isGlob = function( selector )
+    let selectorIsGlob;
+    if( _.path && _.path.selectorIsGlob )
+    selectorIsGlob = function( selector )
     {
-      return _.path.isGlob( selector )
+      return _.path.selectorIsGlob( selector )
     }
     else
-    isGlob = function isGlob( selector )
+    selectorIsGlob = function selectorIsGlob( selector )
     {
       return _.strHas( selector, '*' );
     }
 
-    it.isGlob = it.selector ? isGlob( it.selector ) : false;
+    it.selectorIsGlob = it.selector ? selectorIsGlob( it.selector ) : false;
 
-  }
-
-  it.indexedAccessToMap();
-
-}
-
-//
-
-function indexedAccessToMap()
-{
-  let it = this;
-
-  if( it.selector !== undefined && !it.isRelative && !it.isGlob )
-  if( it.usingIndexedAccessToMap && !isNaN( _.numberFromStr( it.selector ) ) )
-  if( _.objectLike( it.src ) || _.hashMapLike( it.src ) )
-  {
-    let q = _.numberFromStr( it.selector );
-    it.selector = _.mapKeys( it.src )[ q ];
   }
 
 }
@@ -469,7 +509,7 @@ function globParse()
 function errNoDown()
 {
   let it = this;
-  let err = _.ErrorLooking
+  let err = this.errMake
   (
     'Cant go down', _.strQuote( it.selector ),
     '\nbecause', _.strQuote( it.selector ), 'does not exist',
@@ -481,23 +521,10 @@ function errNoDown()
 
 //
 
-function errNoDownThrow()
+function errNoDownHandle()
 {
   let it = this;
-  it.continue = false;
-  if( it.missingAction === 'undefine' || it.missingAction === 'ignore' )
-  {
-    it.dst = undefined;
-  }
-  else
-  {
-    let err = it.errNoDown();
-    it.dst = undefined;
-    it.iterator.error = err;
-    debugger;
-    if( it.missingAction === 'throw' )
-    throw err;
-  }
+  it.errHandle( () => it.errNoDown() );
 }
 
 //
@@ -508,17 +535,17 @@ function errCantSet()
   debugger;
   let err = _.err
   (
-    'Cant set', _.strQuote( it.key )
+    `Cant set ${it.key}`
   );
   return err;
 }
 
 //
 
-function errCantSetThrow()
+function errCantSetHandle()
 {
   let it = this;
-  throw it.errCantSet();
+  it.errHandle( () => it.errCantSet() );
 }
 
 //
@@ -526,37 +553,71 @@ function errCantSetThrow()
 function errDoesNotExist()
 {
   let it = this;
-  let err = _.ErrorLooking
+  let err = this.errMake
   (
-    'Cant select', _.strQuote( it.selector ),
-    '\nbecause', _.strQuote( it.selector ), 'does not exist',
-    'at', _.strQuote( it.path ),
-    '\nin container', _.entity.exportStringShort( it.src )
+    `Cant select ${it.iterator.selector} from ${_.entity.exportStringShort( it.src )}`,
+    `\n  because ${_.entity.exportStringShort( it.originalSelector )} does not exist`,
+    `\n  fall at ${_.strQuote( it.path )}`,
   );
   return err;
 }
 
 //
 
-function errDoesNotExistThrow()
+function errDoesNotExistHandle()
+{
+  let it = this;
+  it.errHandle( () => it.errDoesNotExist() );
+}
+
+//
+
+function errMake()
+{
+  let it = this;
+  /* xxx : group the error */
+  let err = _.ErrorLooking
+  (
+    ... arguments
+  );
+  debugger;
+  return err;
+}
+
+//
+
+function errHandle( err )
 {
   let it = this;
   it.continue = false;
 
+  _.assert( arguments.length === 1 );
+  _.assert( _.routineIs( err ) || _.errIs( err ) );
+
   if( it.missingAction === 'undefine' || it.missingAction === 'ignore' )
   {
+    it.iterator.error = true;
+    if( it.missingAction === 'undefine' )
     it.dst = undefined;
   }
   else
   {
-    let err = it.errDoesNotExist();
     it.dst = undefined;
-    it.iterator.error = err;
+    if( !it.iterator.error || it.iterator.error === true )
+    it.iterator.error = errMake();
     if( it.missingAction === 'throw' )
     {
+      err = errMake();
       debugger;
       throw err;
     }
+  }
+
+  function errMake()
+  {
+    if( _.routineIs( err ) )
+    return err();
+    return err;
   }
 
 }
@@ -575,11 +636,11 @@ function visitUp()
   if( it.dstWritingDown )
   {
 
-    if( it.isTerminal )
+    if( it.selectorIsTerminal )
     it.upTerminal();
-    else if( it.isRelative )
+    else if( it.selectorIsRelative )
     it.upRelative();
-    else if( it.isGlob )
+    else if( it.selectorIsGlob )
     it.upGlob();
     else
     it.upSingle();
@@ -637,7 +698,7 @@ function upRelative()
 {
   let it = this;
 
-  _.assert( it.isRelative === true );
+  _.assert( it.selectorIsRelative === true );
 
 }
 
@@ -649,7 +710,7 @@ function upGlob()
 
   _.assert( it.globing );
 
-  /* !!! qqq : teach it to parse more than single "*=" */
+  /* qqq : teach it to parse more than single "*=" */
 
   if( it.globing )
   it.globParse();
@@ -682,7 +743,7 @@ function upGlob()
   }
   else /* qqq : not implemented for other structures, please implement */
   {
-    it.errDoesNotExistThrow();
+    it.errDoesNotExistHandle();
   }
 
 }
@@ -705,11 +766,11 @@ function visitDown()
   if( it.onDownBegin )
   it.onDownBegin.call( it );
 
-  if( it.isTerminal )
+  if( it.selectorIsTerminal )
   it.downTerminal();
-  else if( it.isRelative )
+  else if( it.selectorIsRelative )
   it.downRelative();
-  else if( it.isGlob )
+  else if( it.selectorIsGlob )
   it.downGlob();
   else
   it.downSingle();
@@ -803,10 +864,16 @@ function downSet()
 {
   let it = this;
 
-  if( it.setting && it.isTerminal )
+  if( it.setting && it.selectorIsTerminal )
   {
     /* qqq2 : implement and cover for all type of containers */
-    if( it.down && !_.primitiveIs( it.down.src ) && it.key !== undefined )
+    /* qqq : cover it.error === null */
+    if
+    (
+      it.down
+      && !_.primitiveIs( it.down.src )
+      && it.key !== undefined
+    )
     {
       if( it.set === undefined )
       delete it.down.src[ it.key ];
@@ -815,7 +882,7 @@ function downSet()
     }
     else
     {
-      it.errCantSetThrow();
+      it.errCantSetHandle();
     }
   }
 
@@ -826,8 +893,10 @@ function downSet()
 function dstWriteDownLong( eit )
 {
   let it = this;
-  if( it.missingAction === 'ignore' && eit.dst === undefined )
+  if( eit.dst === undefined )
+  if( it.missingAction === 'ignore' )
   return;
+
   if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
   it.dst.push( eit );
   else
@@ -839,7 +908,8 @@ function dstWriteDownLong( eit )
 function dstWriteDownMap( eit )
 {
   let it = this;
-  if( it.missingAction === 'ignore' && eit.dst === undefined )
+  if( eit.dst === undefined )
+  if( it.missingAction === 'ignore' )
   return;
   if( it.preservingIteration )
   it.dst[ eit.key ] = eit;
@@ -858,9 +928,9 @@ function _relativeAscend()
   _.assert( arguments.length === 1 );
 
   if( !dit )
-  return it.errNoDownThrow();
+  return it.errNoDownHandle();
 
-  while( dit.isRelative || dit.isTerminal || counter > 0 )
+  while( dit.selectorIsRelative || dit.selectorIsTerminal || counter > 0 )
   {
     if( dit.selector === it.downToken )
     counter += 1;
@@ -868,7 +938,7 @@ function _relativeAscend()
     counter -= 1;
     dit = dit.down;
     if( !dit )
-    return it.errNoDownThrow();
+    return it.errNoDownHandle();
   }
 
   _.assert( it.iterationProper( dit ) );
@@ -901,7 +971,7 @@ function _singleAscend( src )
 
   if( eit.src === undefined )
   {
-    eit.errDoesNotExistThrow();
+    it.errDoesNotExistHandle();
   }
 
   eit.iterate();
@@ -1087,15 +1157,6 @@ let selectUnique = _.routineUnite( select.head, selectUnique_body );
 
 //
 
-function onSelectorReplicate( o )
-{
-  let it = this;
-  if( _.strIs( o.selector ) )
-  return o.selector;
-}
-
-//
-
 function onSelectorUndecorate()
 {
   let it = this;
@@ -1125,7 +1186,7 @@ let Selector = Object.create( Parent );
 
 Selector.constructor = function Selector(){};
 Selector.Looker = Selector;
-Selector.performMaking = selectIt;
+Selector.exec = selectIt;
 Selector.head = head;
 Selector.optionsFromArguments = optionsFromArguments;
 Selector.optionsForm = optionsForm;
@@ -1134,21 +1195,25 @@ Selector.reselectIt = reselectIt;
 Selector.reselect = reselect;
 Selector.perform = perform;
 Selector._iterationMakeAct = _iterationMakeAct;
-Selector.iteratorSelectorReset = iteratorSelectorReset;
 Selector.iterableEval = iterableEval;
 Selector.ascendEval = ascendEval;
-Selector.choose = choose;
+Selector.selectorQuantitativeIs = selectorQuantitativeIs;
+Selector.selectorQuantitativeParse = selectorQuantitativeParse;
+Selector.elementGet = elementGet;
+Selector.chooseBegin = chooseBegin;
+Selector.chooseEnd = chooseEnd;
 Selector.iteratorSelectorChanged = iteratorSelectorChanged;
 Selector.iterationSelectorChanged = iterationSelectorChanged;
-Selector.indexedAccessToMap = indexedAccessToMap;
 Selector.globParse = globParse;
 
 Selector.errNoDown = errNoDown;
-Selector.errNoDownThrow = errNoDownThrow;
+Selector.errNoDownHandle = errNoDownHandle;
 Selector.errCantSet = errCantSet;
-Selector.errCantSetThrow = errCantSetThrow;
+Selector.errCantSetHandle = errCantSetHandle;
 Selector.errDoesNotExist = errDoesNotExist;
-Selector.errDoesNotExistThrow = errDoesNotExistThrow;
+Selector.errDoesNotExistHandle = errDoesNotExistHandle;
+Selector.errMake = errMake; /* xxx : move to looker */
+Selector.errHandle = errHandle;
 
 Selector.visitUp = visitUp;
 Selector.visitUpBegin = visitUpBegin;
@@ -1169,28 +1234,31 @@ Selector.dstWriteDownMap = dstWriteDownMap;
 
 Selector._relativeAscend = _relativeAscend;
 Selector._singleAscend = _singleAscend;
+Selector.quantitiveDelimeter = '#';
 
 let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
 
 Iterator.selectorArray = null;
 Iterator.result = null; /* qqq : cover please */
 Iterator.selectedResult = null; /* qqq : cover please */
-Iterator.done = null; /* qqq : cover please */
+Iterator.state = 0; /* qqq : cover please */
 
 let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
 
 Iteration.dst = null;
 Iteration.selector = null;
-Iteration.absoluteLevel = 0;
+Iteration.originalSelector = null;
+Iteration.absoluteLevel = null;
 Iteration.parsedSelector = null;
-Iteration.isRelative = null;
-Iteration.isGlob = null;
-Iteration.isTerminal = null;
+Iteration.selectorIsRelative = null;
+Iteration.selectorIsGlob = null;
+Iteration.selectorIsTerminal = null;
+Iteration.selectorIsQuantitive = false;
 Iteration.dstWritingDown = true;
 Iteration.dstWriteDown = null;
 
 let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
-IterationPreserve.absoluteLevel = 0;
+IterationPreserve.absoluteLevel = null;
 
 //
 
@@ -1232,16 +1300,12 @@ let SelectorExtension =
 {
 
   ... _.looker,
+  Selector,
 
   containerNameToIdMap,
   containerIdToNameMap,
   containerIdToAscendMap,
   containerIdToWriteDownMap,
-
-  // is : _.looker.is,
-  // iteratorIs : _.looker.iteratorIs,
-  // iterationIs : _.looker.iterationIs,
-  // define : _.looker.define,
 
   selectIt,
   select,

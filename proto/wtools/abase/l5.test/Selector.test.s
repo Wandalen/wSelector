@@ -150,12 +150,12 @@ function select( test )
 
 //
 
-function selectOptionUsingIndexedAccessToMap( test )
+function selectQuantifiedSelector( test )
 {
 
   /* */
 
-  test.case = '*/1';
+  test.case = '#1';
   var src =
   {
     a : { map : { name : 'name1' }, value : 13 },
@@ -165,62 +165,112 @@ function selectOptionUsingIndexedAccessToMap( test )
   var got = _.select
   ({
     src,
-    selector : '*/1',
-    usingIndexedAccessToMap : 1,
-  });
-  test.identical( got, { a : 13, c : 53 } );
-
-  /* */
-
-  test.case = '1';
-  var src =
-  {
-    a : { map : { name : 'name1' }, value : 13 },
-    c : { value : 25, date : 53 },
-  }
-
-  var got = _.select
-  ({
-    src,
-    selector : '1',
-    usingIndexedAccessToMap : 1,
+    selector : '#1',
+    // usingIndexedAccessToMap : 1,
   });
   test.identical( got, { value : 25, date : 53 } );
   test.true( got === src.c );
 
   /* */
 
+  test.case = '#1, setting';
   var exp = { a : 'a', b : {} };
   var src = { a : 'a', b : 'b' };
   var got = _.select
   ({
     src,
-    selector : '/1',
+    selector : '/#1',
     set : {},
     setting : 1,
-    usingIndexedAccessToMap : 1,
+    // usingIndexedAccessToMap : 1,
   });
   test.identical( got, 'b' );
   test.identical( src, exp );
 
   /* */
 
-  test.shouldThrowErrorSync( () =>
+  test.case = '*/#1';
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
+  }
+
+  var got = _.select
+  ({
+    src,
+    selector : '*/#1',
+    // usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, { a : 13, c : 53 } );
+
+  /* */
+
+}
+
+//
+
+function selectQuantifiedSelectorOptionMissingAction( test )
+{
+
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
+  act({ missingAction : 'error' });
+  actThrowing({ missingAction : 'throw' });
+
+  /* - */
+
+  function act( env )
   {
 
-    var src = { a : 'a' };
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
+    var exp = {};
+    var src = {};
     var got = _.select
     ({
       src,
-      selector : '/1',
+      selector : '/#1',
       set : {},
       setting : 1,
-      usingIndexedAccessToMap : 1,
+      missingAction : env.missingAction,
+    });
+    if( env.missingAction === 'error' )
+    test.true( _.errIs( got ) );
+    else
+    test.identical( got, undefined );
+    test.identical( src, exp );
+
+    /* */
+
+  }
+
+  /* - */
+
+  function actThrowing( env )
+  {
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
+    test.shouldThrowErrorSync( () =>
+    {
+      var got = _.select
+      ({
+        src,
+        selector : '/#1',
+        set : {},
+        setting : 1,
+        missingAction : env.missingAction,
+      });
     });
 
-  });
+    /* */
 
-  /* */
+  }
+
+  /* - */
 
 }
 
@@ -340,8 +390,8 @@ function selectUsingIndexedAccessToMap( test )
   var got = _.select
   ({
     src,
-    selector : '*/1',
-    usingIndexedAccessToMap : 1,
+    selector : '*/#1',
+    // usingIndexedAccessToMap : 1,
   });
   test.identical( got, { a : 13, c : 53 } );
 
@@ -359,10 +409,10 @@ function selectFromInstance( test )
   test.description = 'non-iterable';
 
   var src = new _.Logger({ name : 'logger' });
-  var expected = 'logger';
+  var exp = 'logger';
   var got = _.select( src, 'name' );
-  test.identical( got, expected );
-  test.true( got === expected );
+  test.identical( got, exp );
+  test.true( got === exp );
 
 }
 
@@ -516,7 +566,7 @@ function selectMissing( test )
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : { name : undefined, value : undefined },
     c : { value : undefined, date : undefined },
@@ -535,12 +585,12 @@ function selectMissing( test )
     missingAction : 'undefine',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : { name : undefined, value : undefined },
     c : { value : undefined, date : undefined },
@@ -559,7 +609,7 @@ function selectMissing( test )
     missingAction : 'undefine',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   /* */
@@ -710,7 +760,7 @@ function selectMissing( test )
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : {},
     c : {},
@@ -729,12 +779,12 @@ function selectMissing( test )
     missingAction : 'ignore',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : {},
     c : {},
@@ -753,7 +803,7 @@ function selectMissing( test )
     missingAction : 'ignore',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   /* */
@@ -870,7 +920,7 @@ function selectMissing( test )
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : {},
     c : {},
@@ -889,7 +939,7 @@ function selectMissing( test )
     missingAction : 'ignore',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   test.shouldThrowErrorSync( () => _.select
@@ -915,7 +965,7 @@ function selectMissing( test )
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : {},
     c : {},
@@ -934,7 +984,7 @@ function selectMissing( test )
     missingAction : 'ignore',
   })
 
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got !== src );
 
   /* */
@@ -1099,12 +1149,164 @@ function selectMissing( test )
 
 //
 
-function selectSet( test )
+function selectSetOptionMissingAction( test )
+{
+
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
+  act({ missingAction : 'error' });
+  actThrowing({ missingAction : 'throw' });
+
+  /* - */
+
+  function act( env )
+  {
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, l1`;
+    var src = {};
+    var options =
+    {
+      src,
+      selector : '/l1',
+      set : 'a',
+      missingAction : env.missingAction,
+    }
+    var got = _.select( options );
+    if( env.missingAction === 'error' )
+    {
+      test.true( _.errIs( got ) );
+      test.true( _.errIs( options.error ) );
+      test.true( got === options.error );
+    }
+    else
+    {
+      test.identical( got, undefined );
+    }
+    var exp = { 'l1' : 'a' };
+    test.identical( src, exp );
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, l2`;
+    var src = {};
+    var options =
+    {
+      src,
+      selector : '/l1/l2',
+      set : 'a',
+      missingAction : env.missingAction,
+    }
+    var got = _.select( options );
+    if( env.missingAction === 'error' )
+    {
+      test.true( _.errIs( got ) );
+      test.true( _.errIs( options.error ) );
+      test.true( got === options.error );
+    }
+    else
+    {
+      test.identical( got, undefined );
+    }
+    var exp = { 'l1' : { 'l2' : 'a' } };
+    test.identical( src, exp );
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /`;
+    var src = {};
+    var options =
+    {
+      src,
+      selector : '/',
+      set : 'a',
+      missingAction : env.missingAction,
+    }
+    var got = _.select( options );
+    if( env.missingAction === 'error' )
+    {
+      test.true( _.errIs( got ) );
+      test.true( _.errIs( options.error ) );
+      test.true( got === options.error );
+    }
+    else
+    {
+      if( env.missingAction === 'undefine' )
+      test.identical( got, undefined );
+      else
+      test.true( got === src );
+    }
+    var exp = {};
+    test.identical( src, exp );
+
+    /* */
+
+  }
+
+  /* - */
+
+  function actThrowing( env )
+  {
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, l1`;
+    test.shouldThrowErrorSync( () =>
+    {
+      var got = _.select
+      ({
+        src,
+        selector : '/l1',
+        set : 'a',
+        missingAction : env.missingAction,
+      });
+    });
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, l2`;
+    test.shouldThrowErrorSync( () =>
+    {
+      var got = _.select
+      ({
+        src,
+        selector : '/l1/l2',
+        set : 'a',
+        missingAction : env.missingAction,
+      });
+    });
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /`;
+    test.shouldThrowErrorSync( () =>
+    {
+      var got = _.select
+      ({
+        src,
+        selector : '/',
+        set : 'a',
+        missingAction : env.missingAction,
+      });
+    });
+
+    /* */
+
+  }
+
+  /* - */
+
+}
+
+//
+
+function selectSetBasic( test )
 {
 
   /* */
 
-  var expected =
+  var exp =
   {
     a : { name : 'x', value : 13 },
     b : { name : 'x', value : 77 },
@@ -1127,12 +1329,12 @@ function selectSet( test )
   });
 
   test.identical( got, { a : 'name1', b : 'name2', c : undefined } );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
   var src = {};
-  var expected = { a : 'c' };
+  var exp = { a : 'c' };
   var got = _.select
   ({
     src,
@@ -1142,64 +1344,89 @@ function selectSet( test )
   });
 
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
   var src = {};
-  var expected = { '1' : {} };
+  var exp = { '1' : {} };
   var got = _.select
   ({
     src,
     selector : '/1',
     set : {},
     setting : 1,
-    usingIndexedAccessToMap : 0,
+    //usingIndexedAccessToMap : 0,
   });
 
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
-  test.shouldThrowErrorSync( () =>
-  {
+  test.case = 'setting, quantitive selector';
+
+  var src = { a : 1, b : 2 };
+  var exp = { a : 1, b : 3 };
+
+  var got = _.select
+  ({
+    src,
+    selector : '/#1',
+    set : 3,
+    setting : 1,
+  });
+
+  test.identical( got, 2 );
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = 'setting, quantitive selector, does not exist';
+
+  // yyy
+  // test.shouldThrowErrorSync( () =>
+  // {
 
     var src = {};
-    var expected = {};
+    var exp = {};
 
+    debugger;
     var got = _.select
     ({
       src,
-      selector : '/1',
+      selector : '/#0',
       set : {},
       setting : 1,
-      usingIndexedAccessToMap : 1,
+      // usingIndexedAccessToMap : 1,
     });
 
-  });
+  test.identical( got, undefined );
+  test.identical( src, exp );
+
+  // });
 
   /* */
 
   var src = { a : '1', b : '1' };
-  var expected = { a : '1', b : '2' };
+  var exp = { a : '1', b : '2' };
   var got = _.select
   ({
     src,
-    selector : '/1',
+    selector : '/#1',
     set : '2',
     setting : 1,
-    usingIndexedAccessToMap : 1,
+    // usingIndexedAccessToMap : 1,
   });
 
   test.identical( got, '1' );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* - */
 
   test.open( '/a from empty map' );
 
-  var expected = { 'a' : 'x' }
+  var exp = { 'a' : 'x' }
   var src = {}
   var got = _.select
   ({
@@ -1210,11 +1437,11 @@ function selectSet( test )
   });
 
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
-  var expected = { 'a' : 'x' }
+  var exp = { 'a' : 'x' }
   var src = {}
   var got = _.select
   ({
@@ -1225,11 +1452,11 @@ function selectSet( test )
   });
 
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
-  var expected = { 'dir' : { 'b' : 'dir/b' } }
+  var exp = { 'dir' : { 'b' : 'dir/b' } }
   var src = { 'dir' : { 'a' : 'dir/a', 'b' : 'dir/b' } }
   var got = _.select
   ({
@@ -1239,11 +1466,11 @@ function selectSet( test )
   });
 
   test.identical( got, 'dir/a' );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
-  var expected = { 'a' : 'x' }
+  var exp = { 'a' : 'x' }
   var src = {}
   var got = _.select
   ({
@@ -1254,7 +1481,7 @@ function selectSet( test )
   });
 
   test.true( _.errIs( got ) );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
@@ -1278,9 +1505,7 @@ function selectSet( test )
 
   test.open( '/a/b from empty map' );
 
-  /* */
-
-  var expected = {}
+  var exp = {}
   var src = {}
   var got = _.select
   ({
@@ -1292,11 +1517,11 @@ function selectSet( test )
   });
 
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
-  var expected = {}
+  var exp = {}
   var src = {}
   var got = _.select
   ({
@@ -1306,9 +1531,8 @@ function selectSet( test )
     missingAction : 'undefine',
     creating : 0,
   });
-
   test.identical( got, undefined );
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
@@ -1321,9 +1545,9 @@ function selectSet( test )
     missingAction : 'error',
     creating : 0,
   });
-
   test.true( _.errIs( got ) );
-  test.identical( src, expected );
+  var exp = {}
+  test.identical( src, exp );
 
   /* */
 
@@ -1339,21 +1563,40 @@ function selectSet( test )
     });
   });
 
-  /* */
+  /* - */
 
   test.close( '/a/b from empty map' );
+  test.open( 'etc' );
 
   /* - */
 
-  test.open( 'throwing' );
-
-  test.shouldThrowErrorSync( () => _.select
+  var src = {};
+  var got = _.select
   ({
-    src : {},
+    src,
     selector : '/',
     set : { a : 1 },
     setting : 1,
-  }));
+  });
+  test.true( got === undefined );
+  var exp = {};
+  test.identical( src, exp );
+
+  /* - */
+
+  test.close( 'etc' );
+  test.open( 'throwing' );
+
+  /* - */
+
+  // yyy
+  // test.shouldThrowErrorSync( () => _.select
+  // ({
+  //   src : {},
+  //   selector : '/',
+  //   set : { a : 1 },
+  //   setting : 1,
+  // }));
 
   /* */
 
@@ -1729,9 +1972,9 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  // var it = _.selectIt( it.lastSelected.iterationMake(), '..' );
-  // var it = it.lastSelected.iterationMake().reselect( '..' );
-  var it = it.lastSelected.reselectIt( '..' );
+  // var it = _.selectIt( it.lastIt.iterationMake(), '..' );
+  // var it = it.lastIt.iterationMake().reselect( '..' );
+  var it = it.lastIt.reselectIt( '..' );
 
   test.identical( it.dst, src.a );
   test.true( it.dst === src.a );
@@ -1750,15 +1993,15 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  // var it2 = _.selectIt( it.lastSelected.iterationMake(), '../../b/name' );
-  var it2 = it.lastSelected.reselectIt( '../../b/name' );
+  // var it2 = _.selectIt( it.lastIt.iterationMake(), '../../b/name' );
+  var it2 = it.lastIt.reselectIt( '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.true( it2.dst === src.b.name );
   test.true( it !== it2 );
 
-  var it3 = it.lastSelected.reselectIt( '..' );
-  // var it3 = _.selectIt( it.lastSelected.iterationMake(), '..' );
+  var it3 = it.lastIt.reselectIt( '..' );
+  // var it3 = _.selectIt( it.lastIt.iterationMake(), '..' );
 
   test.identical( it3.dst, src.b );
   test.true( it3.dst === src.b );
@@ -1788,8 +2031,8 @@ function selectWithDownRemake( test )
   {
     if( it.path === '/a/name' )
     {
-      it.dst = it.lastSelected.reselect( '../../b/name' );
-      // it.dst = _.select( it.lastSelected.iterationMake(), '../../b/name' );
+      it.dst = it.lastIt.reselect( '../../b/name' );
+      // it.dst = _.select( it.lastIt.iterationMake(), '../../b/name' );
     }
   }
 
@@ -1950,6 +2193,7 @@ function reselect( test )
 
   function onUp( e, k, it )
   {
+    debugger;
     upsLevel.push( it.level );
     upsAbsoluteLevel.push( it.absoluteLevel );
     upsSelector.push( it.selector );
@@ -2037,24 +2281,24 @@ function selectWithGlob( test )
 
   test.description = 'trivial';
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
-  var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
+  var exp = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
   var got = _.select( src, '*Y' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY && got.ccY === src.ccY );
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*Y' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, '*a*' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
 }
@@ -2186,6 +2430,7 @@ function selectThis( test )
     let it = this;
     if( it.selector === 'this' )
     {
+      debugger;
       it.src = [ it.src ];
       it.selector = 0;
       it.iterationSelectorChanged();
@@ -2257,8 +2502,8 @@ function fieldPath( test )
     onDownBegin,
     onDownEnd,
   });
-  var expected = 13;
-  test.identical( got, expected );
+  var exp = 13;
+  test.identical( got, exp );
   test.identical( onUpBeginCounter, 3 );
   test.identical( onUpEndCounter, 3 );
   test.identical( onDownBeginCounter, 3 );
@@ -2283,16 +2528,16 @@ function iteratorResult( test )
     b : [ 'str', { c : 13, d : [], e : {} } ],
   }
 
-  var expected = 13;
+  var exp = 13;
   var got = _.select( src, 'b/1/c' );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
-  var expected =
+  var exp =
   {
     a : 'str',
     b : [ 'str', { c : 13, d : [], e : {} } ],
   }
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
@@ -2304,18 +2549,18 @@ function iteratorResult( test )
     b : [ 'str', { c : 13, d : [], e : {} } ],
   }
 
-  var expected = 13;
+  var exp = 13;
   var it = _.select.head( _.select, [ src, 'b/1/c' ] );
   var got = it.perform();
   test.true( got === it );
-  test.identical( it.result, expected );
+  test.identical( it.result, exp );
 
-  var expected =
+  var exp =
   {
     a : 'str',
     b : [ 'str', { c : 13, d : [], e : {} } ],
   }
-  test.identical( src, expected );
+  test.identical( src, exp );
 
   /* */
 
@@ -2323,7 +2568,106 @@ function iteratorResult( test )
 
 //
 
-function selectWithGlobNonPrimitive( test )
+function selectGlobOptionMissingAction( test )
+{
+
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
+  act({ missingAction : 'error' });
+  actThrowing({ missingAction : 'throw' });
+
+  /* - */
+
+  function act( env )
+  {
+
+    /* */
+
+    test.case = '*/*/*';
+
+    var src =
+    {
+      a : { name : 'name1', value : 13 },
+      c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
+    }
+
+    var options =
+    {
+      src,
+      selector : '*/*/*',
+      missingAction : env.missingAction,
+    }
+    var got = _.select( options );
+
+    if( env.missingAction === 'error' )
+    {
+      test.true( _.errIs( got ) );
+      test.true( _.errIs( options.error ) );
+      test.true( got === options.error );
+    }
+    else
+    {
+      var exp =
+      {
+        'a' : {},
+        'c' : {},
+      }
+      if( env.missingAction === 'undefine' )
+      {
+        var exp =
+        {
+          'a' : { 'name' : undefined, 'value' : undefined },
+          'c' : { 'value' : undefined, 'date' : undefined },
+        }
+      }
+      test.identical( got, exp );
+      test.true( got !== src );
+      test.identical( options.error, true );
+    }
+
+    var exp =
+    {
+      a : { name : 'name1', value : 13 },
+      c : { value : 25, date : new Date( Date.UTC( 1990, 0, 0 ) ) },
+    }
+    test.identical( src, exp );
+
+    /* */
+
+  }
+
+  /* - */
+
+  function actThrowing( env )
+  {
+
+    /* */
+
+    test.case = '*/*/*';
+    test.shouldThrowErrorSync( () =>
+    {
+
+      var options =
+      {
+        src,
+        selector : '*/*/*',
+        missingAction : env.missingAction,
+      }
+      var got = _.select( options );
+
+    });
+
+    /* */
+
+  }
+
+  /* - */
+
+}
+
+//
+
+function selectGlobNonPrimitive( test )
 {
 
   let Selector2 = _.mapExtend( null, _.Selector );
@@ -2337,23 +2681,23 @@ function selectWithGlobNonPrimitive( test )
 
   test.case = 'Composes/name';
   var src = new _.Logger({ name : 'logger' });
-  var expected = '';
+  var exp = '';
   var got = _.select( src, 'Composes/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
+  test.identical( got, exp );
+  test.true( got === exp );
 
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
-  var expected = 'eventHandlerAppend';
+  var exp = 'eventHandlerAppend';
   var got = _.select( src, 'eventHandlerAppend/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
+  test.identical( got, exp );
+  test.true( got === exp );
 
   test.case = '**';
   var src = 'abc';
-  var expected = undefined;
+  var exp = undefined;
   var got = _.select({ src, selector : '**' });
-  test.true( got === expected );
+  test.true( got === exp );
 
   test.close( 'trivial' );
 
@@ -2363,25 +2707,25 @@ function selectWithGlobNonPrimitive( test )
 
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
-  var expected = undefined;
+  var exp = undefined;
   test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
-  var expected = undefined;
+  var exp = undefined;
   var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Looker : Selector2 });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
   test.case = '**';
   var src = new _.Logger();
-  var expected = undefined;
+  var exp = undefined;
   var got = _.select({ src, selector : '**', Looker : Selector2 });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
   var src = new _.Logger({ name : 'logger' });
-  var expected = undefined;
+  var exp = undefined;
   var got = _.select({ src, selector : '**/name', Looker : Selector2 });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
   test.close( 'only maps' );
 
@@ -2391,45 +2735,45 @@ function selectWithGlobNonPrimitive( test )
 
   test.case = 'setup';
   var src = new _.Logger();
-  var expected = src;
+  var exp = src;
   var got = _.select( src, '**' );
-  test.true( got !== expected );
+  test.true( got !== exp );
   test.true( _.mapIs( got ) );
   test.true( _.entityLengthOf( got ) > 10 );
 
 
   test.case = 'Composes/name';
   var src = new _.Logger({ name : 'logger' });
-  var expected = '';
+  var exp = '';
   var got = _.select( src, 'Composes/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
+  test.identical( got, exp );
+  test.true( got === exp );
 
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
-  var expected = 'eventHandlerAppend';
+  var exp = 'eventHandlerAppend';
   var got = _.select( src, 'eventHandlerAppend/name' );
-  test.identical( got, expected );
-  test.true( got === expected );
+  test.identical( got, exp );
+  test.true( got === exp );
 
   var src = new _.Logger({ name : 'logger' });
-  var expected = src;
+  var exp = src;
   var got = _.select( src, '**/name' );
-  test.true( got !== expected );
+  test.true( got !== exp );
   test.true( _.mapIs( got ) );
   test.true( _.entityLengthOf( got ) > 10 );
 
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
-  var expected = {};
+  var exp = {};
   var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'throw' });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
   test.case = 'should return empty map if continue set to false in onUpBegin';
   var src = new _.Logger();
-  var expected = {};
+  var exp = {};
   var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine' });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
   test.close( 'not only maps' );
 
@@ -2481,37 +2825,37 @@ function selectWithAssert( test )
 
   test.description = 'trivial';
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*=1' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
-  var expected = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
+  var exp = { aaY : { name : 'a', value : 1 }, ccY : { name : 'c', value : 3 } };
   var got = _.select( src, '*=2Y' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY && got.ccY === src.ccY );
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, 'a*=1Y' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
-  var expected = { aaY : { name : 'a', value : 1 } };
+  var exp = { aaY : { name : 'a', value : 1 } };
   var got = _.select( src, '*a*=1' );
-  test.identical( got, expected );
+  test.identical( got, exp );
   test.true( got.aaY === src.aaY );
 
   /* */
 
   test.description = 'second level';
 
-  var expected = { name : 'a' };
+  var exp = { name : 'a' };
   var got = _.select( src, 'aaY/n*=1e' );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
-  var expected = {};
+  var exp = {};
   var got = _.select( src, 'aaY/n*=0x' );
-  test.identical( got, expected );
+  test.identical( got, exp );
 
 }
 
@@ -2534,106 +2878,16 @@ function selectWithCallback( test )
   function onDownBegin()
   {
     let it = this;
-    if( !it.isGlob )
+    if( !it.selectorIsGlob )
     return;
     delete it.dst.aaY;
   }
 
-  var expected = {};
+  var exp = {};
   var got = _.select({ src, selector : 'a*=0', onDownBegin });
-  test.identical( got, expected );
+  test.identical( got, exp );
 
 }
-
-// //
-//
-// function selectContainerType( test )
-// {
-//   try
-//   {
-//
-//     let type = Object.create( null );
-//     type.name = 'ContainerForTest';
-//     type._while = _while;
-//     type._elementGet = _elementGet;
-//     type._elementSet = _elementSet;
-//     type._is = _is;
-//
-//     _.container.typeDeclare( type );
-//
-//     test.description = 'basic';
-//     var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-//     var exp = 2;
-//     var got = _.select( src1, '1' );
-//     test.identical( got, exp );
-//
-//     test.description = '2 levels';
-//     var a = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-//     var src2 = { a, b : 'bb' }
-//     var exp = 2;
-//     var got = _.select( src2, 'a/1' );
-//     test.identical( got, exp );
-//
-//     test.description = 'object';
-//     var a1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-//     var a2 = new objectMake();
-//     _.mapExtend( a2, a1 );
-//     var src2 = { a : a2, b : 'bb' }
-//     var exp = 2;
-//     var got = _.select( src2, 'a/1' );
-//     test.identical( got, exp );
-//
-//     _.container.typeUndeclare( 'ContainerForTest' );
-//
-//     test.description = 'undeclared';
-//     var src1 = { eSet, eGet, elements : [ 1, 2, 3 ], field1 : 1 };
-//     var exp = undefined;
-//     var got = _.select( src1, '1' );
-//     test.identical( got, exp );
-//
-//   }
-//   catch( err )
-//   {
-//     _.container.typeUndeclare( 'ContainerForTest' );
-//     throw err;
-//   }
-//
-//   function objectMake()
-//   {
-//   }
-//
-//   function _is( src )
-//   {
-//     return !!src.eGet;
-//   }
-//
-//   function _elementSet( container, key, val )
-//   {
-//     return container.eSet( key, val );
-//   }
-//
-//   function _elementGet( container, key )
-//   {
-//     return container.eGet( key );
-//   }
-//
-//   function _while( container, onEach )
-//   {
-//     for( let k = 0 ; k < container.elements.length ; k++ )
-//     onEach( container.elements[ k ], k, container );
-//   }
-//
-//   function eSet( k, v )
-//   {
-//     this.elements[ k ] = v;
-//   }
-//
-//   function eGet( k )
-//   {
-//     return this.elements[ k ];
-//   }
-//
-// }
 
 // --
 // declare
@@ -2654,13 +2908,15 @@ let Self =
   {
 
     select,
-    selectOptionUsingIndexedAccessToMap,
+    selectQuantifiedSelector,
+    selectQuantifiedSelectorOptionMissingAction,
     selectTrivial,
     selectUsingIndexedAccessToMap,
     selectFromInstance,
 
     selectMissing,
-    selectSet,
+    selectSetOptionMissingAction,
+    selectSetBasic,
     selectSetOptionCreating,
     selectWithDown,
     selectWithDownRemake,
@@ -2673,10 +2929,10 @@ let Self =
 
     fieldPath,
     iteratorResult,
-    selectWithGlobNonPrimitive,
+    selectGlobOptionMissingAction,
+    selectGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
-    // selectContainerType, /* yyy */
 
   }
 
