@@ -262,7 +262,7 @@ function iterableEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.selectorIsTerminal ) ); debugger;
+  _.assert( _.boolIs( it.selectorIsTerminal ) );
 
   if( it.selectorIsRelative )
   {
@@ -421,7 +421,6 @@ function chooseRoot( src )
 
   _.assert( arguments.length === 1 );
 
-  debugger;
   it.selector = it.selectorArray[ it.level ];
   it.iterationSelectorChanged();
 
