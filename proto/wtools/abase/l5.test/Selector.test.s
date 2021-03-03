@@ -1972,9 +1972,7 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  // var it = _.selectIt( it.lastIt.iterationMake(), '..' );
-  // var it = it.lastIt.iterationMake().reselect( '..' );
-  var it = it.lastIt.reselectIt( '..' );
+  var it = it.lastIt.reperformIt( '..' );
 
   test.identical( it.dst, src.a );
   test.true( it.dst === src.a );
@@ -1993,15 +1991,13 @@ function selectWithDownRemake( test )
   test.identical( it.dst, src.a.name );
   test.true( it.dst === src.a.name );
 
-  // var it2 = _.selectIt( it.lastIt.iterationMake(), '../../b/name' );
-  var it2 = it.lastIt.reselectIt( '../../b/name' );
+  var it2 = it.lastIt.reperformIt( '../../b/name' );
 
   test.identical( it2.dst, src.b.name );
   test.true( it2.dst === src.b.name );
   test.true( it !== it2 );
 
-  var it3 = it.lastIt.reselectIt( '..' );
-  // var it3 = _.selectIt( it.lastIt.iterationMake(), '..' );
+  var it3 = it.lastIt.reperformIt( '..' );
 
   test.identical( it3.dst, src.b );
   test.true( it3.dst === src.b );
@@ -2031,8 +2027,7 @@ function selectWithDownRemake( test )
   {
     if( it.path === '/a/name' )
     {
-      it.dst = it.lastIt.reselect( '../../b/name' );
-      // it.dst = _.select( it.lastIt.iterationMake(), '../../b/name' );
+      it.dst = it.lastIt.reperform( '../../b/name' );
     }
   }
 
@@ -2041,7 +2036,7 @@ function selectWithDownRemake( test )
 //
 
 /* qqq : rewrite all similar tests using mapper */
-function reselect( test )
+function reperform( test )
 {
   let upsLevel = [];
   let upsAbsoluteLevel = [];
@@ -2218,13 +2213,13 @@ function reselect( test )
     if( !it.selector )
     if( it.path === '/a/name' )
     {
-      it.dst = it.reselect( '../../b/name' );
+      it.dst = it.reperform( '../../b/name' );
     }
 
     if( !it.selector )
     if( it.path === '/a/name/../../b/name' )
     {
-      it.dst = it.reselect( '../value' );
+      it.dst = it.reperform( '../value' );
     }
 
   }
@@ -2237,12 +2232,12 @@ function reselect( test )
 
     if( it.path === '/a/name' )
     {
-      it.dst = it.reselect( '../../b/name' );
+      it.dst = it.reperform( '../../b/name' );
     }
 
     if( it.path === '/a/name/../../b/name' )
     {
-      it.dst = it.reselect( '../value' );
+      it.dst = it.reperform( '../value' );
     }
 
   }
@@ -2920,7 +2915,7 @@ let Self =
     selectSetOptionCreating,
     selectWithDown,
     selectWithDownRemake,
-    reselect,
+    reperform,
     selectWithGlob,
     selectUndecorating,
     selectIrregularSelector,

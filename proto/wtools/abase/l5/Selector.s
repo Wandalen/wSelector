@@ -61,7 +61,7 @@ Defaults.revisiting = 2;
 // Defaults.absoluteLevel = null;
 Defaults.upToken = '/';
 Defaults.downToken = '..';
-Defaults.prevSelectIteration = null;
+// Defaults.prevSelectIteration = null;
 Defaults.visited = null;
 Defaults.set = null;
 Defaults.setting = null;
@@ -152,10 +152,9 @@ function optionsToIteration( o )
 
 //
 
-function reselectIt()
+function reperformIt()
 {
   let it = this;
-  debugger;
 
   _.assert( arguments.length === 1 );
   _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}` );
@@ -173,10 +172,10 @@ function reselectIt()
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( it2.iterator.selector ) );
 
-  debugger;
   it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
+  // it2.iterator.prevSelectIteration = it;
   it2.iteratorSelectorChanged();
-  it2.prevSelectIteration = it;
+  it2.chooseRoot( it2.src );
   it2.iterate();
 
   return it2.lastIt;
@@ -184,20 +183,20 @@ function reselectIt()
 
 //
 
-function reselect( o )
+function reperform( o )
 {
   let it = this;
 
   _.assert( arguments.length === 1 );
 
-  let it2 = it.reselectIt( o );
+  let it2 = it.reperformIt( o );
 
   return it2.dst;
 }
 
 //
 
-function perform()
+function performBegin()
 {
   let it = this;
 
@@ -210,14 +209,18 @@ function perform()
 
   it.iteratorSelectorChanged();
 
+  Parent.performBegin.apply( it, arguments );
+
   _.assert( it.state === 0 );
   it.iterator.state = 1;
 
-  let result = it.iterate();
+}
 
-  // _.assert( it.state === null );
-  // if( !it.error )
-  // it.iterator.state = true;
+//
+
+function performEnd()
+{
+  let it = this;
 
   _.assert( it.state === 1 );
   it.iterator.state = 2;
@@ -234,6 +237,7 @@ function perform()
 
   _.assert( it.error === null || it.error === true );
 
+  Parent.performEnd.apply( it, arguments );
   return it;
 }
 
@@ -254,7 +258,7 @@ function iterableEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.selectorIsTerminal ) );
+  _.assert( _.boolIs( it.selectorIsTerminal ) ); debugger;
 
   if( it.selectorIsRelative )
   {
@@ -381,20 +385,51 @@ function chooseEnd( e, k )
 
   _.assert( arguments.length === 2 );
 
+  it.selector = it.selectorArray[ it.level+1 ];
+  it.iterationSelectorChanged();
+
   if( it.creating )
-  if( e === undefined && it.selectorArray[ it.level+1 ] !== undefined ) /* xxx : use k? */
-  if( k !== undefined )
+  // if( e === undefined && k !== undefined && it.selectorArray[ it.level+1 ] !== undefined ) /* yyy : use k? */
+  if( e === undefined && k !== undefined && it.selector !== undefined )
   {
     debugger;
     /* yyy */
-    /* xxx : introduce containerMake() */
-    e = Object.create( null );
+    /* yyy : introduce containerMake() */
+    // e = Object.create( null );
+    // if( it.down )
+    // it.down.src[ k ] = it.containerMake();
     if( it.down )
-    it.down.src[ k ] = e;
-    /* xxx : use writeDown */
+    {
+      e = it.containerMake();
+      it.down.srcWriteDown( e, k );
+    }
+    /* yyy : use writeDown */
   }
 
   return Parent.chooseEnd.call( it, e, k );
+}
+
+//
+
+function chooseRoot( src )
+{
+  let it = this;
+
+  _.assert( arguments.length === 1 );
+
+  debugger;
+  it.selector = it.selectorArray[ it.level ];
+  it.iterationSelectorChanged();
+
+  return Parent.chooseRoot.call( it, src );
+}
+
+//
+
+function containerMake()
+{
+  let it = this;
+  return Object.create( null );
 }
 
 //
@@ -572,20 +607,6 @@ function errDoesNotExistHandle()
 
 //
 
-function errMake()
-{
-  let it = this;
-  /* xxx : group the error */
-  let err = _.ErrorLooking
-  (
-    ... arguments
-  );
-  debugger;
-  return err;
-}
-
-//
-
 function errHandle( err )
 {
   let it = this;
@@ -671,8 +692,9 @@ function visitUpBegin()
 
   _.assert( it.visiting );
 
-  it.selector = it.selectorArray[ it.level ];
-  it.iterationSelectorChanged();
+  // yyy
+  // it.selector = it.selectorArray[ it.level ];
+  // it.iterationSelectorChanged();
 
   it.dstWriteDown = function dstWriteDown( eit )
   {
@@ -734,12 +756,12 @@ function upGlob()
   if( it.iterable === _.selector.containerNameToIdMap.countable )
   {
     it.dst = [];
-    it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
+    it.dstWriteDown = _.selector.containerIdToDstWriteDownMap[ it.iterable ]
   }
   else if( it.iterable === _.selector.containerNameToIdMap.aux )
   {
     it.dst = Object.create( null );
-    it.dstWriteDown = _.selector.containerIdToWriteDownMap[ it.iterable ]
+    it.dstWriteDown = _.selector.containerIdToDstWriteDownMap[ it.iterable ]
   }
   else /* qqq : not implemented for other structures, please implement */
   {
@@ -890,13 +912,32 @@ function downSet()
 
 //
 
+function srcWriteDown( e, k )
+{
+  let it = this;
+  if( it._srcWriteDownMethod === null )
+  it._srcWriteDownMethod = it.srcWriteDownMap;
+
+  /* qqq : extend to been able to write into hash maps and other complex structures */
+  it._srcWriteDownMethod( e, k );
+}
+
+//
+
+function srcWriteDownMap( e, k )
+{
+  let it = this;
+  it.src[ k ] = e;
+}
+
+//
+
 function dstWriteDownLong( eit )
 {
   let it = this;
   if( eit.dst === undefined )
   if( it.missingAction === 'ignore' )
   return;
-
   if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
   it.dst.push( eit );
   else
@@ -1191,9 +1232,10 @@ Selector.head = head;
 Selector.optionsFromArguments = optionsFromArguments;
 Selector.optionsForm = optionsForm;
 Selector.optionsToIteration = optionsToIteration;
-Selector.reselectIt = reselectIt;
-Selector.reselect = reselect;
-Selector.perform = perform;
+Selector.reperformIt = reperformIt;
+Selector.reperform = reperform;
+Selector.performBegin = performBegin;
+Selector.performEnd = performEnd;
 Selector._iterationMakeAct = _iterationMakeAct;
 Selector.iterableEval = iterableEval;
 Selector.ascendEval = ascendEval;
@@ -1202,6 +1244,8 @@ Selector.selectorQuantitativeParse = selectorQuantitativeParse;
 Selector.elementGet = elementGet;
 Selector.chooseBegin = chooseBegin;
 Selector.chooseEnd = chooseEnd;
+Selector.chooseRoot = chooseRoot;
+Selector.containerMake = containerMake
 Selector.iteratorSelectorChanged = iteratorSelectorChanged;
 Selector.iterationSelectorChanged = iterationSelectorChanged;
 Selector.globParse = globParse;
@@ -1212,7 +1256,7 @@ Selector.errCantSet = errCantSet;
 Selector.errCantSetHandle = errCantSetHandle;
 Selector.errDoesNotExist = errDoesNotExist;
 Selector.errDoesNotExistHandle = errDoesNotExistHandle;
-Selector.errMake = errMake; /* xxx : move to looker */
+// Selector.errMake = errMake; /* yyy : move to looker */
 Selector.errHandle = errHandle;
 
 Selector.visitUp = visitUp;
@@ -1229,6 +1273,8 @@ Selector.downGlob = downGlob;
 Selector.downSingle = downSingle;
 Selector.downSet = downSet;
 
+Selector.srcWriteDown = srcWriteDown;
+Selector.srcWriteDownMap = srcWriteDownMap;
 Selector.dstWriteDownLong = dstWriteDownLong;
 Selector.dstWriteDownMap = dstWriteDownMap;
 
@@ -1256,6 +1302,7 @@ Iteration.selectorIsTerminal = null;
 Iteration.selectorIsQuantitive = false;
 Iteration.dstWritingDown = true;
 Iteration.dstWriteDown = null;
+Iteration._srcWriteDownMethod = null;
 
 let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
 IterationPreserve.absoluteLevel = null;
@@ -1285,11 +1332,17 @@ let containerIdToAscendMap =
   [ last+2 ] : _singleAscend,
 }
 
-let containerIdToWriteDownMap =
+let containerIdToDstWriteDownMap =
 {
   1 : dstWriteDownLong,
   2 : dstWriteDownMap,
 }
+
+// let containerIdToDstWriteDownMap =
+// {
+//   1 : dstWriteDownLong,
+//   2 : dstWriteDownMap,
+// }
 
 var FunctorExtension =
 {
@@ -1305,7 +1358,7 @@ let SelectorExtension =
   containerNameToIdMap,
   containerIdToNameMap,
   containerIdToAscendMap,
-  containerIdToWriteDownMap,
+  containerIdToDstWriteDownMap,
 
   selectIt,
   select,
