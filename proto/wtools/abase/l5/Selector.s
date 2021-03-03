@@ -157,8 +157,12 @@ function reperformIt()
   let it = this;
 
   _.assert( arguments.length === 1 );
-  _.assert( it.iterationProper( it ), () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}` );
   _.assert( it.selector !== null, () => `Iteration is not looked` );
+  _.assert
+  (
+    it.iterationProper( it ),
+    () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}`
+  );
 
   let it2 = it.iterationMake();
   let args = _.longSlice( arguments );

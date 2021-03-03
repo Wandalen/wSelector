@@ -1384,27 +1384,19 @@ function selectSetBasic( test )
 
   test.case = 'setting, quantitive selector, does not exist';
 
-  // yyy
-  // test.shouldThrowErrorSync( () =>
-  // {
+  var src = {};
+  var exp = {};
 
-    var src = {};
-    var exp = {};
-
-    debugger;
-    var got = _.select
-    ({
-      src,
-      selector : '/#0',
-      set : {},
-      setting : 1,
-      // usingIndexedAccessToMap : 1,
-    });
+  var got = _.select
+  ({
+    src,
+    selector : '/#0',
+    set : {},
+    setting : 1,
+  });
 
   test.identical( got, undefined );
   test.identical( src, exp );
-
-  // });
 
   /* */
 
@@ -2188,7 +2180,6 @@ function reperform( test )
 
   function onUp( e, k, it )
   {
-    debugger;
     upsLevel.push( it.level );
     upsAbsoluteLevel.push( it.absoluteLevel );
     upsSelector.push( it.selector );
@@ -2425,7 +2416,6 @@ function selectThis( test )
     let it = this;
     if( it.selector === 'this' )
     {
-      debugger;
       it.src = [ it.src ];
       it.selector = 0;
       it.iterationSelectorChanged();
