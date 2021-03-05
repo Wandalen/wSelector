@@ -418,6 +418,161 @@ function selectFromInstance( test )
 
 //
 
+function selectThrowing( test )
+{
+
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
+  act({ missingAction : 'error' });
+  actThrowing({ missingAction : 'throw' });
+
+  /* - */
+
+  function act( env )
+  {
+
+    test.case = `${_.entity.exportStringSolo( env )}, basic`;
+
+    var src =
+    {
+      result :
+      {
+        dir :
+        {
+          x : 1,
+        }
+      },
+    }
+
+    var options =
+    {
+      src,
+      selector : 'result::dir/x',
+      recursive : Infinity,
+      onSelectorUndecorate,
+      missingAction : env.missingAction,
+    }
+    var got = _.select( options );
+
+    if( env.missingAction === 'error' )
+    {
+      let exp =
+`
+      Cant select result::dir/x from {- Map.polluted with 1 elements -}
+        because result::dir does not exist
+        fall at "/"
+`
+      test.true( _.errIs( got ) );
+      test.equivalent( got.originalMessage, exp );
+    }
+    else
+    {
+      test.true( got === undefined );
+    }
+    test.true( options.iteratorProper( options ) );
+
+    var exp =
+    {
+      'selector' : 'result::dir/x',
+      'recursive' : Infinity,
+      'missingAction' : env.missingAction,
+      'fast' : 0,
+      'revisiting' : 2,
+      'withCountable' : 'array',
+      'withImplicit' : 'aux',
+      'upToken' : '/',
+      'defaultUpToken' : '/',
+      'path' : '/',
+      'level' : 0,
+      'preservingIteration' : 0,
+      'globing' : 1,
+      'downToken' : '..',
+      'creating' : false,
+      'lastPath' : '/dir/x',
+      'continue' : true,
+      'error' : true,
+      'state' : 2,
+      'childrenCounter' : 0,
+      'ascending' : true,
+      'revisited' : false,
+      'visiting' : false,
+      'visitCounting' : true,
+      'selectorIsQuantitive' : false,
+      'dstWritingDown' : true,
+      'quantitiveDelimeter' : '#'
+    }
+    if( env.missingAction === 'error' )
+    delete exp.error;
+    if( env.missingAction === 'error' )
+    test.true( _.errIs( options.error ) );
+    else
+    test.true( options.error === true );
+    var got = _.filter_( null, _.mapExtend( null, options ), ( e, k ) => ( _.primitiveIs( e ) && e !== null ) ? e : undefined );
+    test.identical( got, exp );
+
+  }
+
+  /* - */
+
+  function actThrowing( env )
+  {
+
+    test.case = `${_.entity.exportStringSolo( env )}, basic`;
+
+    var src =
+    {
+      result :
+      {
+        dir :
+        {
+          x : 1,
+        }
+      },
+    }
+
+    test.shouldThrowErrorSync
+    (
+      () =>
+      {
+        var got = _.select
+        ({
+          src,
+          selector : 'result::dir/x',
+          recursive : Infinity,
+          onSelectorUndecorate,
+          missingAction : env.missingAction,
+        });
+      },
+      ( err ) =>
+      {
+        let exp =
+`
+        Cant select result::dir/x from {- Map.polluted with 1 elements -}
+          because result::dir does not exist
+          fall at "/"
+`
+        test.equivalent( err.originalMessage, exp );
+      }
+    );
+
+  }
+
+  /* - */
+
+  function onSelectorUndecorate()
+  {
+    let it = this;
+    if( !_.strIs( it.selector ) )
+    return;
+    if( !_.strHas( it.selector, '::' ) )
+    return;
+    it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
+  }
+
+}
+
+//
+
 function selectMissing( test )
 {
 
@@ -2898,6 +3053,7 @@ let Self =
     selectTrivial,
     selectUsingIndexedAccessToMap,
     selectFromInstance,
+    selectThrowing,
 
     selectMissing,
     selectSetOptionMissingAction,

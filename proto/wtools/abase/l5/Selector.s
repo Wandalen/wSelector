@@ -247,10 +247,10 @@ function performEnd()
 
 //
 
-function _iterationMakeAct()
+function iterationMake()
 {
   let it = this;
-  let newIt = Parent._iterationMakeAct.call( it );
+  let newIt = Parent.iterationMake.call( it );
   newIt.dst = undefined;
   return newIt;
 }
@@ -367,7 +367,7 @@ function chooseBegin( e, k )
   let q = it.selectorQuantitativeParse( k );
   if( q )
   {
-    [ k, e ] = _.container.elementThGet( it.srcEffective, q.number );
+    [ k, e ] = _.container.elementThGet( it./*srcEffective*/src, q.number );
   }
 
   _.assert( arguments.length === 2, 'Expects two argument' );
@@ -393,21 +393,11 @@ function chooseEnd( e, k )
   it.iterationSelectorChanged();
 
   if( it.creating )
-  // if( e === undefined && k !== undefined && it.selectorArray[ it.level+1 ] !== undefined ) /* yyy : use k? */
   if( e === undefined && k !== undefined && it.selector !== undefined )
+  if( it.down )
   {
-    debugger;
-    /* yyy */
-    /* yyy : introduce containerMake() */
-    // e = Object.create( null );
-    // if( it.down )
-    // it.down.src[ k ] = it.containerMake();
-    if( it.down )
-    {
-      e = it.containerMake();
-      it.down.srcWriteDown( e, k );
-    }
-    /* yyy : use writeDown */
+    e = it.containerMake();
+    it.down.srcWriteDown( e, k );
   }
 
   return Parent.chooseEnd.call( it, e, k );
@@ -570,7 +560,6 @@ function errNoDownHandle()
 function errCantSet()
 {
   let it = this;
-  debugger;
   let err = _.err
   (
     `Cant set ${it.key}`
@@ -1239,7 +1228,7 @@ Selector.reperformIt = reperformIt;
 Selector.reperform = reperform;
 Selector.performBegin = performBegin;
 Selector.performEnd = performEnd;
-Selector._iterationMakeAct = _iterationMakeAct;
+Selector.iterationMake = iterationMake;
 Selector.iterableEval = iterableEval;
 Selector.ascendEval = ascendEval;
 Selector.selectorQuantitativeIs = selectorQuantitativeIs;
