@@ -1397,7 +1397,7 @@ const selectIt = Selector.execIt;
 
 // let selectSet = _.routineUnite( select.head, select.body );
 // let selectSet = _.routineUnite({ head : select.head, body : select.body, strategy : 'inheriting' });
-let selectSet = _.routine.uniteInheriting(  select.head, select.body );
+let selectSet = _.routine.uniteInheriting( select.head, select.body );
 
 var defaults = selectSet.defaults;
 defaults.Looker = defaults;
@@ -1444,7 +1444,7 @@ _.routine.extendInheriting( selectUnique_body, select.body );
 selectUnique_body.defaults.Looker = selectUnique_body.defaults;
 // let selectUnique = _.routineUnite( select.head, selectUnique_body );
 // let selectUnique = _.routineUnite({ head : select.head, body : selectUnique_body, strategy : 'replacing' });
-let selectUnique = _.routine.uniteReplacing(  select.head, selectUnique_body );
+let selectUnique = _.routine.uniteReplacing( select.head, selectUnique_body );
 
 //
 
