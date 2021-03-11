@@ -470,36 +470,30 @@ function selectThrowing( test )
       test.true( got === undefined );
     }
     test.true( options.iteratorProper( options ) );
+    test.identical( options.childrenCounter, undefined );
 
     var exp =
     {
       'selector' : 'result::dir/x',
       'recursive' : Infinity,
       'missingAction' : env.missingAction,
+      'creating' : false,
+      'defaultUpToken' : '/',
+      'path' : '/',
+      'lastPath' : '/dir/x',
+      'state' : 2,
+      'error' : true,
+      'continue' : true,
       'fast' : 0,
       'revisiting' : 2,
       'withCountable' : 'array',
       'withImplicit' : 'aux',
       'upToken' : '/',
-      'defaultUpToken' : '/',
-      'path' : '/',
       'level' : 0,
       'preservingIteration' : 0,
       'globing' : 1,
       'downToken' : '..',
-      'creating' : false,
-      'lastPath' : '/dir/x',
-      'continue' : true,
-      'error' : true,
-      'state' : 2,
-      'childrenCounter' : 0,
-      'ascending' : true,
-      'revisited' : false,
-      'visiting' : false,
-      'visitCounting' : true,
-      'selectorIsQuantitive' : false,
-      'dstWritingDown' : true,
-      'quantitiveDelimeter' : '#'
+      'quantitiveDelimeter' : '#',
     }
     if( env.missingAction === 'error' )
     delete exp.error;
@@ -1162,7 +1156,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1172,7 +1166,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1181,7 +1175,7 @@ function selectMissing( test )
     selector : '*/x',
     missingAction : 'error',
   });
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1191,7 +1185,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   var src =
@@ -1207,7 +1201,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   var src =
@@ -1238,7 +1232,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.ErrorLooking );
+  test.true( got instanceof _.LookingError );
   console.log( got );
 
   /* */
@@ -2810,10 +2804,12 @@ function selectGlobOptionMissingAction( test )
 function selectGlobNonPrimitive( test )
 {
 
-  let Selector2 = _.mapExtend( null, _.Selector );
-  Selector2.Looker = Selector2;
-  let Iterator = Selector2.Iterator = _.mapExtend( null, Selector2.Iterator );
-  Iterator.srcChanged = srcChanged;
+  let iterator = { srcChanged }
+  let Selector2 = _.selector.classDefine({ iterator });
+  test.true( _.looker.Looker.containerNameToIdMap.countable > 0 );
+  test.true( Selector2.iterableEval === _.selector.Selector.iterableEval );
+  test.true( Selector2.Iterator.srcChanged === srcChanged );
+  test.true( Selector2.srcChanged === srcChanged );
 
   /* */
 
@@ -2848,7 +2844,13 @@ function selectGlobNonPrimitive( test )
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
   var exp = undefined;
-  test.shouldThrowErrorSync( () => _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 }) );
+  test.shouldThrowErrorSync
+  (
+    () =>
+    {
+      let r = _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 });
+    }
+  );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
@@ -2932,11 +2934,11 @@ function selectGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = _.looker.containerNameToIdMap.countable;
+      it.iterable = _.looker.Looker.containerNameToIdMap.countable;
     }
     else if( _.aux.is( it.src ) )
     {
-      it.iterable = _.looker.containerNameToIdMap.aux;
+      it.iterable = _.looker.Looker.containerNameToIdMap.aux;
     }
     else
     {

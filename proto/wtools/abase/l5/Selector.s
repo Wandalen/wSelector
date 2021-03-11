@@ -3,7 +3,6 @@
 
 'use strict';
 
-
 /**
  * Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short selector string.
   @module Tools/base/Selector
@@ -49,9 +48,10 @@ _.assert( !!_realGlobal_ );
 // relations
 // --
 
-let Defaults = _.mapExtend( null, _.look.defaults );
+// let Defaults = _.mapExtend( null, _.look.defaults );
+let Defaults = Object.create( null );
 
-Defaults.Looker = null;
+// Defaults.Looker = null;
 Defaults.src = null;
 Defaults.selector = null;
 Defaults.missingAction = 'undefine';
@@ -72,6 +72,7 @@ Defaults.onDownBegin = null;
 Defaults.onDownEnd = null;
 Defaults.onQuantitativeFail = null;
 Defaults.onSelectorUndecorate = null;
+// Defaults.iterableEval = null;
 
 // --
 // extend looker
@@ -80,14 +81,19 @@ Defaults.onSelectorUndecorate = null;
 function head( routine, args )
 {
   _.assert( arguments.length === 2 );
-  let o = Self.optionsFromArguments( args );
-  o.Looker = o.Looker || routine.defaults.Looker || Self;
+  // debugger;
+  let o = routine.defaults.Looker.optionsFromArguments( args );
+  // o.Looker = o.Looker || routine.defaults.Looker;
+  o.Looker = o.Looker || routine.defaults;
+  _.assert( _.routineIs( routine ) || _.auxIs( routine ) );
   if( _.routineIs( routine ) ) /* zzz : remove "if" later */
-  _.routineOptionsPreservingUndefines( routine, o );
+  _.assertMapHasOnly( o, routine.defaults );
+  // _.routineOptionsPreservingUndefines( routine, o );
   else if( routine !== null )
-  _.routineOptionsPreservingUndefines( null, o, routine );
-  o.Looker.optionsForm( routine, o );
-  let it = o.Looker.optionsToIteration( o );
+  _.assertMapHasOnly( o, routine );
+  // _.routineOptionsPreservingUndefines( null, o, routine );
+  // o.Looker.optionsForm( routine, o );
+  let it = o.Looker.optionsToIteration( null, o );
   return it;
 }
 
@@ -115,7 +121,8 @@ function optionsForm( routine, o )
 {
   Parent.optionsForm.call( this, routine, o );
 
-  _.assert( _.mapIs( o ) );
+  // _.assert( _.mapIs( o ) );
+  _.assert( o.iteratorProper( o ) );
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( o.downToken ) );
@@ -124,7 +131,7 @@ function optionsForm( routine, o )
     _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction )
     , `Unknown missing action ${o.missingAction}`
   );
-  _.assert( o.selectorArray === undefined );
+  // _.assert( o.selectorArray === undefined );
   _.assert( o.it === undefined );
 
   if( o.setting === null && o.set !== null )
@@ -140,9 +147,10 @@ function optionsForm( routine, o )
 
 //
 
-function optionsToIteration( o )
+function optionsToIteration( iterator, o )
 {
-  let it = Parent.optionsToIteration.call( this, o );
+  let it = Parent.optionsToIteration.call( this, iterator, o );
+  _.assert( arguments.length === 2 );
   _.assert( it.absoluteLevel === null );
   it.absoluteLevel = 0;
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
@@ -266,7 +274,7 @@ function iterableEval()
 
   if( it.selectorIsRelative )
   {
-    it.iterable = _.selector.containerNameToIdMap.relative;
+    it.iterable = it.containerNameToIdMap.relative;
   }
   else if( it.selectorIsTerminal )
   {
@@ -277,19 +285,19 @@ function iterableEval()
 
     if( _.longLike( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.countable;
+      it.iterable = it.containerNameToIdMap.countable;
     }
     else if( _.objectIs( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.aux;
+      it.iterable = it.containerNameToIdMap.aux;
     }
     else if( _.hashMapLike( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.hashMap;
+      it.iterable = it.containerNameToIdMap.hashMap;
     }
     else if( _.setLike( it.src ) )
     {
-      it.iterable = _.selector.containerNameToIdMap.set;
+      it.iterable = it.containerNameToIdMap.set;
     }
     else
     {
@@ -299,25 +307,25 @@ function iterableEval()
   }
   else
   {
-    it.iterable = _.selector.containerNameToIdMap.single;
+    it.iterable = it.containerNameToIdMap.single;
   }
 
   _.assert( it.iterable >= 0 );
 }
 
+// //
 //
-
-function ascendEval()
-{
-  let it = this;
-
-  _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.selectorIsTerminal ) );
-
-  it.ascendAct = _.selector.containerIdToAscendMap[ it.iterable ];
-
-  _.assert( _.routineIs( it.ascendAct ) );
-}
+// function ascendEval()
+// {
+//   let it = this;
+//
+//   _.assert( arguments.length === 0, 'Expects no arguments' );
+//   _.assert( _.boolIs( it.selectorIsTerminal ) );
+//
+//   it.ascendAct = it.containerIdToAscendMap[ it.iterable ];
+//
+//   _.assert( _.routineIs( it.ascendAct ) );
+// }
 
 //
 
@@ -367,7 +375,7 @@ function chooseBegin( e, k )
   let q = it.selectorQuantitativeParse( k );
   if( q )
   {
-    [ k, e ] = _.container.elementThGet( it./*srcEffective*/src, q.number );
+    [ k, e ] = _.container.elementThGet( it.src, q.number );
   }
 
   _.assert( arguments.length === 2, 'Expects two argument' );
@@ -734,6 +742,12 @@ function upGlob()
   {
     if( it.iterable )
     {
+      /* xxx : optimize for ** */
+      /* xxx : write test routine for ** */
+      if( _.longIs( it.src ) )
+      debugger;
+      // if( !_.aux.is( it.src ) )
+      // debugger;
       it.src = _.path.globShortFilter
       ({
         src : it.src,
@@ -745,15 +759,15 @@ function upGlob()
     }
   }
 
-  if( it.iterable === _.selector.containerNameToIdMap.countable )
+  if( it.iterable === it.containerNameToIdMap.countable )
   {
     it.dst = [];
-    it.dstWriteDown = _.selector.containerIdToDstWriteDownMap[ it.iterable ]
+    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
   }
-  else if( it.iterable === _.selector.containerNameToIdMap.aux )
+  else if( it.iterable === it.containerNameToIdMap.aux )
   {
     it.dst = Object.create( null );
-    it.dstWriteDown = _.selector.containerIdToDstWriteDownMap[ it.iterable ]
+    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
   }
   else /* qqq : not implemented for other structures, please implement */
   {
@@ -851,7 +865,7 @@ function downGlob()
     if( it.parsedSelector && it.parsedSelector.full )
     currentSelector = it.parsedSelector.full;
     debugger;
-    let err = _.ErrorLooking
+    let err = _.LookingError
     (
       `Select constraint "${ currentSelector }" failed with ${ length } elements`
       + `\nSelector "${ it.iterator.selector }"`
@@ -1017,22 +1031,22 @@ function _singleAscend( src )
 
 function select_head( routine, args )
 {
-  return Self.head( routine, args );
+  return routine.defaults.head( routine, args );
 }
 
+// //
 //
-
-function selectIt_body( it )
-{
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.looker.is( it.Looker ) );
-  _.assert( _.looker.iterationIs( it ) );
-  _.assert( it.looker === undefined );
-  it.perform();
-  return it;
-}
-
-var defaults = selectIt_body.defaults = Defaults;
+// function selectIt_body( it )
+// {
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( _.looker.is( it.Looker ) );
+//   _.assert( _.looker.iterationIs( it ) );
+//   _.assert( it.looker === undefined );
+//   it.perform();
+//   return it;
+// }
+//
+// var defaults = selectIt_body.defaults = Defaults;
 
 //
 
@@ -1075,17 +1089,38 @@ var defaults = selectIt_body.defaults = Defaults;
  * @namespace Tools.selector
 */
 
-let selectIt = _.routineUnite( select_head, selectIt_body );
+// let selectIt = _.routineUnite( select_head, selectIt_body );
+
+// //
+//
+// function select_body( it )
+// {
+//   it.perform();
+//   return it.result;
+// }
+
+// _.routineExtend( select_body, selectIt );
 
 //
 
-function select_body( it )
+// function exec()
+// {
+//   let it = this;
+//   debugger;
+//   it.perform();
+//   return it.result;
+// }
+
+function exec_head( routine, args )
 {
-  it.perform();
-  return it.result;
+  return routine.defaults.head( routine, args );
 }
 
-_.routineExtend( select_body, selectIt );
+function exec_body( it )
+{
+  it.execIt.body.call( this, it );
+  return it.result;
+}
 
 //
 
@@ -1121,7 +1156,224 @@ _.routineExtend( select_body, selectIt );
  * @namespace Tools.selector
 */
 
-let select = _.routineUnite( select_head, select_body );
+// let select = _.routineUnite( select_head, select_body );
+
+// //
+//
+// /**
+//  * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.select _.select }. Sets value of element selected by pattern ( o.selector ).
+//  * @param {Object} o Options map
+//  * @param {*} o.src Source entity
+//  * @param {String} o.selector Pattern to select element(s).
+//  * @param {*} o.set=null Entity to set.
+//  * @param {Boolean} o.setting=1 Allows to set value for a property or create a new property if needed.
+//  *
+//  * @example
+//  * let src = {};
+//    _.selectSet({ src, selector : 'a', set : 1 });
+//    console.log( src.a ); //1
+//  *
+//  * @function selectSet
+//  * @module Tools/base/Selector
+//  * @namespace Tools.selector
+// */
+//
+// let selectSet = _.routineUnite( select.head, select.body );
+//
+// var defaults = selectSet.defaults;
+// defaults.set = null;
+// defaults.setting = 1;
+
+//
+
+function onSelectorUndecorate()
+{
+  let it = this;
+  _.assert( _.strIs( it.selector ) || _.numberIs( it.selector ) );
+}
+
+//
+
+function onSelectorUndecorateDoubleColon()
+{
+  return function onSelectorUndecorateDoubleColon()
+  {
+    let it = this;
+    if( !_.strIs( it.selector ) )
+    return;
+    if( !_.strHas( it.selector, '::' ) )
+    return;
+    it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
+  }
+}
+
+// --
+// relations
+// --
+
+let last = _.looker.Looker.containerNameToIdMap.last;
+_.assert( last > 0 );
+let containerNameToIdMap =
+{
+  ... _.looker.Looker.containerNameToIdMap,
+  relative : last+1,
+  single : last+2,
+  last : last+2,
+}
+
+let containerIdToNameMap =
+{
+  ... _.looker.Looker.containerIdToNameMap,
+  [ last+1 ] : 'relative',
+  [ last+2 ] : 'single',
+}
+
+let containerIdToAscendMap =
+{
+  ... _.looker.Looker.containerIdToAscendMap,
+  [ last+1 ] : _relativeAscend,
+  [ last+2 ] : _singleAscend,
+}
+
+let containerIdToDstWriteDownMap =
+{
+  1 : dstWriteDownLong,
+  2 : dstWriteDownMap,
+}
+
+// let containerIdToDstWriteDownMap =
+// {
+//   1 : dstWriteDownLong,
+//   2 : dstWriteDownMap,
+// }
+
+//
+
+// let Selector = Object.create( Parent );
+let LookerExtension = Object.create( null );
+
+LookerExtension.constructor = function Selector(){};
+// LookerExtension.Looker = Selector;
+// LookerExtension.exec = exec;
+LookerExtension.head = head;
+LookerExtension.optionsFromArguments = optionsFromArguments;
+LookerExtension.optionsForm = optionsForm;
+LookerExtension.optionsToIteration = optionsToIteration;
+LookerExtension.reperformIt = reperformIt;
+LookerExtension.reperform = reperform;
+LookerExtension.performBegin = performBegin;
+LookerExtension.performEnd = performEnd;
+LookerExtension.iterationMake = iterationMake;
+LookerExtension.iterableEval = iterableEval;
+// LookerExtension.ascendEval = ascendEval;
+LookerExtension.selectorQuantitativeIs = selectorQuantitativeIs;
+LookerExtension.selectorQuantitativeParse = selectorQuantitativeParse;
+LookerExtension.elementGet = elementGet;
+LookerExtension.chooseBegin = chooseBegin;
+LookerExtension.chooseEnd = chooseEnd;
+LookerExtension.chooseRoot = chooseRoot;
+LookerExtension.containerMake = containerMake
+LookerExtension.iteratorSelectorChanged = iteratorSelectorChanged;
+LookerExtension.iterationSelectorChanged = iterationSelectorChanged;
+LookerExtension.globParse = globParse;
+
+LookerExtension.errNoDown = errNoDown;
+LookerExtension.errNoDownHandle = errNoDownHandle;
+LookerExtension.errCantSet = errCantSet;
+LookerExtension.errCantSetHandle = errCantSetHandle;
+LookerExtension.errDoesNotExist = errDoesNotExist;
+LookerExtension.errDoesNotExistHandle = errDoesNotExistHandle;
+// LookerExtension.errMake = errMake; /* yyy : move to looker */
+LookerExtension.errHandle = errHandle;
+
+LookerExtension.visitUp = visitUp;
+LookerExtension.visitUpBegin = visitUpBegin;
+LookerExtension.upTerminal = upTerminal;
+LookerExtension.upRelative = upRelative;
+LookerExtension.upGlob = upGlob;
+LookerExtension.upSingle = upSingle;
+
+LookerExtension.visitDown = visitDown;
+LookerExtension.downTerminal = downTerminal;
+LookerExtension.downRelative = downRelative;
+LookerExtension.downGlob = downGlob;
+LookerExtension.downSingle = downSingle;
+LookerExtension.downSet = downSet;
+
+LookerExtension.srcWriteDown = srcWriteDown;
+LookerExtension.srcWriteDownMap = srcWriteDownMap;
+LookerExtension.dstWriteDownLong = dstWriteDownLong;
+LookerExtension.dstWriteDownMap = dstWriteDownMap;
+
+LookerExtension._relativeAscend = _relativeAscend;
+LookerExtension._singleAscend = _singleAscend;
+
+// fields
+
+LookerExtension.quantitiveDelimeter = '#';
+LookerExtension.containerNameToIdMap = containerNameToIdMap;
+LookerExtension.containerIdToNameMap = containerIdToNameMap;
+LookerExtension.containerIdToAscendMap = containerIdToAscendMap;
+LookerExtension.containerIdToDstWriteDownMap = containerIdToDstWriteDownMap;
+
+//
+
+// let Iterator = LookerExtension.Iterator = _.mapExtend( null, LookerExtension.Iterator );
+let Iterator = Object.create( null );
+
+Iterator.selectorArray = null;
+Iterator.result = null; /* qqq : cover please */
+Iterator.selectedResult = null; /* qqq : cover please */
+Iterator.state = 0; /* qqq : cover please */
+Iterator.absoluteLevel = null;
+
+//
+
+// let Iteration = LookerExtension.Iteration = _.mapExtend( null, LookerExtension.Iteration );
+let Iteration = Object.create( null );
+
+Iteration.dst = null;
+Iteration.selector = null;
+Iteration.originalSelector = null;
+Iteration.absoluteLevel = null;
+Iteration.parsedSelector = null;
+Iteration.selectorIsRelative = null;
+Iteration.selectorIsGlob = null;
+Iteration.selectorIsTerminal = null;
+Iteration.selectorIsQuantitive = false;
+Iteration.dstWritingDown = true;
+Iteration.dstWriteDown = null;
+Iteration._srcWriteDownMethod = null;
+
+//
+
+// let IterationPreserve = LookerExtension.IterationPreserve = _.mapExtend( null, LookerExtension.IterationPreserve );
+let IterationPreserve = Object.create( null );
+IterationPreserve.absoluteLevel = null;
+
+//
+
+const Selector = _.looker.classDefine
+({
+  name : 'Equaler',
+  parent : _.looker.Looker,
+  defaults : Defaults,
+  looker : LookerExtension,
+  iterator : Iterator,
+  iteration : Iteration,
+  iterationPreserve : IterationPreserve,
+  exec : { head : exec_head, body : exec_body },
+});
+
+_.assert( Selector.exec.head === exec_head );
+_.assert( Selector.exec.body === exec_body );
+
+// exec_body.defaults = Selector;
+// const exec = _.routineUnite({ head : exec_head, body : exec_body, strategy : 'replacing' });
+// Selector.exec = exec;
+
+const select = Selector.exec;
+const selectIt = Selector.execIt;
 
 //
 
@@ -1143,9 +1395,12 @@ let select = _.routineUnite( select_head, select_body );
  * @namespace Tools.selector
 */
 
-let selectSet = _.routineUnite( select.head, select.body );
+// let selectSet = _.routineUnite( select.head, select.body );
+// let selectSet = _.routineUnite({ head : select.head, body : select.body, strategy : 'inheriting' });
+let selectSet = _.routine.uniteInheriting(  select.head, select.body );
 
 var defaults = selectSet.defaults;
+defaults.Looker = defaults;
 defaults.set = null;
 defaults.setting = 1;
 
@@ -1184,157 +1439,14 @@ function selectUnique_body( o )
 
 }
 
-_.routineExtend( selectUnique_body, select.body );
-
-let selectUnique = _.routineUnite( select.head, selectUnique_body );
-
-//
-
-function onSelectorUndecorate()
-{
-  let it = this;
-  _.assert( _.strIs( it.selector ) || _.numberIs( it.selector ) );
-}
+// _.routineExtend( selectUnique_body, select.body );
+_.routine.extendInheriting( selectUnique_body, select.body );
+selectUnique_body.defaults.Looker = selectUnique_body.defaults;
+// let selectUnique = _.routineUnite( select.head, selectUnique_body );
+// let selectUnique = _.routineUnite({ head : select.head, body : selectUnique_body, strategy : 'replacing' });
+let selectUnique = _.routine.uniteReplacing(  select.head, selectUnique_body );
 
 //
-
-function onSelectorUndecorateDoubleColon()
-{
-  return function onSelectorUndecorateDoubleColon()
-  {
-    let it = this;
-    if( !_.strIs( it.selector ) )
-    return;
-    if( !_.strHas( it.selector, '::' ) )
-    return;
-    it.selector = _.strIsolateRightOrAll( it.selector, '::' )[ 2 ];
-  }
-}
-
-// --
-// relations
-// --
-
-let Selector = Object.create( Parent );
-
-Selector.constructor = function Selector(){};
-Selector.Looker = Selector;
-Selector.exec = selectIt;
-Selector.head = head;
-Selector.optionsFromArguments = optionsFromArguments;
-Selector.optionsForm = optionsForm;
-Selector.optionsToIteration = optionsToIteration;
-Selector.reperformIt = reperformIt;
-Selector.reperform = reperform;
-Selector.performBegin = performBegin;
-Selector.performEnd = performEnd;
-Selector.iterationMake = iterationMake;
-Selector.iterableEval = iterableEval;
-Selector.ascendEval = ascendEval;
-Selector.selectorQuantitativeIs = selectorQuantitativeIs;
-Selector.selectorQuantitativeParse = selectorQuantitativeParse;
-Selector.elementGet = elementGet;
-Selector.chooseBegin = chooseBegin;
-Selector.chooseEnd = chooseEnd;
-Selector.chooseRoot = chooseRoot;
-Selector.containerMake = containerMake
-Selector.iteratorSelectorChanged = iteratorSelectorChanged;
-Selector.iterationSelectorChanged = iterationSelectorChanged;
-Selector.globParse = globParse;
-
-Selector.errNoDown = errNoDown;
-Selector.errNoDownHandle = errNoDownHandle;
-Selector.errCantSet = errCantSet;
-Selector.errCantSetHandle = errCantSetHandle;
-Selector.errDoesNotExist = errDoesNotExist;
-Selector.errDoesNotExistHandle = errDoesNotExistHandle;
-// Selector.errMake = errMake; /* yyy : move to looker */
-Selector.errHandle = errHandle;
-
-Selector.visitUp = visitUp;
-Selector.visitUpBegin = visitUpBegin;
-Selector.upTerminal = upTerminal;
-Selector.upRelative = upRelative;
-Selector.upGlob = upGlob;
-Selector.upSingle = upSingle;
-
-Selector.visitDown = visitDown;
-Selector.downTerminal = downTerminal;
-Selector.downRelative = downRelative;
-Selector.downGlob = downGlob;
-Selector.downSingle = downSingle;
-Selector.downSet = downSet;
-
-Selector.srcWriteDown = srcWriteDown;
-Selector.srcWriteDownMap = srcWriteDownMap;
-Selector.dstWriteDownLong = dstWriteDownLong;
-Selector.dstWriteDownMap = dstWriteDownMap;
-
-Selector._relativeAscend = _relativeAscend;
-Selector._singleAscend = _singleAscend;
-Selector.quantitiveDelimeter = '#';
-
-let Iterator = Selector.Iterator = _.mapExtend( null, Selector.Iterator );
-
-Iterator.selectorArray = null;
-Iterator.result = null; /* qqq : cover please */
-Iterator.selectedResult = null; /* qqq : cover please */
-Iterator.state = 0; /* qqq : cover please */
-
-let Iteration = Selector.Iteration = _.mapExtend( null, Selector.Iteration );
-
-Iteration.dst = null;
-Iteration.selector = null;
-Iteration.originalSelector = null;
-Iteration.absoluteLevel = null;
-Iteration.parsedSelector = null;
-Iteration.selectorIsRelative = null;
-Iteration.selectorIsGlob = null;
-Iteration.selectorIsTerminal = null;
-Iteration.selectorIsQuantitive = false;
-Iteration.dstWritingDown = true;
-Iteration.dstWriteDown = null;
-Iteration._srcWriteDownMethod = null;
-
-let IterationPreserve = Selector.IterationPreserve = _.mapExtend( null, Selector.IterationPreserve );
-IterationPreserve.absoluteLevel = null;
-
-//
-
-let last = _.looker.containerNameToIdMap.last;
-let containerNameToIdMap =
-{
-  ... _.looker.containerNameToIdMap,
-  relative : last+1,
-  single : last+2,
-  last : last+2,
-}
-
-let containerIdToNameMap =
-{
-  ... _.looker.containerIdToNameMap,
-  [ last+1 ] : 'relative',
-  [ last+2 ] : 'single',
-}
-
-let containerIdToAscendMap =
-{
-  ... _.looker.containerIdToAscendMap,
-  [ last+1 ] : _relativeAscend,
-  [ last+2 ] : _singleAscend,
-}
-
-let containerIdToDstWriteDownMap =
-{
-  1 : dstWriteDownLong,
-  2 : dstWriteDownMap,
-}
-
-// let containerIdToDstWriteDownMap =
-// {
-//   1 : dstWriteDownLong,
-//   2 : dstWriteDownMap,
-// }
 
 var FunctorExtension =
 {
@@ -1345,12 +1457,8 @@ let SelectorExtension =
 {
 
   ... _.looker,
+  Looker : Selector,
   Selector,
-
-  containerNameToIdMap,
-  containerIdToNameMap,
-  containerIdToAscendMap,
-  containerIdToDstWriteDownMap,
 
   selectIt,
   select,
@@ -1376,6 +1484,8 @@ let Self = Selector;
 _.mapSupplement( _, SupplementTools );
 _.mapSupplement( _.selector, SelectorExtension );
 _.mapSupplement( _.selector.functor, FunctorExtension );
+
+// _.looker.namespaceExtend( _.selector );
 
 // --
 // export
