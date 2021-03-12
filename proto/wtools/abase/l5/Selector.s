@@ -38,41 +38,37 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Parent = _.Looker;
-_.selector = _.selector || Object.create( null );
+let Parent = _.looker.Looker;
+_.selector = _.selector || Object.create( _.looker );
 _.selector.functor = _.selector.functor || Object.create( null );
 
 _.assert( !!_realGlobal_ );
+_.assert( !!Parent );
 
 // --
 // relations
 // --
 
-// let Defaults = _.mapExtend( null, _.look.defaults );
-let Defaults = Object.create( null );
+let Prime = Object.create( null );
 
-// Defaults.Looker = null;
-Defaults.src = null;
-Defaults.selector = null;
-Defaults.missingAction = 'undefine';
-Defaults.preservingIteration = 0;
-Defaults.globing = 1;
-Defaults.revisiting = 2;
-// Defaults.absoluteLevel = null;
-Defaults.upToken = '/';
-Defaults.downToken = '..';
-// Defaults.prevSelectIteration = null;
-Defaults.visited = null;
-Defaults.set = null;
-Defaults.setting = null;
-Defaults.creating = null;
-Defaults.onUpBegin = null;
-Defaults.onUpEnd = null;
-Defaults.onDownBegin = null;
-Defaults.onDownEnd = null;
-Defaults.onQuantitativeFail = null;
-Defaults.onSelectorUndecorate = null;
-// Defaults.iterableEval = null;
+Prime.src = null;
+Prime.selector = null;
+Prime.missingAction = 'undefine';
+Prime.preservingIteration = 0;
+Prime.globing = 1;
+Prime.revisiting = 2;
+Prime.upToken = '/';
+Prime.downToken = '..';
+Prime.visited = null;
+Prime.set = null;
+Prime.setting = null;
+Prime.creating = null;
+Prime.onUpBegin = null;
+Prime.onUpEnd = null;
+Prime.onDownBegin = null;
+Prime.onDownEnd = null;
+Prime.onQuantitativeFail = null;
+Prime.onSelectorUndecorate = null;
 
 // --
 // extend looker
@@ -81,18 +77,13 @@ Defaults.onSelectorUndecorate = null;
 function head( routine, args )
 {
   _.assert( arguments.length === 2 );
-  // debugger;
   let o = routine.defaults.Looker.optionsFromArguments( args );
-  // o.Looker = o.Looker || routine.defaults.Looker;
   o.Looker = o.Looker || routine.defaults;
   _.assert( _.routineIs( routine ) || _.auxIs( routine ) );
   if( _.routineIs( routine ) ) /* zzz : remove "if" later */
   _.assertMapHasOnly( o, routine.defaults );
-  // _.routineOptionsPreservingUndefines( routine, o );
   else if( routine !== null )
   _.assertMapHasOnly( o, routine );
-  // _.routineOptionsPreservingUndefines( null, o, routine );
-  // o.Looker.optionsForm( routine, o );
   let it = o.Looker.optionsToIteration( null, o );
   return it;
 }
@@ -121,7 +112,6 @@ function optionsForm( routine, o )
 {
   Parent.optionsForm.call( this, routine, o );
 
-  // _.assert( _.mapIs( o ) );
   _.assert( o.iteratorProper( o ) );
   _.assert( arguments.length === 2 );
   _.assert( _.strIs( o.selector ) );
@@ -131,7 +121,6 @@ function optionsForm( routine, o )
     _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction )
     , `Unknown missing action ${o.missingAction}`
   );
-  // _.assert( o.selectorArray === undefined );
   _.assert( o.it === undefined );
 
   if( o.setting === null && o.set !== null )
@@ -185,7 +174,6 @@ function reperformIt()
   _.assert( _.strIs( it2.iterator.selector ) );
 
   it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
-  // it2.iterator.prevSelectIteration = it;
   it2.iteratorSelectorChanged();
   it2.chooseRoot( it2.src );
   it2.iterate();
@@ -312,20 +300,6 @@ function iterableEval()
 
   _.assert( it.iterable >= 0 );
 }
-
-// //
-//
-// function ascendEval()
-// {
-//   let it = this;
-//
-//   _.assert( arguments.length === 0, 'Expects no arguments' );
-//   _.assert( _.boolIs( it.selectorIsTerminal ) );
-//
-//   it.ascendAct = it.containerIdToAscendMap[ it.iterable ];
-//
-//   _.assert( _.routineIs( it.ascendAct ) );
-// }
 
 //
 
@@ -692,10 +666,6 @@ function visitUpBegin()
 
   _.assert( it.visiting );
 
-  // yyy
-  // it.selector = it.selectorArray[ it.level ];
-  // it.iterationSelectorChanged();
-
   it.dstWriteDown = function dstWriteDown( eit )
   {
     it.dst = eit.dst;
@@ -742,12 +712,7 @@ function upGlob()
   {
     if( it.iterable )
     {
-      /* xxx : optimize for ** */
-      /* xxx : write test routine for ** */
-      if( _.longIs( it.src ) )
-      debugger;
-      // if( !_.aux.is( it.src ) )
-      // debugger;
+      /* qqq : optimize for ** */
       it.src = _.path.globShortFilter
       ({
         src : it.src,
@@ -1034,20 +999,6 @@ function select_head( routine, args )
   return routine.defaults.head( routine, args );
 }
 
-// //
-//
-// function selectIt_body( it )
-// {
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( _.looker.is( it.Looker ) );
-//   _.assert( _.looker.iterationIs( it ) );
-//   _.assert( it.looker === undefined );
-//   it.perform();
-//   return it;
-// }
-//
-// var defaults = selectIt_body.defaults = Defaults;
-
 //
 
 /**
@@ -1088,28 +1039,6 @@ function select_head( routine, args )
  * @module Tools/base/Selector
  * @namespace Tools.selector
 */
-
-// let selectIt = _.routineUnite( select_head, selectIt_body );
-
-// //
-//
-// function select_body( it )
-// {
-//   it.perform();
-//   return it.result;
-// }
-
-// _.routineExtend( select_body, selectIt );
-
-//
-
-// function exec()
-// {
-//   let it = this;
-//   debugger;
-//   it.perform();
-//   return it.result;
-// }
 
 function exec_head( routine, args )
 {
@@ -1155,34 +1084,6 @@ function exec_body( it )
  * @module Tools/base/Selector
  * @namespace Tools.selector
 */
-
-// let select = _.routineUnite( select_head, select_body );
-
-// //
-//
-// /**
-//  * @summary Short-cut for {@link module:Tools/base/Selector.Tools.selector.select _.select }. Sets value of element selected by pattern ( o.selector ).
-//  * @param {Object} o Options map
-//  * @param {*} o.src Source entity
-//  * @param {String} o.selector Pattern to select element(s).
-//  * @param {*} o.set=null Entity to set.
-//  * @param {Boolean} o.setting=1 Allows to set value for a property or create a new property if needed.
-//  *
-//  * @example
-//  * let src = {};
-//    _.selectSet({ src, selector : 'a', set : 1 });
-//    console.log( src.a ); //1
-//  *
-//  * @function selectSet
-//  * @module Tools/base/Selector
-//  * @namespace Tools.selector
-// */
-//
-// let selectSet = _.routineUnite( select.head, select.body );
-//
-// var defaults = selectSet.defaults;
-// defaults.set = null;
-// defaults.setting = 1;
 
 //
 
@@ -1241,20 +1142,11 @@ let containerIdToDstWriteDownMap =
   2 : dstWriteDownMap,
 }
 
-// let containerIdToDstWriteDownMap =
-// {
-//   1 : dstWriteDownLong,
-//   2 : dstWriteDownMap,
-// }
-
 //
 
-// let Selector = Object.create( Parent );
 let LookerExtension = Object.create( null );
 
 LookerExtension.constructor = function Selector(){};
-// LookerExtension.Looker = Selector;
-// LookerExtension.exec = exec;
 LookerExtension.head = head;
 LookerExtension.optionsFromArguments = optionsFromArguments;
 LookerExtension.optionsForm = optionsForm;
@@ -1265,7 +1157,6 @@ LookerExtension.performBegin = performBegin;
 LookerExtension.performEnd = performEnd;
 LookerExtension.iterationMake = iterationMake;
 LookerExtension.iterableEval = iterableEval;
-// LookerExtension.ascendEval = ascendEval;
 LookerExtension.selectorQuantitativeIs = selectorQuantitativeIs;
 LookerExtension.selectorQuantitativeParse = selectorQuantitativeParse;
 LookerExtension.elementGet = elementGet;
@@ -1283,7 +1174,6 @@ LookerExtension.errCantSet = errCantSet;
 LookerExtension.errCantSetHandle = errCantSetHandle;
 LookerExtension.errDoesNotExist = errDoesNotExist;
 LookerExtension.errDoesNotExistHandle = errDoesNotExistHandle;
-// LookerExtension.errMake = errMake; /* yyy : move to looker */
 LookerExtension.errHandle = errHandle;
 
 LookerExtension.visitUp = visitUp;
@@ -1318,7 +1208,6 @@ LookerExtension.containerIdToDstWriteDownMap = containerIdToDstWriteDownMap;
 
 //
 
-// let Iterator = LookerExtension.Iterator = _.mapExtend( null, LookerExtension.Iterator );
 let Iterator = Object.create( null );
 
 Iterator.selectorArray = null;
@@ -1329,7 +1218,6 @@ Iterator.absoluteLevel = null;
 
 //
 
-// let Iteration = LookerExtension.Iteration = _.mapExtend( null, LookerExtension.Iteration );
 let Iteration = Object.create( null );
 
 Iteration.dst = null;
@@ -1347,7 +1235,6 @@ Iteration._srcWriteDownMethod = null;
 
 //
 
-// let IterationPreserve = LookerExtension.IterationPreserve = _.mapExtend( null, LookerExtension.IterationPreserve );
 let IterationPreserve = Object.create( null );
 IterationPreserve.absoluteLevel = null;
 
@@ -1357,7 +1244,7 @@ const Selector = _.looker.classDefine
 ({
   name : 'Equaler',
   parent : _.looker.Looker,
-  defaults : Defaults,
+  prime : Prime,
   looker : LookerExtension,
   iterator : Iterator,
   iteration : Iteration,
@@ -1367,10 +1254,6 @@ const Selector = _.looker.classDefine
 
 _.assert( Selector.exec.head === exec_head );
 _.assert( Selector.exec.body === exec_body );
-
-// exec_body.defaults = Selector;
-// const exec = _.routineUnite({ head : exec_head, body : exec_body, strategy : 'replacing' });
-// Selector.exec = exec;
 
 const select = Selector.exec;
 const selectIt = Selector.execIt;
@@ -1395,8 +1278,6 @@ const selectIt = Selector.execIt;
  * @namespace Tools.selector
 */
 
-// let selectSet = _.routineUnite( select.head, select.body );
-// let selectSet = _.routineUnite({ head : select.head, body : select.body, strategy : 'inheriting' });
 let selectSet = _.routine.uniteInheriting( select.head, select.body );
 
 var defaults = selectSet.defaults;
@@ -1439,11 +1320,8 @@ function selectUnique_body( o )
 
 }
 
-// _.routineExtend( selectUnique_body, select.body );
 _.routine.extendInheriting( selectUnique_body, select.body );
 selectUnique_body.defaults.Looker = selectUnique_body.defaults;
-// let selectUnique = _.routineUnite( select.head, selectUnique_body );
-// let selectUnique = _.routineUnite({ head : select.head, body : selectUnique_body, strategy : 'replacing' });
 let selectUnique = _.routine.uniteReplacing( select.head, selectUnique_body );
 
 //
@@ -1456,7 +1334,7 @@ var FunctorExtension =
 let SelectorExtension =
 {
 
-  ... _.looker,
+  name : 'selector',
   Looker : Selector,
   Selector,
 
@@ -1469,10 +1347,10 @@ let SelectorExtension =
 
 }
 
-let SupplementTools =
+let ToolsSupplementation =
 {
 
-  Selector,
+  // Selector,
   selectIt,
   select,
   selectSet,
@@ -1481,11 +1359,9 @@ let SupplementTools =
 }
 
 let Self = Selector;
-_.mapSupplement( _, SupplementTools );
-_.mapSupplement( _.selector, SelectorExtension );
-_.mapSupplement( _.selector.functor, FunctorExtension );
-
-// _.looker.namespaceExtend( _.selector );
+_.mapExtend( _, ToolsSupplementation );
+_.mapExtend( _.selector, SelectorExtension );
+_.mapExtend( _.selector.functor, FunctorExtension );
 
 // --
 // export
