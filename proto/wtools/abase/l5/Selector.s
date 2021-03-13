@@ -175,7 +175,7 @@ function reperformIt()
 
   it2.iterator.selector = it2.iterator.selector + _.strsShortest( it2.iterator.upToken ) + o.selector;
   it2.iteratorSelectorChanged();
-  it2.chooseRoot( it2.src );
+  it2.chooseRoot();
   it2.iterate();
 
   return it2.lastIt;
@@ -225,7 +225,7 @@ function performEnd()
   _.assert( it.state === 1 );
   it.iterator.state = 2;
 
-  it.iterator.selectedResult = it.dst;
+  it.iterator.originalResult = it.dst;
 
   if( it.missingAction === 'error' && it.error )
   {
@@ -233,7 +233,7 @@ function performEnd()
     return it;
   }
 
-  it.iterator.result = it.selectedResult;
+  it.iterator.result = it.originalResult;
 
   _.assert( it.error === null || it.error === true );
 
@@ -387,16 +387,16 @@ function chooseEnd( e, k )
 
 //
 
-function chooseRoot( src )
+function chooseRoot()
 {
   let it = this;
 
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length === 0 );
 
   it.selector = it.selectorArray[ it.level ];
   it.iterationSelectorChanged();
 
-  return Parent.chooseRoot.call( it, src );
+  return Parent.chooseRoot.call( it );
 }
 
 //
@@ -1211,8 +1211,8 @@ LookerExtension.containerIdToDstWriteDownMap = containerIdToDstWriteDownMap;
 let Iterator = Object.create( null );
 
 Iterator.selectorArray = null;
-Iterator.result = null; /* qqq : cover please */
-Iterator.selectedResult = null; /* qqq : cover please */
+Iterator.result = undefined; /* qqq : cover please */
+Iterator.originalResult = undefined; /* qqq : cover please */
 Iterator.state = 0; /* qqq : cover please */
 Iterator.absoluteLevel = null;
 
@@ -1220,7 +1220,7 @@ Iterator.absoluteLevel = null;
 
 let Iteration = Object.create( null );
 
-Iteration.dst = null;
+Iteration.dst = undefined;
 Iteration.selector = null;
 Iteration.originalSelector = null;
 Iteration.absoluteLevel = null;
@@ -1254,6 +1254,8 @@ const Selector = _.looker.classDefine
 
 _.assert( Selector.exec.head === exec_head );
 _.assert( Selector.exec.body === exec_body );
+_.assert( _.property.has( Selector.Iteration, 'dst' ) && Selector.Iteration.dst === undefined );
+_.assert( _.property.has( Selector.Iterator, 'result' ) && Selector.Iterator.result === undefined );
 
 const select = Selector.exec;
 const selectIt = Selector.execIt;

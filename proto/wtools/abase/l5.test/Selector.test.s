@@ -2717,7 +2717,7 @@ function selectGlobOptionMissingAction( test )
 
     /* */
 
-    test.case = '*/*/*';
+    test.case = `${_.entity.exportStringSolo( env )}, */*/*`;
 
     var src =
     {
