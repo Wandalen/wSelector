@@ -321,6 +321,8 @@ function selectorQuantitativeParse( src )
   let result = Object.create( null );
   result.str = _.strRemoveBegin( src, it.quantitiveDelimeter );
   result.number = _.numberFromStrMaybe( result.str );
+  if( !_.numberIs( result.number ) )
+  return false;
   // _.assert( _.numberIs( result.number ), 'not tested' );
   return result;
 }
@@ -345,8 +347,8 @@ function chooseBegin( e, k )
   [ e, k ] = Parent.chooseBegin.call( it, ... arguments );
 
   let q = it.selectorQuantitativeParse( k );
-  // if( q )
-  if( _.numberIs( q.number ) ) /* Dmytro : method selectorQuantitativeParse can return not number {-q.number-} */
+  if( q )
+  // if( _.numberIs( q.number ) ) /* Dmytro : method selectorQuantitativeParse can return not number {-q.number-} */
   {
     [ k, e ] = _.container.elementThGet( it.src, q.number );
   }
