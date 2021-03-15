@@ -51,7 +51,7 @@ _.assert( !!Parent );
 
 let Prime = Object.create( null );
 
-Prime.src = null;
+// Prime.src = null;
 Prime.selector = null;
 Prime.missingAction = 'undefine';
 Prime.preservingIteration = 0;
@@ -108,34 +108,6 @@ function optionsFromArguments( args )
 
 //
 
-function optionsForm( routine, o )
-{
-  Parent.optionsForm.call( this, routine, o );
-
-  _.assert( o.iteratorProper( o ) );
-  _.assert( arguments.length === 2 );
-  _.assert( _.strIs( o.selector ) );
-  _.assert( _.strIs( o.downToken ) );
-  _.assert
-  (
-    _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], o.missingAction )
-    , `Unknown missing action ${o.missingAction}`
-  );
-  _.assert( o.it === undefined );
-
-  if( o.setting === null && o.set !== null )
-  o.setting = 1;
-  if( o.creating === null )
-  o.creating = !!o.setting;
-
-  if( o.Looker === null )
-  o.Looker = Self;
-
-  return o;
-}
-
-//
-
 function optionsToIteration( iterator, o )
 {
   let it = Parent.optionsToIteration.call( this, iterator, o );
@@ -145,6 +117,31 @@ function optionsToIteration( iterator, o )
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
   _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
   return it;
+}
+
+//
+
+function iteratorInitEnd( iterator )
+{
+  let looker = this;
+
+  _.assert( iterator.iteratorProper( iterator ) );
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( iterator.selector ) );
+  _.assert( _.strIs( iterator.downToken ) );
+  _.assert
+  (
+    _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], iterator.missingAction )
+    , `Unknown missing action ${iterator.missingAction}`
+  );
+  _.assert( iterator.it === undefined );
+
+  if( iterator.setting === null && iterator.set !== null )
+  iterator.setting = 1;
+  if( iterator.creating === null )
+  iterator.creating = !!iterator.setting;
+
+  return Parent.iteratorInitEnd.call( this, iterator );
 }
 
 //
@@ -177,6 +174,7 @@ function reperformIt()
   it2.iteratorSelectorChanged();
   it2.chooseRoot();
   it2.iterate();
+  /* qqq : call perform here? */
 
   return it2.lastIt;
 }
@@ -603,7 +601,7 @@ function errHandle( err )
     if( it.missingAction === 'throw' )
     {
       err = errMake();
-      debugger;
+      debugger; /* eslint-disable-line no-debugger */
       throw err;
     }
   }
@@ -829,13 +827,13 @@ function downGlob()
     let currentSelector = it.selector;
     if( it.parsedSelector && it.parsedSelector.full )
     currentSelector = it.parsedSelector.full;
-    debugger;
     let err = _.LookingError
     (
       `Select constraint "${ currentSelector }" failed with ${ length } elements`
       + `\nSelector "${ it.iterator.selector }"`
       + `\nAt : "${ it.path }"`
     );
+    debugger; /* eslint-disable-line no-debugger */
     if( it.onQuantitativeFail )
     it.onQuantitativeFail.call( it, err );
     else
@@ -1149,8 +1147,8 @@ let LookerExtension = Object.create( null );
 LookerExtension.constructor = function Selector(){};
 LookerExtension.head = head;
 LookerExtension.optionsFromArguments = optionsFromArguments;
-LookerExtension.optionsForm = optionsForm;
 LookerExtension.optionsToIteration = optionsToIteration;
+LookerExtension.iteratorInitEnd = iteratorInitEnd;
 LookerExtension.reperformIt = reperformIt;
 LookerExtension.reperform = reperform;
 LookerExtension.performBegin = performBegin;
