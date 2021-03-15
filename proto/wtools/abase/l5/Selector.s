@@ -1353,7 +1353,6 @@ let SelectorExtension =
 let ToolsSupplementation =
 {
 
-  // Selector,
   selectIt,
   select,
   selectSet,
