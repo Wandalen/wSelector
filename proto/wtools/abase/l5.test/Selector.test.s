@@ -150,6 +150,70 @@ function select( test )
 
 //
 
+function selectQuantitativeProperty( test )
+{
+  test.case = 'selector - #a1, no entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#a1',
+  });
+  test.identical( got, undefined );
+
+  /* */
+
+  test.case = 'selector - #a1, with entry';
+  var src =
+  {
+    '#a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#a1',
+  });
+  test.identical( got, { map : { name : 'name1' }, value : 13 } );
+  test.true( got === src[ '#a1' ] );
+
+  /* */
+
+  test.case = 'selector - #1, no entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#1',
+  });
+  test.identical( got, undefined );
+
+  /* */
+
+  test.case = 'selector - #1, with entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#1',
+  });
+  test.identical( got, { value : 25, date : 53 } );
+  test.true( got === src.c );
+}
+
+//
+
 function selectQuantifiedSelector( test )
 {
 
@@ -3050,6 +3114,7 @@ let Self =
   {
 
     select,
+    selectQuantitativeProperty,
     selectQuantifiedSelector,
     selectQuantifiedSelectorOptionMissingAction,
     selectTrivial,
