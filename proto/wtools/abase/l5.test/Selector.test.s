@@ -1220,7 +1220,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1230,7 +1230,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1239,7 +1239,7 @@ function selectMissing( test )
     selector : '*/x',
     missingAction : 'error',
   });
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   var got = _.select
@@ -1249,7 +1249,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   var src =
@@ -1265,7 +1265,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   var src =
@@ -1296,7 +1296,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.LookingError );
+  test.true( got instanceof _.looker.LookingError );
   console.log( got );
 
   /* */

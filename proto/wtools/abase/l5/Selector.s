@@ -603,9 +603,8 @@ function errHandle( err )
     it.iterator.error = errMake();
     if( it.missingAction === 'throw' )
     {
-      err = errMake();
       debugger; /* eslint-disable-line no-debugger */
-      throw err;
+      throw it.iterator.error;
     }
   }
 
@@ -830,7 +829,7 @@ function downGlob()
     let currentSelector = it.selector;
     if( it.parsedSelector && it.parsedSelector.full )
     currentSelector = it.parsedSelector.full;
-    let err = _.LookingError
+    let err = _.looker.LookingError
     (
       `Select constraint "${ currentSelector }" failed with ${ length } elements`
       + `\nSelector "${ it.iterator.selector }"`
