@@ -59,9 +59,11 @@ Prime.globing = 1;
 Prime.revisiting = 2;
 Prime.upToken = '/';
 Prime.downToken = '..';
+Prime.hereToken = '.';
 Prime.visited = null;
 Prime.set = null;
-Prime.setting = null;
+// Prime.setting = null;
+Prime.action = null;
 Prime.creating = null;
 Prime.onUpBegin = null;
 Prime.onUpEnd = null;
@@ -69,6 +71,12 @@ Prime.onDownBegin = null;
 Prime.onDownEnd = null;
 Prime.onQuantitativeFail = null;
 Prime.onSelectorUndecorate = null;
+
+let Action = Object.create( null );
+Action.no = 0;
+Action.set = 1;
+Action.del = 2;
+Action.last = 2;
 
 // --
 // extend looker
@@ -129,6 +137,7 @@ function iteratorInitEnd( iterator )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( iterator.selector ) );
   _.assert( _.strIs( iterator.downToken ) );
+  _.assert( _.strIs( iterator.hereToken ) );
   _.assert
   (
     _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], iterator.missingAction )
@@ -136,10 +145,15 @@ function iteratorInitEnd( iterator )
   );
   _.assert( iterator.it === undefined );
 
-  if( iterator.setting === null && iterator.set !== null )
-  iterator.setting = 1;
+  // if( iterator.setting === null && iterator.set !== null )
+  // iterator.setting = 1;
+  if( iterator.action === null )
+  iterator.action = iterator.set === null ? iterator.Action.no : iterator.Action.set;
   if( iterator.creating === null )
-  iterator.creating = !!iterator.setting;
+  iterator.creating = iterator.action === iterator.Action.set;
+  // iterator.creating = !!iterator.setting;
+
+  _.assert( _.numberIs( iterator.action ) && iterator.action <= iterator.Action.last );
 
   return Parent.iteratorInitEnd.call( this, iterator );
 }
@@ -223,6 +237,10 @@ function performEnd()
   _.assert( it.state === 1 );
   it.iterator.state = 2;
 
+  // if( !!it.action && it.lastIt.selectorType === 'terminal' )
+  // if( !!it.action )
+  // it.lastIt.performSet();
+
   it.iterator.originalResult = it.dst;
 
   if( it.missingAction === 'error' && it.error )
@@ -256,17 +274,28 @@ function iterableEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( _.boolIs( it.selectorIsTerminal ) );
+  // _.assert( _.boolIs( it.selectorIsTerminal ) );
+  _.assert( _.strIs( it.selectorType ) );
 
-  if( it.selectorIsRelative )
+  // debugger;
+
+  // if( it.selectorIsRelative )
+  if( it.selectorType === 'down' )
   {
-    it.iterable = it.containerNameToIdMap.relative;
+    it.iterable = it.containerNameToIdMap.down;
   }
-  else if( it.selectorIsTerminal )
+  else if( it.selectorType === 'here' )
+  {
+    it.iterable = it.containerNameToIdMap.here;
+  }
+  // else if( it.selectorIsTerminal )
+  else if( it.selectorType === 'terminal' )
   {
     it.iterable = 0;
   }
-  else if( it.selectorIsGlob )
+  // else if( it.selectorIsGlob )
+  // else if( it.globing && it.selectorType === 'glob' )
+  else if( it.selectorType === 'glob' )
   {
 
     if( _.longLike( it.src ) )
@@ -323,37 +352,41 @@ function selectorQuantitativeParse( src )
   result.number = _.numberFromStrMaybe( result.str );
   if( !_.numberIs( result.number ) )
   return false;
-  // _.assert( _.numberIs( result.number ), 'not tested' );
   return result;
 }
 
 //
 
-function elementGet( src, k )
+// function elementGet( src, k )
+function elementGet( e, k )
 {
   let it = this;
   let result;
+
   _.assert( arguments.length === 2, 'Expects two argument' );
-  result = [ k, _.container.elementGet( src, k ) ];
+
+  let q = it.selectorQuantitativeParse( k );
+  if( q )
+  {
+    result = _.container.elementThGet( e, q.number );
+  }
+  else
+  {
+    result = _.container.elementGet( e, k );
+  }
+
   return result;
 }
 
 //
 
-function chooseBegin( e, k )
+function chooseBegin( e, k, exists )
 {
   let it = this;
 
-  [ e, k ] = Parent.chooseBegin.call( it, ... arguments );
+  [ e, k, exists ] = Parent.chooseBegin.call( it, ... arguments );
 
-  let q = it.selectorQuantitativeParse( k );
-  if( q )
-  // if( _.numberIs( q.number ) ) /* Dmytro : method selectorQuantitativeParse can return not number {-q.number-} */
-  {
-    [ k, e ] = _.container.elementThGet( it.src, q.number );
-  }
-
-  _.assert( arguments.length === 2, 'Expects two argument' );
+  _.assert( arguments.length === 3, 'Expects three argument' );
   _.assert( !!it.down );
 
   if( !it.fast )
@@ -361,29 +394,46 @@ function chooseBegin( e, k )
     it.absoluteLevel = it.down.absoluteLevel+1;
   }
 
-  return [ e, k ];
+  return [ e, k, exists ];
 }
 
 //
 
-function chooseEnd( e, k )
+function chooseEnd( e, k, exists )
 {
   let it = this;
 
-  _.assert( arguments.length === 2 );
+  _.assert( arguments.length === 3 );
+  _.assert( _.boolIs( exists ) || exists === null );
 
+  it.exists = exists;
   it.selector = it.selectorArray[ it.level+1 ];
   it.iterationSelectorChanged();
 
+  /* xxx : move out */
+  // debugger;
   if( it.creating )
-  if( e === undefined && k !== undefined && it.selector !== undefined )
+  // if( e === undefined && k !== undefined && it.selector !== undefined )
+  // if( exists === false && k !== undefined && it.selector !== undefined )
+  if( exists === false && k !== undefined && it.selectorType !== 'terminal' )
   if( it.down )
   {
     e = it.containerMake();
     it.down.srcWriteDown( e, k );
+    it.exists = true;
   }
 
-  return Parent.chooseEnd.call( it, e, k );
+  let result = Parent.chooseEnd.call( it, e, k, exists );
+
+  _.assert( _.boolIs( it.exists ) );
+
+  if( it.exists === false )
+  if( it.action === it.Action.no || ( it.action === it.action.set && it.selectorType !== 'terminal' ) )
+  {
+    it.errDoesNotExistHandle();
+  }
+
+  return result;
 }
 
 //
@@ -394,6 +444,7 @@ function chooseRoot()
 
   _.assert( arguments.length === 0 );
 
+  it.exists = true;
   it.selector = it.selectorArray[ it.level ];
   it.iterationSelectorChanged();
 
@@ -460,10 +511,21 @@ function iterationSelectorChanged()
     it.onSelectorUndecorate();
   }
 
-  it.selectorIsRelative = it.selector === it.downToken;
-  it.selectorIsTerminal = it.selector === undefined || it.selector === '/';
+  /* xxx : move out and use it in ResolverAdv */
+  // debugger;
 
-  if( it.globing && it.selectorIsGlob === null )
+  if( it.selector === it.downToken )
+  it.selectorType = 'down';
+  else if( it.selector === it.hereToken )
+  it.selectorType = 'here';
+  else if( it.selector === undefined || it.selector === '/' )
+  it.selectorType = 'terminal';
+
+  // it.selectorIsRelative = it.selector === it.downToken;
+  // it.selectorIsTerminal = it.selector === undefined || it.selector === '/';
+
+  // if( it.globing && it.selectorIsGlob === null )
+  if( it.globing && it.selector && it.selectorType === null )
   {
 
     let selectorIsGlob;
@@ -478,9 +540,14 @@ function iterationSelectorChanged()
       return _.strHas( selector, '*' );
     }
 
-    it.selectorIsGlob = it.selector ? selectorIsGlob( it.selector ) : false;
+    // it.selectorIsGlob = it.selector ? selectorIsGlob( it.selector ) : false;
+    if( selectorIsGlob( it.selector ) )
+    it.selectorType = 'glob';
 
   }
+
+  if( it.selectorType === null )
+  it.selectorType = 'single';
 
 }
 
@@ -563,13 +630,23 @@ function errCantSetHandle()
 function errDoesNotExist()
 {
   let it = this;
-  let err = this.errMake
-  (
-    `Cant select ${it.iterator.selector} from ${_.entity.exportStringShort( it.src )}`,
-    `\n  because ${_.entity.exportStringShort( it.originalSelector )} does not exist`,
-    `\n  fall at ${_.strQuote( it.path )}`,
-  );
-  return err;
+  if( it.down )
+  {
+    return this.errMake
+    (
+      `Cant select ${it.iterator.selector} from ${_.entity.exportStringShort( it.down.originalSrc )}`,
+      `\n  because ${_.entity.exportStringShort( it.down.originalSelector )} does not exist`,
+      `\n  fall at ${_.strQuote( it.path )}`,
+    );
+  }
+  else
+  {
+    return this.errMake
+    (
+      `Cant select ${it.iterator.selector} from ${it.originalSrc}`,
+      `\n  because ${_.entity.exportStringShort( it.path )} does not exist`,
+    );
+  }
 }
 
 //
@@ -589,6 +666,8 @@ function errHandle( err )
 
   _.assert( arguments.length === 1 );
   _.assert( _.routineIs( err ) || _.errIs( err ) );
+
+  // debugger;
 
   if( it.missingAction === 'undefine' || it.missingAction === 'ignore' )
   {
@@ -631,14 +710,17 @@ function visitUp()
   if( it.dstWritingDown )
   {
 
-    if( it.selectorIsTerminal )
-    it.upTerminal();
-    else if( it.selectorIsRelative )
-    it.upRelative();
-    else if( it.selectorIsGlob )
-    it.upGlob();
+    // if( it.selectorIsTerminal )
+    if( it.selectorType === 'terminal' )
+    it.terminalUp();
+    // else if( it.selectorIsRelative )
+    else if( it.selectorType === 'down' )
+    it.downUp();
+    // else if( it.selectorIsGlob )
+    else if( it.selectorType === 'glob' )
+    it.globUp();
     else
-    it.upSingle();
+    it.singleUp();
 
   }
 
@@ -676,80 +758,6 @@ function visitUpBegin()
 
 //
 
-function upTerminal()
-{
-  let it = this;
-
-  it.dst = it.src;
-
-}
-
-//
-
-function upRelative()
-{
-  let it = this;
-
-  _.assert( it.selectorIsRelative === true );
-
-}
-
-//
-
-function upGlob()
-{
-  let it = this;
-
-  _.assert( it.globing );
-
-  /* qqq : teach it to parse more than single "*=" */
-
-  if( it.globing )
-  it.globParse();
-
-  if( it.globing )
-  if( it.parsedSelector.glob !== '*' )
-  {
-    if( it.iterable )
-    {
-      /* qqq : optimize for ** */
-      it.src = _.path.globShortFilter
-      ({
-        src : it.src,
-        selector : it.parsedSelector.glob,
-        onEvaluate : ( e, k ) => k,
-      });
-      it.iterable = null;
-      it.srcChanged();
-    }
-  }
-
-  if( it.iterable === it.containerNameToIdMap.countable )
-  {
-    it.dst = [];
-    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
-  }
-  else if( it.iterable === it.containerNameToIdMap.aux )
-  {
-    it.dst = Object.create( null );
-    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
-  }
-  else /* qqq : not implemented for other structures, please implement */
-  {
-    it.errDoesNotExistHandle();
-  }
-
-}
-
-//
-
-function upSingle()
-{
-  let it = this;
-}
-
-//
-
 function visitDown()
 {
   let it = this;
@@ -759,14 +767,17 @@ function visitDown()
   if( it.onDownBegin )
   it.onDownBegin.call( it );
 
-  if( it.selectorIsTerminal )
-  it.downTerminal();
-  else if( it.selectorIsRelative )
-  it.downRelative();
-  else if( it.selectorIsGlob )
-  it.downGlob();
+  // if( it.selectorIsTerminal )
+  if( it.selectorType === 'terminal' )
+  it.terminalDown();
+  // else if( it.selectorIsRelative )
+  else if( it.selectorType === 'down' )
+  it.downDown();
+  // else if( it.selectorIsGlob )
+  else if( it.selectorType === 'glob' )
+  it.globDown();
   else
-  it.downSingle();
+  it.singleDown();
 
   it.downSet();
 
@@ -795,61 +806,36 @@ function visitDown()
 
 }
 
+// //
 //
-
-function downTerminal()
-{
-  let it = this;
-}
-
+// function performSet()
+// {
+//   let it = this;
+//   let it2 = it;
 //
-
-function downRelative()
-{
-  let it = this;
-}
-
+//   if( !!it2.action && it2.selectorType === 'terminal' )
+//   {
+//     /* qqq2 : implement and cover for all type of containers */
+//     if
+//     (
+//       it2.down
+//       && !_.primitiveIs( it2.down.src )
+//       && it2.key !== undefined
+//     )
+//     {
+//       if( it2.action === it2.Action.del )
+//       delete it2.down.src[ it2.key ];
+//       else
+//       it2.down.src[ it2.key ] = it2.set;
+//       /* zzz : introduce method writeDown */
+//     }
+//     else
+//     {
+//       it2.errCantSetHandle();
+//     }
+//   }
 //
-
-function downGlob()
-{
-  let it = this;
-
-  if( !it.dstWritingDown )
-  return;
-
-  if( it.parsedSelector.limit === undefined )
-  return;
-
-  _.assert( it.globing );
-
-  let length = _.entityLengthOf( it.dst );
-  if( length !== it.parsedSelector.limit )
-  {
-    let currentSelector = it.selector;
-    if( it.parsedSelector && it.parsedSelector.full )
-    currentSelector = it.parsedSelector.full;
-    let err = _.looker.LookingError
-    (
-      `Select constraint "${ currentSelector }" failed with ${ length } elements`
-      + `\nSelector "${ it.iterator.selector }"`
-      + `\nAt : "${ it.path }"`
-    );
-    debugger; /* eslint-disable-line no-debugger */
-    if( it.onQuantitativeFail )
-    it.onQuantitativeFail.call( it, err );
-    else
-    throw err;
-  }
-
-}
-
-//
-
-function downSingle()
-{
-  let it = this;
-}
+// }
 
 //
 
@@ -857,10 +843,9 @@ function downSet()
 {
   let it = this;
 
-  if( it.setting && it.selectorIsTerminal )
+  if( !!it.action && it.selectorType === 'terminal' )
   {
     /* qqq2 : implement and cover for all type of containers */
-    /* qqq : cover it.error === null */
     if
     (
       it.down
@@ -868,10 +853,11 @@ function downSet()
       && it.key !== undefined
     )
     {
-      if( it.set === undefined )
+      if( it.action === it.Action.del )
       delete it.down.src[ it.key ];
       else
-      it.down.src[ it.key ] = it.set;
+      it.down.srcWriteDown( it.set, it.key );
+      // it.down.src[ it.key ] = it.set;
     }
     else
     {
@@ -882,6 +868,8 @@ function downSet()
 }
 
 //
+
+/* xxx : merge src/dst writeDown? */
 
 function srcWriteDown( e, k )
 {
@@ -931,26 +919,51 @@ function dstWriteDownMap( eit )
 
 //
 
-function _relativeAscend()
+function downUp()
 {
   let it = this;
-  let counter = 0;
-  let dit = it.down;
+
+  _.assert( it.selectorType === 'down' );
+  // _.assert( it.selectorIsRelative === true );
+
+}
+
+//
+
+function downDown()
+{
+  let it = this;
+}
+
+//
+
+function downAscend()
+{
+  let it = this;
+  let counter = 1;
+  let dit = it;
 
   _.assert( arguments.length === 1 );
 
-  if( !dit )
-  return it.errNoDownHandle();
-
-  while( dit.selectorIsRelative || dit.selectorIsTerminal || counter > 0 )
+  while( counter > 0 )
   {
-    if( dit.selector === it.downToken )
-    counter += 1;
-    else if( dit.selector !== undefined )
-    counter -= 1;
     dit = dit.down;
     if( !dit )
     return it.errNoDownHandle();
+    if( dit.selectorType === 'down' )
+    {
+      counter += 1;
+    }
+    else if( dit.selectorType === 'here' )
+    {
+    }
+    else if( dit.selectorType === 'terminal' )
+    {
+    }
+    else if( dit.selectorType !== 'terminal' )
+    {
+      counter -= 1;
+    }
   }
 
   _.assert( it.iterationProper( dit ) );
@@ -961,8 +974,12 @@ function _relativeAscend()
   /* */
 
   let nit = it.iterationMake();
-  nit.choose( undefined, it.selector );
-  nit.src = dit.src;
+
+  nit.choose( dit.src, it.selector, true );
+  _.assert( nit.src === dit.src );
+  _.assert( nit.exists === true );
+
+  _.assert( nit.dst === undefined );
   nit.dst = undefined;
   nit.absoluteLevel -= 2;
 
@@ -973,20 +990,157 @@ function _relativeAscend()
 
 //
 
-function _singleAscend( src )
+function hereUp()
+{
+  let it = this;
+
+}
+
+//
+
+function hereDown()
+{
+  let it = this;
+
+  it.dst = it.src;
+
+}
+
+//
+
+function hereAscend()
+{
+  let it = this;
+
+  let eit = it.iterationMake().choose( it.src, it.selector, true );
+  eit.iterate();
+
+}
+
+//
+
+function singleUp()
+{
+  let it = this;
+}
+
+//
+
+function singleDown()
+{
+  let it = this;
+}
+
+//
+
+function singleAscend( src )
 {
   let it = this;
 
   _.assert( arguments.length === 1 );
 
-  let eit = it.iterationMake().choose( undefined, it.selector );
+  let eit = it.iterationMake().choose( undefined, it.selector, null );
+  eit.iterate();
 
-  if( eit.src === undefined )
+}
+
+//
+
+function terminalUp()
+{
+  let it = this;
+
+  it.dst = it.src;
+
+}
+
+//
+
+function terminalDown()
+{
+  let it = this;
+}
+
+//
+
+function globUp()
+{
+  let it = this;
+
+  _.assert( it.globing );
+
+  /* qqq : teach it to parse more than single "*=" */
+
+  if( it.globing )
+  it.globParse();
+
+  if( it.globing )
+  if( it.parsedSelector.glob !== '*' )
+  {
+    if( it.iterable )
+    {
+      /* qqq : optimize for ** */
+      it.src = _.path.globShortFilter
+      ({
+        src : it.src,
+        selector : it.parsedSelector.glob,
+        onEvaluate : ( e, k ) => k,
+      });
+      it.iterable = null;
+      it.srcChanged();
+    }
+  }
+
+  /* xxx : refactor */
+  if( it.iterable === it.containerNameToIdMap.countable )
+  {
+    it.dst = [];
+    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
+  }
+  else if( it.iterable === it.containerNameToIdMap.aux )
+  {
+    it.dst = Object.create( null );
+    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
+  }
+  else /* qqq : not implemented for other structures, please implement */
   {
     it.errDoesNotExistHandle();
   }
 
-  eit.iterate();
+}
+
+//
+
+function globDown()
+{
+  let it = this;
+
+  if( !it.dstWritingDown )
+  return;
+
+  if( it.parsedSelector.limit === undefined )
+  return;
+
+  _.assert( it.globing );
+
+  let length = _.entityLengthOf( it.dst );
+  if( length !== it.parsedSelector.limit )
+  {
+    let currentSelector = it.selector;
+    if( it.parsedSelector && it.parsedSelector.full )
+    currentSelector = it.parsedSelector.full;
+    let err = _.looker.LookingError
+    (
+      `Select constraint "${ currentSelector }" failed with ${ length } elements`
+      + `\nSelector "${ it.iterator.selector }"`
+      + `\nAt : "${ it.path }"`
+    );
+    debugger; /* eslint-disable-line no-debugger */
+    if( it.onQuantitativeFail )
+    it.onQuantitativeFail.call( it, err );
+    else
+    throw err;
+  }
 
 }
 
@@ -1117,23 +1271,26 @@ _.assert( last > 0 );
 let containerNameToIdMap =
 {
   ... _.looker.Looker.containerNameToIdMap,
-  relative : last+1,
-  single : last+2,
-  last : last+2,
+  down : last+1,
+  here : last+2,
+  single : last+3,
+  last : last+3,
 }
 
 let containerIdToNameMap =
 {
   ... _.looker.Looker.containerIdToNameMap,
-  [ last+1 ] : 'relative',
-  [ last+2 ] : 'single',
+  [ last+1 ] : 'down',
+  [ last+2 ] : 'here',
+  [ last+3 ] : 'single',
 }
 
 let containerIdToAscendMap =
 {
   ... _.looker.Looker.containerIdToAscendMap,
-  [ last+1 ] : _relativeAscend,
-  [ last+2 ] : _singleAscend,
+  [ last+1 ] : downAscend,
+  [ last+2 ] : hereAscend,
+  [ last+3 ] : singleAscend,
 }
 
 let containerIdToDstWriteDownMap =
@@ -1178,16 +1335,9 @@ LookerExtension.errHandle = errHandle;
 
 LookerExtension.visitUp = visitUp;
 LookerExtension.visitUpBegin = visitUpBegin;
-LookerExtension.upTerminal = upTerminal;
-LookerExtension.upRelative = upRelative;
-LookerExtension.upGlob = upGlob;
-LookerExtension.upSingle = upSingle;
 
 LookerExtension.visitDown = visitDown;
-LookerExtension.downTerminal = downTerminal;
-LookerExtension.downRelative = downRelative;
-LookerExtension.downGlob = downGlob;
-LookerExtension.downSingle = downSingle;
+// LookerExtension.performSet = performSet;
 LookerExtension.downSet = downSet;
 
 LookerExtension.srcWriteDown = srcWriteDown;
@@ -1195,11 +1345,37 @@ LookerExtension.srcWriteDownMap = srcWriteDownMap;
 LookerExtension.dstWriteDownLong = dstWriteDownLong;
 LookerExtension.dstWriteDownMap = dstWriteDownMap;
 
-LookerExtension._relativeAscend = _relativeAscend;
-LookerExtension._singleAscend = _singleAscend;
+// down
+
+LookerExtension.downUp = downUp;
+LookerExtension.downDown = downDown;
+LookerExtension.downAscend = downAscend;
+
+// down
+
+LookerExtension.hereUp = hereUp;
+LookerExtension.hereDown = hereDown;
+LookerExtension.hereAscend = hereAscend;
+
+// single
+
+LookerExtension.singleUp = singleUp;
+LookerExtension.singleDown = singleDown;
+LookerExtension.singleAscend = singleAscend;
+
+// terminal
+
+LookerExtension.terminalUp = terminalUp;
+LookerExtension.terminalDown = terminalDown;
+
+// glob
+
+LookerExtension.globUp = globUp;
+LookerExtension.globDown = globDown;
 
 // fields
 
+LookerExtension.Action = Action;
 LookerExtension.quantitiveDelimeter = '#';
 LookerExtension.containerNameToIdMap = containerNameToIdMap;
 LookerExtension.containerIdToNameMap = containerIdToNameMap;
@@ -1220,15 +1396,19 @@ Iterator.absoluteLevel = null;
 
 let Iteration = Object.create( null );
 
+Iteration.exists = null;
 Iteration.dst = undefined;
 Iteration.selector = null;
 Iteration.originalSelector = null;
 Iteration.absoluteLevel = null;
 Iteration.parsedSelector = null;
-Iteration.selectorIsRelative = null;
-Iteration.selectorIsGlob = null;
-Iteration.selectorIsTerminal = null;
-Iteration.selectorIsQuantitive = false;
+
+Iteration.selectorType = null;
+// Iteration.selectorIsRelative = null;
+// Iteration.selectorIsGlob = null;
+// Iteration.selectorIsTerminal = null;
+// Iteration.selectorIsQuantitive = false;
+
 Iteration.dstWritingDown = true;
 Iteration.dstWriteDown = null;
 Iteration._srcWriteDownMethod = null;
@@ -1268,7 +1448,6 @@ const selectIt = Selector.execIt;
  * @param {*} o.src Source entity
  * @param {String} o.selector Pattern to select element(s).
  * @param {*} o.set=null Entity to set.
- * @param {Boolean} o.setting=1 Allows to set value for a property or create a new property if needed.
  *
  * @example
  * let src = {};
@@ -1285,7 +1464,9 @@ let selectSet = _.routine.uniteInheriting( select.head, select.body );
 var defaults = selectSet.defaults;
 defaults.Looker = defaults;
 defaults.set = null;
-defaults.setting = 1;
+defaults.action = Action.set;
+
+_.assert( Action.set > 0 );
 
 //
 
@@ -1339,6 +1520,7 @@ let SelectorExtension =
   name : 'selector',
   Looker : Selector,
   Selector,
+  Action,
 
   selectIt,
   select,
@@ -1352,6 +1534,7 @@ let SelectorExtension =
 let ToolsSupplementation =
 {
 
+  Selector,
   selectIt,
   select,
   selectSet,
