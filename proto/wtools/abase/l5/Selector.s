@@ -23,6 +23,8 @@
 zzz qqq : optimize
 qqq : cover select with glob using test routine filesFindGlob of test suite FilesFind.Extract.test.s. ask how
 
+qqq : write nice example for readme
+
 */
 
 if( typeof module !== 'undefined' )
