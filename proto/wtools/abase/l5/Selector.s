@@ -9,9 +9,6 @@
 */
 
 /**
- *  */
-
-/**
  * Collection of cross-platform routines to select a sub-structure from a complex data structure.
   @namespace Tools.selector
   @extends Tools
@@ -25,24 +22,30 @@ qqq : cover select with glob using test routine filesFindGlob of test suite File
 
 qqq : write nice example for readme
 
+qqq xxx : does not work
+__.select( module.files, '* / sourcePath' )
+and
+__.select( module.files.values(), '* / sourcePath' )
+where module.files is hash map
+
 */
 
 if( typeof module !== 'undefined' )
 {
-
   let _ = require( '../../../wtools/Tools.s' );
-
   _.include( 'wLooker' );
   _.include( 'wReplicator' );
   _.include( 'wPathTools' );
-
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
-let Parent = _.looker.Looker;
+const _global = _global_;
+const _ = _global_.wTools;
+const Parent = _.looker.Looker;
 _.selector = _.selector || Object.create( _.looker );
 _.selector.functor = _.selector.functor || Object.create( null );
+
+/* xxx : qqq : implement _.selector.isQuery() */
+/* xxx : qqq : move _.selector.isQuery() to module::Tools? */
 
 _.assert( !!_realGlobal_ );
 _.assert( !!Parent );
@@ -91,9 +94,9 @@ function head( routine, args )
   o.Looker = o.Looker || routine.defaults;
   _.assert( _.routineIs( routine ) || _.auxIs( routine ) );
   if( _.routineIs( routine ) ) /* zzz : remove "if" later */
-  _.assertMapHasOnly( o, routine.defaults );
+  _.map.assertHasOnly( o, routine.defaults );
   else if( routine !== null )
-  _.assertMapHasOnly( o, routine );
+  _.map.assertHasOnly( o, routine );
   let it = o.Looker.optionsToIteration( null, o );
   return it;
 }
@@ -171,7 +174,7 @@ function reperformIt()
   _.assert
   (
     it.iterationProper( it ),
-    () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShort( it )}`
+    () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShallow( it )}`
   );
 
   let it2 = it.iterationMake();
@@ -182,7 +185,7 @@ function reperformIt()
   o.Looker = o.Looker || it.Looker || Self;
 
   _.assert( _.mapIs( o ) );
-  _.assertMapHasOnly( o, { src : null, selector : null, Looker : null }, 'Implemented only for options::selector' );
+  _.map.assertHasOnly( o, { src : null, selector : null, Looker : null }, 'Implemented only for options::selector' );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( it2.iterator.selector ) );
 
@@ -594,7 +597,7 @@ function errNoDown()
     'Cant go down', _.strQuote( it.selector ),
     '\nbecause', _.strQuote( it.selector ), 'does not exist',
     '\nat', _.strQuote( it.path ),
-    '\nin container\n', _.entity.exportStringShort( it.src )
+    '\nin container\n', _.entity.exportStringShallow( it.src )
   );
   return err;
 }
@@ -636,8 +639,8 @@ function errDoesNotExist()
   {
     return this.errMake
     (
-      `Cant select ${it.iterator.selector} from ${_.entity.exportStringShort( it.down.originalSrc )}`,
-      `\n  because ${_.entity.exportStringShort( it.down.originalSelector )} does not exist`,
+      `Cant select ${it.iterator.selector} from ${_.entity.exportStringShallow( it.down.originalSrc )}`,
+      `\n  because ${_.entity.exportStringShallow( it.down.originalSelector )} does not exist`,
       `\n  fall at ${_.strQuote( it.path )}`,
     );
   }
@@ -646,7 +649,7 @@ function errDoesNotExist()
     return this.errMake
     (
       `Cant select ${it.iterator.selector} from ${it.originalSrc}`,
-      `\n  because ${_.entity.exportStringShort( it.path )} does not exist`,
+      `\n  because ${_.entity.exportStringShallow( it.path )} does not exist`,
     );
   }
 }
@@ -1544,7 +1547,7 @@ let ToolsSupplementation =
 
 }
 
-let Self = Selector;
+const Self = Selector;
 _.mapExtend( _, ToolsSupplementation );
 _.mapExtend( _.selector, SelectorExtension );
 _.mapExtend( _.selector.functor, FunctorExtension );

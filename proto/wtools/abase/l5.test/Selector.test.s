@@ -15,8 +15,8 @@ if( typeof module !== 'undefined' )
 
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 /*
 xxx : implement escaped selectors and test for it
@@ -342,6 +342,59 @@ function selectQuantifiedSelectorOptionMissingAction( test )
   }
 
   /* - */
+
+}
+
+//
+
+/* xxx : qqq : extend test */
+function selectQuantifiedWithoutSymbol( test )
+{
+
+  /* */
+
+  // xxx : should work?
+  // test.case = '1 level';
+  //
+  // var src =
+  // [
+  //   'str',
+  //   13,
+  // ]
+  //
+  // var exp = 13;
+  // var got = _.select( src, '1' );
+  // test.identical( got, exp );
+
+  /* */
+
+  test.case = '1 level';
+
+  var src =
+  [
+    'str',
+    13,
+  ]
+
+  var exp = 13;
+  var got = _.select( src, '#1' );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = '2 levels';
+
+  var src =
+  {
+    a : 'str',
+    b : [ 'str', 13 ],
+  }
+
+  var exp = 13;
+  var got = _.select( src, 'b/#1' );
+  test.identical( got, exp );
+
+  /* xxx */
 
 }
 
@@ -3783,7 +3836,7 @@ function iteratorResult( test )
   }
 
   var exp = 13;
-  var got = _.select( src, 'b/1/c' );
+  var got = _.select( src, 'b/#1/c' );
   test.identical( got, exp );
 
   var exp =
@@ -3804,7 +3857,7 @@ function iteratorResult( test )
   }
 
   var exp = 13;
-  var it = _.select.head( _.select, [ src, 'b/1/c' ] );
+  var it = _.select.head( _.select, [ src, 'b/#1/c' ] );
   var got = it.perform();
   test.true( got === it );
   test.identical( it.result, exp );
@@ -4156,7 +4209,7 @@ function selectWithCallback( test )
 // declare
 // --
 
-let Self =
+const Proto =
 {
 
   name : 'Tools.l5.Selector',
@@ -4174,6 +4227,7 @@ let Self =
     selectQuantitativeProperty,
     selectQuantifiedSelector,
     selectQuantifiedSelectorOptionMissingAction,
+    selectQuantifiedWithoutSymbol,
     selectTrivial,
     selectUndefined,
     selectEmptySelector,
@@ -4211,7 +4265,7 @@ let Self =
 
 }
 
-Self = wTestSuite( Self );
+const Self = wTestSuite( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 
