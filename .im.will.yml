@@ -86,8 +86,8 @@ path:
       raw: compiled
       content: prime
   npm.proto.entry:
-    - /pro/module/wSelector/proto/wtools/abase/l5/Selector.s
-    - /pro/module/wSelector/proto/node_modules/wselector
+    - proto/wtools/abase/l5/Selector.s
+    - proto/node_modules/wselector
 reflector:
   reflect.proto:
     inherit: predefined.*
