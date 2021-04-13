@@ -242,10 +242,6 @@ function performEnd()
   _.assert( it.state === 1 );
   it.iterator.state = 2;
 
-  // if( !!it.action && it.lastIt.selectorType === 'terminal' )
-  // if( !!it.action )
-  // it.lastIt.performSet();
-
   it.iterator.originalResult = it.dst;
 
   if( it.missingAction === 'error' && it.error )
@@ -279,45 +275,38 @@ function iterableEval()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  // _.assert( _.boolIs( it.selectorIsTerminal ) );
   _.assert( _.strIs( it.selectorType ) );
 
-  // debugger;
-
-  // if( it.selectorIsRelative )
   if( it.selectorType === 'down' )
   {
-    it.iterable = it.containerNameToIdMap.down;
+    it.iterable = it.ContainerNameToIdMap.down;
   }
   else if( it.selectorType === 'here' )
   {
-    it.iterable = it.containerNameToIdMap.here;
+    it.iterable = it.ContainerNameToIdMap.here;
   }
-  // else if( it.selectorIsTerminal )
   else if( it.selectorType === 'terminal' )
   {
     it.iterable = 0;
   }
-  // else if( it.selectorIsGlob )
-  // else if( it.globing && it.selectorType === 'glob' )
   else if( it.selectorType === 'glob' )
   {
 
     if( _.longLike( it.src ) )
     {
-      it.iterable = it.containerNameToIdMap.countable;
+      it.iterable = it.ContainerNameToIdMap.countable;
     }
     else if( _.objectIs( it.src ) )
     {
-      it.iterable = it.containerNameToIdMap.aux;
+      it.iterable = it.ContainerNameToIdMap.aux;
     }
     else if( _.hashMapLike( it.src ) )
     {
-      it.iterable = it.containerNameToIdMap.hashMap;
+      it.iterable = it.ContainerNameToIdMap.hashMap;
     }
     else if( _.setLike( it.src ) )
     {
-      it.iterable = it.containerNameToIdMap.set;
+      it.iterable = it.ContainerNameToIdMap.set;
     }
     else
     {
@@ -327,7 +316,7 @@ function iterableEval()
   }
   else
   {
-    it.iterable = it.containerNameToIdMap.single;
+    it.iterable = it.ContainerNameToIdMap.single;
   }
 
   _.assert( it.iterable >= 0 );
@@ -340,7 +329,7 @@ function selectorQuantitativeIs( src )
   let it = this;
   if( !_.strIs( src ) )
   return false;
-  if( !_.strBegins( src, it.quantitiveDelimeter ) )
+  if( !_.strBegins( src, it.cardinalDelimeter ) )
   return false;
   return true;
 }
@@ -353,7 +342,7 @@ function selectorQuantitativeParse( src )
   if( !it.selectorQuantitativeIs( src ) )
   return false;
   let result = Object.create( null );
-  result.str = _.strRemoveBegin( src, it.quantitiveDelimeter );
+  result.str = _.strRemoveBegin( src, it.cardinalDelimeter );
   result.number = _.numberFromStrMaybe( result.str );
   if( !_.numberIs( result.number ) )
   return false;
@@ -416,10 +405,7 @@ function chooseEnd( e, k, exists )
   it.iterationSelectorChanged();
 
   /* xxx : move out */
-  // debugger;
   if( it.creating )
-  // if( e === undefined && k !== undefined && it.selector !== undefined )
-  // if( exists === false && k !== undefined && it.selector !== undefined )
   if( exists === false && k !== undefined && it.selectorType !== 'terminal' )
   if( it.down )
   {
@@ -474,6 +460,7 @@ function iteratorSelectorChanged()
   it.iterator.selectorArray = [ it.iterator.selector ];
   else
   it.iterator.selectorArray = split( it.iterator.selector );
+  _.debugger;
 
   /* */
 
@@ -517,7 +504,6 @@ function iterationSelectorChanged()
   }
 
   /* xxx : move out and use it in ResolverAdv */
-  // debugger;
 
   if( it.selector === it.downToken )
   it.selectorType = 'down';
@@ -526,10 +512,6 @@ function iterationSelectorChanged()
   else if( it.selector === undefined || it.selector === '/' )
   it.selectorType = 'terminal';
 
-  // it.selectorIsRelative = it.selector === it.downToken;
-  // it.selectorIsTerminal = it.selector === undefined || it.selector === '/';
-
-  // if( it.globing && it.selectorIsGlob === null )
   if( it.globing && it.selector && it.selectorType === null )
   {
 
@@ -545,7 +527,6 @@ function iterationSelectorChanged()
       return _.strHas( selector, '*' );
     }
 
-    // it.selectorIsGlob = it.selector ? selectorIsGlob( it.selector ) : false;
     if( selectorIsGlob( it.selector ) )
     it.selectorType = 'glob';
 
@@ -715,13 +696,10 @@ function visitUp()
   if( it.dstWritingDown )
   {
 
-    // if( it.selectorIsTerminal )
     if( it.selectorType === 'terminal' )
     it.terminalUp();
-    // else if( it.selectorIsRelative )
     else if( it.selectorType === 'down' )
     it.downUp();
-    // else if( it.selectorIsGlob )
     else if( it.selectorType === 'glob' )
     it.globUp();
     else
@@ -772,13 +750,10 @@ function visitDown()
   if( it.onDownBegin )
   it.onDownBegin.call( it );
 
-  // if( it.selectorIsTerminal )
   if( it.selectorType === 'terminal' )
   it.terminalDown();
-  // else if( it.selectorIsRelative )
   else if( it.selectorType === 'down' )
   it.downDown();
-  // else if( it.selectorIsGlob )
   else if( it.selectorType === 'glob' )
   it.globDown();
   else
@@ -929,7 +904,6 @@ function downUp()
   let it = this;
 
   _.assert( it.selectorType === 'down' );
-  // _.assert( it.selectorIsRelative === true );
 
 }
 
@@ -1097,12 +1071,12 @@ function globUp()
   }
 
   /* xxx : refactor */
-  if( it.iterable === it.containerNameToIdMap.countable )
+  if( it.iterable === it.ContainerNameToIdMap.countable )
   {
     it.dst = [];
     it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
   }
-  else if( it.iterable === it.containerNameToIdMap.aux )
+  else if( it.iterable === it.ContainerNameToIdMap.aux )
   {
     it.dst = Object.create( null );
     it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
@@ -1271,28 +1245,28 @@ function onSelectorUndecorateDoubleColon()
 // relations
 // --
 
-let last = _.looker.Looker.containerNameToIdMap.last;
+let last = _.looker.Looker.ContainerNameToIdMap.last;
 _.assert( last > 0 );
-let containerNameToIdMap =
+let ContainerNameToIdMap =
 {
-  ... _.looker.Looker.containerNameToIdMap,
+  ... _.looker.Looker.ContainerNameToIdMap,
   down : last+1,
   here : last+2,
   single : last+3,
   last : last+3,
 }
 
-let containerIdToNameMap =
+let ContainerIdToNameMap =
 {
-  ... _.looker.Looker.containerIdToNameMap,
+  ... _.looker.Looker.ContainerIdToNameMap,
   [ last+1 ] : 'down',
   [ last+2 ] : 'here',
   [ last+3 ] : 'single',
 }
 
-let containerIdToAscendMap =
+let ContainerIdToAscendMap =
 {
-  ... _.looker.Looker.containerIdToAscendMap,
+  ... _.looker.Looker.ContainerIdToAscendMap,
   [ last+1 ] : downAscend,
   [ last+2 ] : hereAscend,
   [ last+3 ] : singleAscend,
@@ -1381,10 +1355,10 @@ LookerExtension.globDown = globDown;
 // fields
 
 LookerExtension.Action = Action;
-LookerExtension.quantitiveDelimeter = '#';
-LookerExtension.containerNameToIdMap = containerNameToIdMap;
-LookerExtension.containerIdToNameMap = containerIdToNameMap;
-LookerExtension.containerIdToAscendMap = containerIdToAscendMap;
+LookerExtension.cardinalDelimeter = '#';
+LookerExtension.ContainerNameToIdMap = ContainerNameToIdMap;
+LookerExtension.ContainerIdToNameMap = ContainerIdToNameMap;
+LookerExtension.ContainerIdToAscendMap = ContainerIdToAscendMap;
 LookerExtension.containerIdToDstWriteDownMap = containerIdToDstWriteDownMap;
 
 //
@@ -1409,11 +1383,6 @@ Iteration.absoluteLevel = null;
 Iteration.parsedSelector = null;
 
 Iteration.selectorType = null;
-// Iteration.selectorIsRelative = null;
-// Iteration.selectorIsGlob = null;
-// Iteration.selectorIsTerminal = null;
-// Iteration.selectorIsQuantitive = false;
-
 Iteration.dstWritingDown = true;
 Iteration.dstWriteDown = null;
 Iteration._srcWriteDownMethod = null;

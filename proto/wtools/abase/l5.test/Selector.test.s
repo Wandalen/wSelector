@@ -154,252 +154,6 @@ function select( test )
 
 //
 
-function selectQuantitativeProperty( test )
-{
-  test.case = 'selector - #a1, no entry';
-  var src =
-  {
-    'a1' : { map : { name : 'name1' }, value : 13 },
-    'c' : { value : 25, date : 53 },
-  };
-  var got = _.select
-  ({
-    src,
-    selector : '#a1',
-  });
-  test.identical( got, undefined );
-
-  /* */
-
-  test.case = 'selector - #a1, with entry';
-  var src =
-  {
-    '#a1' : { map : { name : 'name1' }, value : 13 },
-    'c' : { value : 25, date : 53 },
-  };
-  var got = _.select
-  ({
-    src,
-    selector : '#a1',
-  });
-  test.identical( got, { map : { name : 'name1' }, value : 13 } );
-  test.true( got === src[ '#a1' ] );
-
-  /* */
-
-  test.case = 'selector - #1, no entry';
-  var src =
-  {
-    'a1' : { map : { name : 'name1' }, value : 13 },
-  };
-  var got = _.select
-  ({
-    src,
-    selector : '#1',
-  });
-  test.identical( got, undefined );
-
-  /* */
-
-  test.case = 'selector - #1, with entry';
-  var src =
-  {
-    'a1' : { map : { name : 'name1' }, value : 13 },
-    'c' : { value : 25, date : 53 },
-  };
-  var got = _.select
-  ({
-    src,
-    selector : '#1',
-  });
-  test.identical( got, { value : 25, date : 53 } );
-  test.true( got === src.c );
-}
-
-//
-
-function selectQuantifiedSelector( test )
-{
-
-  /* */
-
-  test.case = '#1';
-  var src =
-  {
-    a : { map : { name : 'name1' }, value : 13 },
-    c : { value : 25, date : 53 },
-  }
-
-  var got = _.select
-  ({
-    src,
-    selector : '#1',
-    // usingIndexedAccessToMap : 1,
-  });
-  test.identical( got, { value : 25, date : 53 } );
-  test.true( got === src.c );
-
-  /* */
-
-  test.case = '#1, setting';
-  var exp = { a : 'a', b : {} };
-  var src = { a : 'a', b : 'b' };
-  var got = _.select
-  ({
-    src,
-    selector : '/#1',
-    set : {},
-    action : _.selector.Action.set,
-    // setting : 1,
-    // usingIndexedAccessToMap : 1,
-  });
-  test.identical( got, 'b' );
-  test.identical( src, exp );
-
-  /* */
-
-  test.case = '*/#1';
-  var src =
-  {
-    a : { map : { name : 'name1' }, value : 13 },
-    c : { value : 25, date : 53 },
-  }
-
-  var got = _.select
-  ({
-    src,
-    selector : '*/#1',
-    // usingIndexedAccessToMap : 1,
-  });
-  test.identical( got, { a : 13, c : 53 } );
-
-  /* */
-
-}
-
-//
-
-function selectQuantifiedSelectorOptionMissingAction( test )
-{
-
-  act({ missingAction : 'ignore' });
-  act({ missingAction : 'undefine' });
-  act({ missingAction : 'error' });
-  actThrowing({ missingAction : 'throw' });
-
-  /* - */
-
-  function act( env )
-  {
-
-    /* */
-
-    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
-    var exp = {};
-    var src = {};
-    var got = _.select
-    ({
-      src,
-      selector : '/#1',
-      set : {},
-      // setting : 1,
-      action : _.selector.Action.set,
-      missingAction : env.missingAction,
-    });
-    if( env.missingAction === 'error' )
-    test.true( _.errIs( got ) );
-    else
-    test.identical( got, undefined );
-    test.identical( src, exp );
-
-    /* */
-
-  }
-
-  /* - */
-
-  function actThrowing( env )
-  {
-
-    /* */
-
-    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
-    test.shouldThrowErrorSync( () =>
-    {
-      var got = _.select
-      ({
-        src,
-        selector : '/#1',
-        set : {},
-        // setting : 1,
-        action : _.selector.Action.set,
-        missingAction : env.missingAction,
-      });
-    });
-
-    /* */
-
-  }
-
-  /* - */
-
-}
-
-//
-
-/* xxx : qqq : extend test */
-function selectQuantifiedWithoutSymbol( test )
-{
-
-  /* */
-
-  // xxx : should work?
-  // test.case = '1 level';
-  //
-  // var src =
-  // [
-  //   'str',
-  //   13,
-  // ]
-  //
-  // var exp = 13;
-  // var got = _.select( src, '1' );
-  // test.identical( got, exp );
-
-  /* */
-
-  test.case = '1 level';
-
-  var src =
-  [
-    'str',
-    13,
-  ]
-
-  var exp = 13;
-  var got = _.select( src, '#1' );
-  test.identical( got, exp );
-
-  /* */
-
-  test.case = '2 levels';
-
-  var src =
-  {
-    a : 'str',
-    b : [ 'str', 13 ],
-  }
-
-  var exp = 13;
-  var got = _.select( src, 'b/#1' );
-  test.identical( got, exp );
-
-  /* xxx */
-
-}
-
-//
-
 function selectTrivial( test )
 {
 
@@ -589,6 +343,316 @@ function selectEmptySelector( test )
   test.identical( src, exp );
 
   /* */
+
+}
+
+//
+
+function selectQuoted( test )
+{
+
+  /* */
+
+  var selector = '/';
+  test.case = `${selector}`;
+  var src = { a : 1, '' : 2 };
+  var exp = { a : 1, '' : 2 };
+  var got = _.select( src, selector );
+  test.identical( got, exp );
+  test.true( got === src );
+
+  /* */
+
+  var selector = '';
+  test.case = `empty string`;
+  var src = { a : 1, '' : 2 };
+  var exp = 2;
+  var got = _.select( src, selector );
+  test.identical( got, exp );
+
+  /* */
+
+  var selector = '""';
+  test.case = `${selector}`;
+  var src = { a : 1, '' : 2 };
+  var exp = 2;
+  var got = _.select( src, selector );
+  test.identical( got, 2 );
+
+  /* */
+
+  var selector = '/""';
+  test.case = `${selector}`;
+  var src = { a : 1, '' : 2 };
+  var exp = 2;
+  var got = _.select( src, selector );
+  test.identical( got, 2 );
+
+  /* */
+
+  var selector = 'dir/""';
+  test.case = `${selector}`;
+  var src = { a : 1, dir : { '' : 2 } };
+  var exp = 2;
+  var got = _.select( src, selector );
+  test.identical( got, 2 );
+
+  /* */
+
+  var selector = '/dir/""';
+  test.case = `${selector}`;
+  var src = { a : 1, dir : { '' : 2 } };
+  var exp = 2;
+  var got = _.select( src, selector );
+  test.identical( got, 2 );
+
+  /* */
+
+}
+
+//
+
+function selectQuantitativeProperty( test )
+{
+  test.case = 'selector - #a1, no entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#a1',
+  });
+  test.identical( got, undefined );
+
+  /* */
+
+  test.case = 'selector - #a1, with entry';
+  var src =
+  {
+    '#a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#a1',
+  });
+  test.identical( got, { map : { name : 'name1' }, value : 13 } );
+  test.true( got === src[ '#a1' ] );
+
+  /* */
+
+  test.case = 'selector - #1, no entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#1',
+  });
+  test.identical( got, undefined );
+
+  /* */
+
+  test.case = 'selector - #1, with entry';
+  var src =
+  {
+    'a1' : { map : { name : 'name1' }, value : 13 },
+    'c' : { value : 25, date : 53 },
+  };
+  var got = _.select
+  ({
+    src,
+    selector : '#1',
+  });
+  test.identical( got, { value : 25, date : 53 } );
+  test.true( got === src.c );
+}
+
+//
+
+function selectCardinalSelector( test )
+{
+
+  /* */
+
+  test.case = '#1';
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
+  }
+
+  var got = _.select
+  ({
+    src,
+    selector : '#1',
+    // usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, { value : 25, date : 53 } );
+  test.true( got === src.c );
+
+  /* */
+
+  test.case = '#1, setting';
+  var exp = { a : 'a', b : {} };
+  var src = { a : 'a', b : 'b' };
+  var got = _.select
+  ({
+    src,
+    selector : '/#1',
+    set : {},
+    action : _.selector.Action.set,
+    // setting : 1,
+    // usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, 'b' );
+  test.identical( src, exp );
+
+  /* */
+
+  test.case = '*/#1';
+  var src =
+  {
+    a : { map : { name : 'name1' }, value : 13 },
+    c : { value : 25, date : 53 },
+  }
+
+  var got = _.select
+  ({
+    src,
+    selector : '*/#1',
+    // usingIndexedAccessToMap : 1,
+  });
+  test.identical( got, { a : 13, c : 53 } );
+
+  /* */
+
+}
+
+//
+
+function selectCardinalSelectorOptionMissingAction( test )
+{
+
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
+  act({ missingAction : 'error' });
+  actThrowing({ missingAction : 'throw' });
+
+  /* - */
+
+  function act( env )
+  {
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
+    var exp = {};
+    var src = {};
+    var got = _.select
+    ({
+      src,
+      selector : '/#1',
+      set : {},
+      // setting : 1,
+      action : _.selector.Action.set,
+      missingAction : env.missingAction,
+    });
+    if( env.missingAction === 'error' )
+    test.true( _.errIs( got ) );
+    else
+    test.identical( got, undefined );
+    test.identical( src, exp );
+
+    /* */
+
+  }
+
+  /* - */
+
+  function actThrowing( env )
+  {
+
+    /* */
+
+    test.case = `${_.entity.exportStringSolo( env )}, /#1`;
+    test.shouldThrowErrorSync( () =>
+    {
+      var got = _.select
+      ({
+        src,
+        selector : '/#1',
+        set : {},
+        // setting : 1,
+        action : _.selector.Action.set,
+        missingAction : env.missingAction,
+      });
+    });
+
+    /* */
+
+  }
+
+  /* - */
+
+}
+
+//
+
+/* xxx : qqq : extend test */
+function selectCardinalWithoutSymbol( test )
+{
+
+  /* */
+
+  // xxx : should work?
+  // test.case = '1 level';
+  //
+  // var src =
+  // [
+  //   'str',
+  //   13,
+  // ]
+  //
+  // var exp = 13;
+  // var got = _.select( src, '1' );
+  // test.identical( got, exp );
+
+  /* */
+
+  test.case = '1 level';
+
+  var src =
+  [
+    'str',
+    13,
+  ]
+
+  var exp = 13;
+  var got = _.select( src, '#1' );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = '2 levels';
+
+  var src =
+  {
+    a : 'str',
+    b : [ 'str', 13 ],
+  }
+
+  var exp = 13;
+  var got = _.select( src, 'b/#1' );
+  test.identical( got, exp );
+
+  /* xxx */
 
 }
 
@@ -1096,7 +1160,7 @@ function selectThrowing( test )
       'globing' : 1,
       'downToken' : '..',
       'hereToken' : '.',
-      'quantitiveDelimeter' : '#',
+      'cardinalDelimeter' : '#',
       'action' : 0,
     }
     if( env.missingAction === 'error' )
@@ -3979,7 +4043,7 @@ function selectGlobNonPrimitive( test )
 
   let iterator = { srcChanged }
   let Selector2 = _.selector.classDefine({ iterator });
-  test.true( _.looker.Looker.containerNameToIdMap.countable > 0 );
+  test.true( _.looker.Looker.ContainerNameToIdMap.countable > 0 );
   test.true( Selector2.iterableEval === _.selector.Selector.iterableEval );
   test.true( Selector2.Iterator.srcChanged === srcChanged );
   test.true( Selector2.srcChanged === srcChanged );
@@ -4107,11 +4171,11 @@ function selectGlobNonPrimitive( test )
 
     if( _.arrayLike( it.src ) )
     {
-      it.iterable = _.looker.Looker.containerNameToIdMap.countable;
+      it.iterable = _.looker.Looker.ContainerNameToIdMap.countable;
     }
     else if( _.aux.is( it.src ) )
     {
-      it.iterable = _.looker.Looker.containerNameToIdMap.aux;
+      it.iterable = _.looker.Looker.ContainerNameToIdMap.aux;
     }
     else
     {
@@ -4193,7 +4257,6 @@ function selectWithCallback( test )
   function onDownBegin()
   {
     let it = this;
-    // if( !it.selectorIsGlob )
     if( it.selectorType !== 'glob' )
     return;
     delete it.dst.aaY;
@@ -4224,13 +4287,14 @@ const Proto =
   {
 
     select,
-    selectQuantitativeProperty,
-    selectQuantifiedSelector,
-    selectQuantifiedSelectorOptionMissingAction,
-    selectQuantifiedWithoutSymbol,
     selectTrivial,
     selectUndefined,
     selectEmptySelector,
+    selectQuoted,
+    selectQuantitativeProperty,
+    selectCardinalSelector,
+    selectCardinalSelectorOptionMissingAction,
+    selectCardinalWithoutSymbol,
     selectRelativeDown,
     selectRelativeHere,
     selectIndexedBasic,
