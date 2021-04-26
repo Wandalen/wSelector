@@ -324,7 +324,7 @@ function iterableEval()
 
 //
 
-function selectorQuantitativeIs( src )
+function selectorIsCardinal( src )
 {
   let it = this;
   if( !_.strIs( src ) )
@@ -336,10 +336,10 @@ function selectorQuantitativeIs( src )
 
 //
 
-function selectorQuantitativeParse( src )
+function selectorCardinalParse( src )
 {
   let it = this;
-  if( !it.selectorQuantitativeIs( src ) )
+  if( !it.selectorIsCardinal( src ) )
   return false;
   let result = Object.create( null );
   result.str = _.strRemoveBegin( src, it.cardinalDelimeter );
@@ -359,14 +359,14 @@ function elementGet( e, k )
 
   _.assert( arguments.length === 2, 'Expects two argument' );
 
-  let q = it.selectorQuantitativeParse( k );
+  let q = it.selectorCardinalParse( k );
   if( q )
   {
-    result = _.container.elementThGet( e, q.number );
+    result = _.entity.elementWithCardinal( e, q.number ); /* xxx : use maybe functor */
   }
   else
   {
-    result = _.container.elementGet( e, k );
+    result = _.entity.elementWithImplicit( e, k ); /* xxx : use maybe functor */
   }
 
   return result;
@@ -460,7 +460,6 @@ function iteratorSelectorChanged()
   it.iterator.selectorArray = [ it.iterator.selector ];
   else
   it.iterator.selectorArray = split( it.iterator.selector );
-  _.debugger;
 
   /* */
 
@@ -825,6 +824,7 @@ function downSet()
 
   if( !!it.action && it.selectorType === 'terminal' )
   {
+    _.debugger;
     /* qqq2 : implement and cover for all type of containers */
     if
     (
@@ -854,20 +854,41 @@ function downSet()
 function srcWriteDown( e, k )
 {
   let it = this;
+
+  // if(  )
+  // if( it.selectorIsCardinal(  ) )
+
   if( it._srcWriteDownMethod === null )
-  it._srcWriteDownMethod = it.srcWriteDownMap;
+  {
+    let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
+    debugger;
+    if( selectorIsCardinal )
+    it._srcWriteDownMethod = _.entity.elementWithCardinalSet.functor.call( _.container, it.src );
+    else
+    it._srcWriteDownMethod = _.entity.elementSet.functor.call( _.container, it.src );
+  }
 
-  /* qqq : extend to been able to write into hash maps and other complex structures */
-  it._srcWriteDownMethod( e, k );
+  let r = it._srcWriteDownMethod( k, e );
+
+  if( r[ 2 ] === false )
+  {
+    it.errCantSetHandle();
+  }
+
+  // if( it._srcWriteDownMethod === null )
+  // it._srcWriteDownMethod = it.srcWriteDownMap;
+  //
+  // /* qqq : extend to been able to write into hash maps and other complex structures */
+  // it._srcWriteDownMethod( e, k );
 }
 
+// //
 //
-
-function srcWriteDownMap( e, k )
-{
-  let it = this;
-  it.src[ k ] = e;
-}
+// function srcWriteDownMap( e, k )
+// {
+//   let it = this;
+//   it.src[ k ] = e;
+// }
 
 //
 
@@ -1293,8 +1314,8 @@ LookerExtension.performBegin = performBegin;
 LookerExtension.performEnd = performEnd;
 LookerExtension.iterationMake = iterationMake;
 LookerExtension.iterableEval = iterableEval;
-LookerExtension.selectorQuantitativeIs = selectorQuantitativeIs;
-LookerExtension.selectorQuantitativeParse = selectorQuantitativeParse;
+LookerExtension.selectorIsCardinal = selectorIsCardinal;
+LookerExtension.selectorCardinalParse = selectorCardinalParse;
 LookerExtension.elementGet = elementGet;
 LookerExtension.chooseBegin = chooseBegin;
 LookerExtension.chooseEnd = chooseEnd;
@@ -1320,8 +1341,8 @@ LookerExtension.visitDown = visitDown;
 LookerExtension.downSet = downSet;
 
 LookerExtension.srcWriteDown = srcWriteDown;
-LookerExtension.srcWriteDownMap = srcWriteDownMap;
-LookerExtension.dstWriteDownLong = dstWriteDownLong;
+// LookerExtension.srcWriteDownMap = srcWriteDownMap;
+LookerExtension.dstWriteDownLong = dstWriteDownLong; /* xxx : remove? */
 LookerExtension.dstWriteDownMap = dstWriteDownMap;
 
 // down
@@ -1408,8 +1429,8 @@ const Selector = _.looker.classDefine
 
 _.assert( Selector.exec.head === exec_head );
 _.assert( Selector.exec.body === exec_body );
-_.assert( _.property.has( Selector.Iteration, 'dst' ) && Selector.Iteration.dst === undefined );
-_.assert( _.property.has( Selector.Iterator, 'result' ) && Selector.Iterator.result === undefined );
+_.assert( _.props.has( Selector.Iteration, 'dst' ) && Selector.Iteration.dst === undefined );
+_.assert( _.props.has( Selector.Iterator, 'result' ) && Selector.Iterator.result === undefined );
 
 const select = Selector.exec;
 const selectIt = Selector.execIt;
@@ -1517,9 +1538,9 @@ let ToolsSupplementation =
 }
 
 const Self = Selector;
-_.mapExtend( _, ToolsSupplementation );
-_.mapExtend( _.selector, SelectorExtension );
-_.mapExtend( _.selector.functor, FunctorExtension );
+_.props.extend( _, ToolsSupplementation );
+_.props.extend( _.selector, SelectorExtension );
+_.props.extend( _.selector.functor, FunctorExtension );
 
 // --
 // export

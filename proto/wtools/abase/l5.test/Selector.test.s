@@ -560,7 +560,6 @@ function selectCardinalSelectorOptionMissingAction( test )
       src,
       selector : '/#1',
       set : {},
-      // setting : 1,
       action : _.selector.Action.set,
       missingAction : env.missingAction,
     });
@@ -652,7 +651,7 @@ function selectCardinalWithoutSymbol( test )
   var got = _.select( src, 'b/#1' );
   test.identical( got, exp );
 
-  /* xxx */
+  /* */
 
 }
 
@@ -1169,7 +1168,7 @@ function selectThrowing( test )
     test.true( _.errIs( options.error ) );
     else
     test.true( options.error === true );
-    var got = _.filter_( null, _.mapExtend( null, options ), ( e, k ) => ( _.primitiveIs( e ) && e !== null ) ? e : undefined );
+    var got = _.filter_( null, _.props.extend( null, options ), ( e, k ) => ( _.primitiveIs( e ) && e !== null ) ? e : undefined );
     test.identical( got, exp );
 
   }
@@ -2165,7 +2164,7 @@ function selectSetBasic( test )
 
   /* */
 
-  test.case = 'setting, quantitive selector';
+  test.case = 'setting, cardinal selector';
 
   var src = { a : 1, b : 2 };
   var exp = { a : 1, b : 3 };
@@ -2183,16 +2182,38 @@ function selectSetBasic( test )
 
   /* */
 
-  test.case = 'setting, quantitive selector, does not exist';
+  test.case = 'setting, cardinal selector, does not exist';
 
   var src = {};
   var exp = {};
 
+  _.debugger = 1;
+  debugger;
   var got = _.select
   ({
     src,
     selector : '/#0',
     set : {},
+    action : _.selector.Action.set,
+  });
+  debugger;
+
+  test.identical( got, undefined );
+  test.identical( src, exp );
+  debugger;
+
+  /* */
+
+  test.case = 'setting, cardinal selector';
+
+  var src = { '1' : 3 };
+  var exp = { '1' : 3 };
+
+  var got = _.select
+  ({
+    src,
+    selector : '/#1',
+    set : undefined,
     action : _.selector.Action.set,
   });
 
@@ -2598,7 +2619,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2626,7 +2647,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2655,7 +2676,7 @@ function selectSetOptionCreatingExtremes( test )
     a : undefined,
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2684,7 +2705,7 @@ function selectSetOptionCreatingExtremes( test )
     a : undefined,
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2711,7 +2732,7 @@ function selectSetOptionCreatingExtremes( test )
     a : undefined,
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* - */
 
@@ -2739,7 +2760,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2767,7 +2788,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2796,7 +2817,7 @@ function selectSetOptionCreatingExtremes( test )
     a : null,
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2825,7 +2846,7 @@ function selectSetOptionCreatingExtremes( test )
     a : null,
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2851,7 +2872,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* -- */
 
@@ -2879,7 +2900,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2908,7 +2929,7 @@ function selectSetOptionCreatingExtremes( test )
     'a' : {},
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2936,7 +2957,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -2965,7 +2986,7 @@ function selectSetOptionCreatingExtremes( test )
     a : { b : undefined },
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -2992,7 +3013,7 @@ function selectSetOptionCreatingExtremes( test )
     a : { b : undefined },
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* - */
 
@@ -3020,7 +3041,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -3049,7 +3070,7 @@ function selectSetOptionCreatingExtremes( test )
     a : {},
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -3077,7 +3098,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* */
 
@@ -3106,7 +3127,7 @@ function selectSetOptionCreatingExtremes( test )
     a : { b : null },
   }
   test.identical( src, exp );
-  test.true( _.property.has( src, 'a' ) );
+  test.true( _.props.has( src, 'a' ) );
 
   /* */
 
@@ -3132,7 +3153,7 @@ function selectSetOptionCreatingExtremes( test )
   {
   }
   test.identical( src, exp );
-  test.true( !_.property.has( src, 'a' ) );
+  test.true( !_.props.has( src, 'a' ) );
 
   /* -- */
 
@@ -4169,7 +4190,7 @@ function selectGlobNonPrimitive( test )
 
     _.assert( arguments.length === 0, 'Expects no arguments' );
 
-    if( _.arrayLike( it.src ) )
+    if( _.argumentsArray.like( it.src ) )
     {
       it.iterable = _.looker.Looker.ContainerNameToIdMap.countable;
     }
