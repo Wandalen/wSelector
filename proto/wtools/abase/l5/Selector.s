@@ -1123,7 +1123,7 @@ function globDown()
 
   _.assert( it.globing );
 
-  let length = _.entityLengthOf( it.dst );
+  let length = _.entity.lengthOf( it.dst );
   if( length !== it.parsedSelector.limit )
   {
     let currentSelector = it.selector;

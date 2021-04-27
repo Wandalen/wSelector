@@ -4139,7 +4139,7 @@ function selectGlobNonPrimitive( test )
   var got = _.select( src, '**' );
   test.true( got !== exp );
   test.true( _.mapIs( got ) );
-  test.true( _.entityLengthOf( got ) > 10 );
+  test.true( _.entity.lengthOf( got ) > 10 );
 
 
   test.case = 'Composes/name';
@@ -4161,7 +4161,7 @@ function selectGlobNonPrimitive( test )
   var got = _.select( src, '**/name' );
   test.true( got !== exp );
   test.true( _.mapIs( got ) );
-  test.true( _.entityLengthOf( got ) > 10 );
+  test.true( _.entity.lengthOf( got ) > 10 );
 
   test.case = 'should not throw error if continue set to false in onUpBegin';
   var src = new _.Logger();
