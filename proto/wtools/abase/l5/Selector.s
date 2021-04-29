@@ -179,7 +179,7 @@ function reperformIt()
 
   let it2 = it.iterationMake();
   let args = _.longSlice( arguments );
-  if( args.length === 1 && !_.objectIs( args[ 0 ] ) )
+  if( args.length === 1 && !_.object.isBasic( args[ 0 ] ) )
   args = [ it.src, args[ 0 ] ];
   let o = Self.optionsFromArguments( args );
   o.Looker = o.Looker || it.Looker || Self;
@@ -296,7 +296,7 @@ function iterableEval()
     {
       it.iterable = it.ContainerNameToIdMap.countable;
     }
-    else if( _.objectIs( it.src ) )
+    else if( _.object.isBasic( it.src ) )
     {
       it.iterable = it.ContainerNameToIdMap.aux;
     }
