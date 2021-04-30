@@ -174,7 +174,7 @@ function reperformIt()
   _.assert
   (
     it.iterationProper( it ),
-    () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringShallow( it )}`
+    () => `Expects iteration of ${Self.constructor.name} but got ${_.entity.exportStringDiagnosticShallow( it )}`
   );
 
   let it2 = it.iterationMake();
@@ -577,7 +577,7 @@ function errNoDown()
     'Cant go down', _.strQuote( it.selector ),
     '\nbecause', _.strQuote( it.selector ), 'does not exist',
     '\nat', _.strQuote( it.path ),
-    '\nin container\n', _.entity.exportStringShallow( it.src )
+    '\nin container\n', _.entity.exportStringDiagnosticShallow( it.src )
   );
   return err;
 }
@@ -619,8 +619,8 @@ function errDoesNotExist()
   {
     return this.errMake
     (
-      `Cant select ${it.iterator.selector} from ${_.entity.exportStringShallow( it.down.originalSrc )}`,
-      `\n  because ${_.entity.exportStringShallow( it.down.originalSelector )} does not exist`,
+      `Cant select ${it.iterator.selector} from ${_.entity.exportStringDiagnosticShallow( it.down.originalSrc )}`,
+      `\n  because ${_.entity.exportStringDiagnosticShallow( it.down.originalSelector )} does not exist`,
       `\n  fall at ${_.strQuote( it.path )}`,
     );
   }
@@ -629,7 +629,7 @@ function errDoesNotExist()
     return this.errMake
     (
       `Cant select ${it.iterator.selector} from ${it.originalSrc}`,
-      `\n  because ${_.entity.exportStringShallow( it.path )} does not exist`,
+      `\n  because ${_.entity.exportStringDiagnosticShallow( it.path )} does not exist`,
     );
   }
 }
