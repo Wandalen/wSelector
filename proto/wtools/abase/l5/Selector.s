@@ -374,8 +374,13 @@ function elementGet( e, k )
 
 //
 
-function chooseBegin( e, k, c, exists )
+function chooseBegin( /* e, k, c, exists */ )
 {
+  let e = arguments[ 0 ];
+  let k = arguments[ 1 ];
+  let c = arguments[ 2 ];
+  let exists = arguments[ 3 ];
+
   let it = this;
 
   [ e, k, c, exists ] = Parent.chooseBegin.call( it, ... arguments );
@@ -878,7 +883,6 @@ function srcWriteDown( e, k )
   if( it._srcWriteDownMethod === null )
   {
     let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
-    debugger;
     if( selectorIsCardinal )
     it._srcWriteDownMethod = _.entity.elementWithCardinalSet.functor.call( _.container, it.src );
     else

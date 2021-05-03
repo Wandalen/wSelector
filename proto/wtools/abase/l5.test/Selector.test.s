@@ -355,8 +355,8 @@ function selectQuoted( test )
 
   var selector = '/';
   test.case = `${selector}`;
-  var src = { a : 1, '' : 2 };
-  var exp = { a : 1, '' : 2 };
+  var src = { 'a' : 1, '' : 2 };
+  var exp = { 'a' : 1, '' : 2 };
   var got = _.select( src, selector );
   test.identical( got, exp );
   test.true( got === src );
@@ -365,7 +365,7 @@ function selectQuoted( test )
 
   var selector = '';
   test.case = `empty string`;
-  var src = { a : 1, '' : 2 };
+  var src = { 'a' : 1, '' : 2 };
   var exp = 2;
   var got = _.select( src, selector );
   test.identical( got, exp );
@@ -374,7 +374,7 @@ function selectQuoted( test )
 
   var selector = '""';
   test.case = `${selector}`;
-  var src = { a : 1, '' : 2 };
+  var src = { 'a' : 1, '' : 2 };
   var exp = 2;
   var got = _.select( src, selector );
   test.identical( got, 2 );
@@ -383,7 +383,7 @@ function selectQuoted( test )
 
   var selector = '/""';
   test.case = `${selector}`;
-  var src = { a : 1, '' : 2 };
+  var src = { 'a' : 1, '' : 2 };
   var exp = 2;
   var got = _.select( src, selector );
   test.identical( got, 2 );
@@ -1168,7 +1168,8 @@ function selectThrowing( test )
     test.true( _.errIs( options.error ) );
     else
     test.true( options.error === true );
-    var got = _.filter_( null, _.props.extend( null, options ), ( e, k ) => ( _.primitiveIs( e ) && e !== null ) ? e : undefined );
+    var got =
+    _.filter_( null, _.props.extend( null, options ), ( e, k ) => ( _.primitiveIs( e ) && e !== null ) ? e : undefined );
     test.identical( got, exp );
 
   }
@@ -2188,7 +2189,6 @@ function selectSetBasic( test )
   var exp = {};
 
   _.debugger = 1;
-  debugger;
   var got = _.select
   ({
     src,
@@ -2196,11 +2196,9 @@ function selectSetBasic( test )
     set : {},
     action : _.selector.Action.set,
   });
-  debugger;
 
   test.identical( got, undefined );
   test.identical( src, exp );
-  debugger;
 
   /* */
 
