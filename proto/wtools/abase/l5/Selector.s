@@ -374,13 +374,13 @@ function elementGet( e, k )
 
 //
 
-function chooseBegin( e, k, exists )
+function chooseBegin( e, k, c, exists )
 {
   let it = this;
 
-  [ e, k, exists ] = Parent.chooseBegin.call( it, ... arguments );
+  [ e, k, c, exists ] = Parent.chooseBegin.call( it, ... arguments );
 
-  _.assert( arguments.length === 3, 'Expects three argument' );
+  _.assert( arguments.length === 4, 'Expects three argument' );
   _.assert( !!it.down );
 
   if( !it.fast )
@@ -388,8 +388,25 @@ function chooseBegin( e, k, exists )
     it.absoluteLevel = it.down.absoluteLevel+1;
   }
 
-  return [ e, k, exists ];
+  return [ e, k, c, exists ];
 }
+
+// function chooseBegin( e, k, exists )
+// {
+//   let it = this;
+//
+//   [ e, k, exists ] = Parent.chooseBegin.call( it, ... arguments );
+//
+//   _.assert( arguments.length === 3, 'Expects three argument' );
+//   _.assert( !!it.down );
+//
+//   if( !it.fast )
+//   {
+//     it.absoluteLevel = it.down.absoluteLevel+1;
+//   }
+//
+//   return [ e, k, exists ];
+// }
 
 //
 
@@ -975,7 +992,8 @@ function downAscend()
 
   let nit = it.iterationMake();
 
-  nit.choose( dit.src, it.selector, true );
+  nit.choose( dit.src, it.selector, it.src, true );
+  // nit.choose( dit.src, it.selector, true ); /* Dmytro : what container should be used? */
   _.assert( nit.src === dit.src );
   _.assert( nit.exists === true );
 
@@ -1012,7 +1030,8 @@ function hereAscend()
 {
   let it = this;
 
-  let eit = it.iterationMake().choose( it.src, it.selector, true );
+  let eit = it.iterationMake().choose( it.src, it.selector, it.src, true ); /* Dmytro : what container should be used? */
+  // let eit = it.iterationMake().choose( it.src, it.selector, true );
   eit.iterate();
 
 }
@@ -1039,7 +1058,8 @@ function singleAscend( src )
 
   _.assert( arguments.length === 1 );
 
-  let eit = it.iterationMake().choose( undefined, it.selector, null );
+  let eit = it.iterationMake().choose( undefined, it.selector, src, null );
+  // let eit = it.iterationMake().choose( undefined, it.selector, null ); /* Dmytro : what container should be used? */
   eit.iterate();
 
 }
