@@ -877,7 +877,6 @@ function srcWriteDown( e, k, c )
   if( it._srcWriteDownMethod === null )
   {
     let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
-    debugger;
     if( selectorIsCardinal )
     it._srcWriteDownMethod = _.entity.elementWithCardinalSet.functor.call( _.container, it.src );
     else
@@ -1656,3 +1655,4 @@ if( typeof module !== 'undefined' )
 module[ 'exports' ] = _;
 
 })();
+
