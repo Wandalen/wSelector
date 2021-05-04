@@ -3212,7 +3212,9 @@ function selectFromHashMap( test )
   test.case = 'k1';
   var src = new HashMap([ [ 'k1', { v : 'v1' } ], [ 'k2', { v : 'v2' } ] ]);
   var exp = { v : 'v1' };
+  debugger;
   var got = _.select( src, 'k1' );
+  debugger;
   test.identical( got, exp );
 
   test.case = '*/v';
