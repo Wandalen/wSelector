@@ -1042,7 +1042,8 @@ function downAscend()
 
   let nit = it.iterationMake();
 
-  nit.choose( dit.src, it.selector, true );
+  nit.choose( dit.src, it.selector, null, true );
+  // nit.choose( dit.src, it.selector, true );
   _.assert( nit.src === dit.src );
   _.assert( nit.exists === true );
 
