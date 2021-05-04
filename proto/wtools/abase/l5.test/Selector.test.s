@@ -17,6 +17,7 @@ if( typeof module !== 'undefined' )
 
 const _global = _global_;
 const _ = _global_.wTools;
+const __ = _globals_.testing.wTools;
 
 /*
 xxx : implement escaped selectors and test for it
@@ -3198,6 +3199,118 @@ function selectSetOptionCreatingMissingAction( test )
 
 //
 
+function selectFromHashMap( test )
+{
+
+  // xxx
+  // test.case = 'from array';
+  // var src = new HashMap([ [ 'k1', { v : 'v1' } ], [ 'k2', { v : 'v2' } ] ]);
+  // var exp = [ 'v1', 'v2' ];
+  // var got = _.select( [ ... src.values() ], '*/v' );
+  // test.identical( got, exp );
+
+  test.case = 'k1';
+  var src = new HashMap([ [ 'k1', { v : 'v1' } ], [ 'k2', { v : 'v2' } ] ]);
+  var exp = { v : 'v1' };
+  var got = _.select( src, 'k1' );
+  test.identical( got, exp );
+
+  test.case = '*/v';
+  var src = new HashMap([ [ 'k1', { v : 'v1' } ], [ 'k2', { v : 'v2' } ] ]);
+  var exp = new HashMap([ [ 'k1', 'v1' ], [ 'k2', 'v2' ] ]);
+  var got = _.select( src, '*/v' );
+  test.identical( got, exp );
+
+}
+
+//
+
+function selectFromArray( test )
+{
+
+  test.case = '*/v';
+  var src = [ { v : 'v1' }, { v : 'v2' } ];
+  var exp = [ 'v1', 'v2' ];
+  var got = _.select( src, '*/v' );
+  test.identical( got, exp );
+
+  test.case = '*/#1/v';
+  var src = [ [ 'k1', { v : 'v1' } ], [ 'k2', { v : 'v2' } ] ];
+  var exp = [ 'v1', 'v2' ];
+  var got = _.select( src, '*/#1/v' );
+  test.identical( got, exp );
+
+}
+
+//
+
+function selectFromObject( test )
+{
+
+  test.case = 'ket from uncountable object';
+  var src = __.diagnostic.objectMake({ countable : 0, elements : [ 'a', 'b' ] });
+  var exp = [ 'a', 'b' ];
+  var got = _.select( src, 'elements' );
+  test.identical( got, exp );
+  test.true( _.object.is( src ) );
+
+  test.case = 'cardinal from uncountable object';
+  var src = __.diagnostic.objectMake({ countable : 0, elements : [ 'a', 'b' ] });
+  var exp = [ 'a', 'b' ];
+  var got = _.select( src, '#1' );
+  test.identical( got, exp );
+  test.true( _.object.is( src ) );
+
+  test.case = 'key from array of uncountable objects';
+  var src =
+  [
+    __.diagnostic.objectMake({ countable : 0, elements : [ 'a', 'b' ] }),
+    __.diagnostic.objectMake({ countable : 0, elements : [ 'c', 'd' ] }),
+  ]
+  var exp = [ [ 'a', 'b' ], [ 'c', 'd' ] ];
+  var got = _.select( src, '*/elements' );
+  test.identical( got, exp );
+
+  test.case = 'cardinal from array of uncountable objects';
+  var src =
+  [
+    __.diagnostic.objectMake({ countable : 0, elements : [ 'a', 'b' ] }),
+    __.diagnostic.objectMake({ countable : 0, elements : [ 'c', 'd' ] }),
+  ]
+  var exp = [ [ 'a', 'b' ], [ 'c', 'd' ] ];
+  var got = _.select( src, '*/#1' );
+  test.identical( got, exp );
+
+  act({ countable : 1, vector : 1, basic : 1 });
+  act({ countable : 1, vector : 1, basic : 0 });
+  act({ countable : 1, vector : 0, basic : 1 });
+  act({ countable : 1, vector : 0, basic : 0 });
+
+  /* */
+
+  function act( env )
+  {
+
+    test.case = `${_.entity.exportStringSolo( env )}, key`;
+    var src = __.diagnostic.objectMake({ elements : [ 'a', 'b' ], ... env });
+    var exp = [ 'a', 'b' ];
+    var got = _.select( src, 'elements' );
+    test.identical( got, exp );
+    test.true( _.object.is( src ) );
+
+    test.case = `${_.entity.exportStringSolo( env )}, cardinal`;
+    var src = __.diagnostic.objectMake({ elements : [ 'a', 'b' ], ... env });
+    var exp = 'b';
+    var got = _.select( src, '#1' );
+    test.identical( got, exp );
+    test.true( _.object.is( src ) );
+
+  }
+
+}
+
+//
+
 function selectWithDown( test )
 {
 
@@ -4081,6 +4194,7 @@ function selectGlobNonPrimitive( test )
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
   var exp = 'eventHandlerAppend';
+  _.debugger = 1;
   var got = _.select( src, 'eventHandlerAppend/name' );
   test.identical( got, exp );
   test.true( got === exp );
@@ -4327,6 +4441,9 @@ const Proto =
     selectSetOptionCreating,
     selectSetOptionCreatingExtremes,
     selectSetOptionCreatingMissingAction,
+    selectFromHashMap,
+    selectFromArray,
+    selectFromObject,
     selectWithDown,
     selectWithDownRemake,
     reperform,

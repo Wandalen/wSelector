@@ -28,6 +28,9 @@ and
 __.select( module.files.values(), '* / sourcePath' )
 where module.files is hash map
 
+xxx : qqq : implement _.selector.isQuery()
+xxx : qqq : move _.selector.isQuery() to module::Tools?
+
 */
 
 if( typeof module !== 'undefined' )
@@ -44,8 +47,6 @@ const Parent = _.looker.Looker;
 _.selector = _.selector || Object.create( _.looker );
 _.selector.functor = _.selector.functor || Object.create( null );
 
-/* xxx : qqq : implement _.selector.isQuery() */
-/* xxx : qqq : move _.selector.isQuery() to module::Tools? */
 
 _.assert( !!_realGlobal_ );
 _.assert( !!Parent );
@@ -351,37 +352,42 @@ function selectorCardinalParse( src )
 
 //
 
-// function elementGet( src, k )
-function elementGet( e, k )
+function elementGet( e, k, c )
 {
   let it = this;
   let result;
 
-  _.assert( arguments.length === 2, 'Expects two argument' );
+  _.assert( arguments.length === 3, 'Expects two argument' );
 
   let q = it.selectorCardinalParse( k );
   if( q )
   {
     result = _.entity.elementWithCardinal( e, q.number ); /* xxx : use maybe functor */
+    return [ result[ 0 ], result[ 1 ], q.number, result[ 2 ] ];
   }
   else
   {
     result = _.entity.elementWithImplicit( e, k ); /* xxx : use maybe functor */
+    if( c === null )
+    c = _.container.cardinalWithKey( e, k );
+    return [ result[ 0 ], result[ 1 ], c, result[ 2 ] ];
   }
 
-  return result;
+  // if( c === null )
+  // c = _.container.cardinalWithKey( e, k );
+  // return result;
 }
 
 //
 
-function chooseBegin( /* e, k, c, exists */ )
+// function chooseBegin( e, k, exists )
+function chooseBegin()
 {
+  let it = this;
   let e = arguments[ 0 ];
   let k = arguments[ 1 ];
   let c = arguments[ 2 ];
   let exists = arguments[ 3 ];
-
-  let it = this;
 
   [ e, k, c, exists ] = Parent.chooseBegin.call( it, ... arguments );
 
@@ -396,30 +402,18 @@ function chooseBegin( /* e, k, c, exists */ )
   return [ e, k, c, exists ];
 }
 
-// function chooseBegin( e, k, exists )
-// {
-//   let it = this;
-//
-//   [ e, k, exists ] = Parent.chooseBegin.call( it, ... arguments );
-//
-//   _.assert( arguments.length === 3, 'Expects three argument' );
-//   _.assert( !!it.down );
-//
-//   if( !it.fast )
-//   {
-//     it.absoluteLevel = it.down.absoluteLevel+1;
-//   }
-//
-//   return [ e, k, exists ];
-// }
-
 //
 
-function chooseEnd( e, k, exists )
+// function chooseEnd( e, k, exists )
+function chooseEnd()
 {
   let it = this;
+  let e = arguments[ 0 ];
+  let k = arguments[ 1 ];
+  let c = arguments[ 2 ];
+  let exists = arguments[ 3 ];
 
-  _.assert( arguments.length === 3 );
+  _.assert( arguments.length === 4 );
   _.assert( _.boolIs( exists ) || exists === null );
 
   it.exists = exists;
@@ -432,11 +426,11 @@ function chooseEnd( e, k, exists )
   if( it.down )
   {
     e = it.containerMake();
-    it.down.srcWriteDown( e, k );
+    it.down.srcWriteDown( e, k, c );
     it.exists = true;
   }
 
-  let result = Parent.chooseEnd.call( it, e, k, exists );
+  let result = Parent.chooseEnd.call( it, e, k, c, exists );
 
   _.assert( _.boolIs( it.exists ) );
 
@@ -752,7 +746,7 @@ function visitUpBegin()
 
   _.assert( it.visiting );
 
-  it.dstWriteDown = function dstWriteDown( eit )
+  it.dstWriteDownAct = function dstWriteDownAct( eit )
   {
     it.dst = eit.dst;
   }
@@ -800,7 +794,7 @@ function visitDown()
 
   if( it.down )
   {
-    _.assert( _.routineIs( it.down.dstWriteDown ) );
+    // _.assert( _.routineIs( it.down.dstWriteDown ) );
     if( it.dstWritingDown )
     it.down.dstWriteDown( it );
   }
@@ -858,7 +852,7 @@ function downSet()
       if( it.action === it.Action.del )
       delete it.down.src[ it.key ];
       else
-      it.down.srcWriteDown( it.set, it.key );
+      it.down.srcWriteDown( it.set, it.key, it.cardinal );
       // it.down.src[ it.key ] = it.set;
     }
     else
@@ -873,7 +867,7 @@ function downSet()
 
 /* xxx : merge src/dst writeDown? */
 
-function srcWriteDown( e, k )
+function srcWriteDown( e, k, c )
 {
   let it = this;
 
@@ -913,30 +907,82 @@ function srcWriteDown( e, k )
 
 //
 
-function dstWriteDownLong( eit )
+function dstWriteDown( eit )
 {
   let it = this;
+  _.assert( _.routineIs( it.dstWriteDownAct ) );
   if( eit.dst === undefined )
   if( it.missingAction === 'ignore' )
   return;
+  let val = eit.dst;
   if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
-  it.dst.push( eit );
-  else
-  it.dst.push( eit.dst );
+  val = eit;
+  return it.dstWriteDownAct( eit, val );
+  // return it.ContainerIdToDstWriteDownMap[ it.iterable ]( eit, val );
 }
 
 //
 
-function dstWriteDownMap( eit )
+function dstWriteDownLong( eit, val )
 {
   let it = this;
-  if( eit.dst === undefined )
-  if( it.missingAction === 'ignore' )
-  return;
-  if( it.preservingIteration )
-  it.dst[ eit.key ] = eit;
-  else
-  it.dst[ eit.key ] = eit.dst;
+  it.dst.push( val );
+}
+
+//
+
+function dstWriteDownAux( eit, val )
+{
+  let it = this;
+  it.dst[ eit.key ] = val;
+}
+
+//
+
+function dstWriteDownHashMap( eit, val )
+{
+  let it = this;
+  it.dst.set( eit.key, val );
+}
+
+//
+
+function dstWriteDownSet( eit, val )
+{
+  let it = this;
+  it.dst.add( val );
+}
+
+//
+
+function makeEmptyLong()
+{
+  let it = this;
+  return [];
+}
+
+//
+
+function makeEmptyAux()
+{
+  let it = this;
+  return Object.create( null );
+}
+
+//
+
+function makeEmptyHashMap()
+{
+  let it = this;
+  return new HashMap();
+}
+
+//
+
+function makeEmptySet( eit, val )
+{
+  let it = this;
+  return new Set();
 }
 
 //
@@ -996,8 +1042,7 @@ function downAscend()
 
   let nit = it.iterationMake();
 
-  nit.choose( dit.src, it.selector, it.src, true );
-  // nit.choose( dit.src, it.selector, true ); /* Dmytro : what container should be used? */
+  nit.choose( dit.src, it.selector, true );
   _.assert( nit.src === dit.src );
   _.assert( nit.exists === true );
 
@@ -1034,8 +1079,7 @@ function hereAscend()
 {
   let it = this;
 
-  let eit = it.iterationMake().choose( it.src, it.selector, it.src, true ); /* Dmytro : what container should be used? */
-  // let eit = it.iterationMake().choose( it.src, it.selector, true );
+  let eit = it.iterationMake().choose( it.src, it.selector, null, true );
   eit.iterate();
 
 }
@@ -1062,8 +1106,7 @@ function singleAscend( src )
 
   _.assert( arguments.length === 1 );
 
-  let eit = it.iterationMake().choose( undefined, it.selector, src, null );
-  // let eit = it.iterationMake().choose( undefined, it.selector, null ); /* Dmytro : what container should be used? */
+  let eit = it.iterationMake().choose( undefined, it.selector, null, null );
   eit.iterate();
 
 }
@@ -1116,20 +1159,32 @@ function globUp()
   }
 
   /* xxx : refactor */
-  if( it.iterable === it.ContainerNameToIdMap.countable )
+
+  let makeEmpty = it.ContainerIdToMakeEmptyMap[ it.iterable ];
+  if( makeEmpty )
   {
-    it.dst = [];
-    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
+    it.dst = makeEmpty.call( it );
+    it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
   }
-  else if( it.iterable === it.ContainerNameToIdMap.aux )
-  {
-    it.dst = Object.create( null );
-    it.dstWriteDown = it.containerIdToDstWriteDownMap[ it.iterable ]
-  }
-  else /* qqq : not implemented for other structures, please implement */
+  else
   {
     it.errDoesNotExistHandle();
   }
+
+  // if( it.iterable === it.ContainerNameToIdMap.countable )
+  // {
+  //   it.dst = [];
+  //   it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
+  // }
+  // else if( it.iterable === it.ContainerNameToIdMap.aux )
+  // {
+  //   it.dst = Object.create( null );
+  //   it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
+  // }
+  // else /* qqq : not implemented for other structures, please implement */
+  // {
+  //   it.errDoesNotExistHandle();
+  // }
 
 }
 
@@ -1317,11 +1372,27 @@ let ContainerIdToAscendMap =
   [ last+3 ] : singleAscend,
 }
 
-let containerIdToDstWriteDownMap =
+let ContainerIdToMakeEmptyMap =
+{
+  1 : makeEmptyLong,
+  2 : makeEmptyAux,
+  3 : makeEmptyHashMap,
+  4 : makeEmptySet,
+}
+
+let ContainerIdToDstWriteDownMap =
 {
   1 : dstWriteDownLong,
-  2 : dstWriteDownMap,
+  2 : dstWriteDownAux,
+  3 : dstWriteDownHashMap,
+  4 : dstWriteDownSet,
 }
+
+  // 0 : 'terminal',
+  // 1 : 'countable',
+  // 2 : 'aux',
+  // 3 : 'hashMap',
+  // 4 : 'set',
 
 //
 
@@ -1366,8 +1437,16 @@ LookerExtension.downSet = downSet;
 
 LookerExtension.srcWriteDown = srcWriteDown;
 // LookerExtension.srcWriteDownMap = srcWriteDownMap;
+LookerExtension.dstWriteDown = dstWriteDown;
 LookerExtension.dstWriteDownLong = dstWriteDownLong; /* xxx : remove? */
-LookerExtension.dstWriteDownMap = dstWriteDownMap;
+LookerExtension.dstWriteDownAux = dstWriteDownAux;
+LookerExtension.dstWriteDownHashMap = dstWriteDownHashMap;
+LookerExtension.dstWriteDownSet = dstWriteDownSet;
+
+LookerExtension.makeEmptyLong = makeEmptyLong; /* xxx : remove? */
+LookerExtension.makeEmptyAux = makeEmptyAux;
+LookerExtension.makeEmptyHashMap = makeEmptyHashMap;
+LookerExtension.makeEmptySet = makeEmptySet;
 
 // down
 
@@ -1404,7 +1483,9 @@ LookerExtension.cardinalDelimeter = '#';
 LookerExtension.ContainerNameToIdMap = ContainerNameToIdMap;
 LookerExtension.ContainerIdToNameMap = ContainerIdToNameMap;
 LookerExtension.ContainerIdToAscendMap = ContainerIdToAscendMap;
-LookerExtension.containerIdToDstWriteDownMap = containerIdToDstWriteDownMap;
+LookerExtension.ContainerIdToDstWriteDownMap = ContainerIdToDstWriteDownMap;
+LookerExtension.ContainerIdToMakeEmptyMap = ContainerIdToMakeEmptyMap;
+
 
 //
 
@@ -1429,7 +1510,7 @@ Iteration.parsedSelector = null;
 
 Iteration.selectorType = null;
 Iteration.dstWritingDown = true;
-Iteration.dstWriteDown = null;
+Iteration.dstWriteDownAct = null;
 Iteration._srcWriteDownMethod = null;
 
 //
@@ -1574,3 +1655,4 @@ if( typeof module !== 'undefined' )
 module[ 'exports' ] = _;
 
 })();
+
