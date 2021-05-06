@@ -436,6 +436,9 @@ function chooseEnd()
   _.assert( _.boolIs( it.exists ) );
 
   if( it.exists === false )
+  debugger;
+
+  if( it.exists === false )
   if( it.action === it.Action.no || ( it.action === it.Action.set && it.selectorType !== 'terminal' ) )
   // if( it.action === it.Action.no || ( it.action === it.Action.set ) )
   {

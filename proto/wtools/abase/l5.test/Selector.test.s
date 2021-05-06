@@ -541,9 +541,9 @@ function selectCardinalSelector( test )
 function selectCardinalSelectorOptionMissingAction( test )
 {
 
-  act({ missingAction : 'ignore' });
-  act({ missingAction : 'undefine' });
-  act({ missingAction : 'error' });
+  // act({ missingAction : 'ignore' });
+  // act({ missingAction : 'undefine' });
+  // act({ missingAction : 'error' });
   actThrowing({ missingAction : 'throw' });
 
   /* - */
