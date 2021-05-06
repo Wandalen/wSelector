@@ -556,6 +556,7 @@ function selectCardinalSelectorOptionMissingAction( test )
     test.case = `${_.entity.exportStringSolo( env )}, /#1`;
     var exp = {};
     var src = {};
+    debugger;
     var got = _.select
     ({
       src,
@@ -564,6 +565,7 @@ function selectCardinalSelectorOptionMissingAction( test )
       action : _.selector.Action.set,
       missingAction : env.missingAction,
     });
+    debugger;
     if( env.missingAction === 'error' )
     test.true( _.errIs( got ) );
     else

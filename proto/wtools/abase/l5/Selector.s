@@ -362,6 +362,7 @@ function elementGet( e, k, c )
   let q = it.selectorCardinalParse( k );
   if( q )
   {
+    debugger;
     result = _.entity.elementWithCardinal( e, q.number ); /* xxx : use maybe functor */
     return [ result[ 0 ], result[ 1 ], q.number, result[ 2 ] ];
   }
@@ -435,7 +436,8 @@ function chooseEnd()
   _.assert( _.boolIs( it.exists ) );
 
   if( it.exists === false )
-  if( it.action === it.Action.no || ( it.action === it.action.set && it.selectorType !== 'terminal' ) )
+  if( it.action === it.Action.no || ( it.action === it.Action.set && it.selectorType !== 'terminal' ) )
+  // if( it.action === it.Action.no || ( it.action === it.Action.set ) )
   {
     it.errDoesNotExistHandle();
   }
