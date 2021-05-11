@@ -357,12 +357,11 @@ function elementGet( e, k, c )
   let it = this;
   let result;
 
-  _.assert( arguments.length === 3, 'Expects two argument' );
+  _.assert( arguments.length === 3 );
 
   let q = it.selectorCardinalParse( k );
   if( q )
   {
-    debugger;
     result = _.entity.elementWithCardinal( e, q.number ); /* xxx : use maybe functor */
     return [ result[ 0 ], result[ 1 ], q.number, result[ 2 ] ];
   }
@@ -437,7 +436,6 @@ function chooseEnd()
 
   if( it.exists === false )
   debugger;
-
   if( it.exists === false )
   if( it.action === it.Action.no || ( it.action === it.Action.set && it.selectorType !== 'terminal' ) )
   // if( it.action === it.Action.no || ( it.action === it.Action.set ) )

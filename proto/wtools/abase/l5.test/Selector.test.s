@@ -543,8 +543,8 @@ function selectCardinalSelectorOptionMissingAction( test )
 
   // act({ missingAction : 'ignore' });
   // act({ missingAction : 'undefine' });
-  // act({ missingAction : 'error' });
-  actThrowing({ missingAction : 'throw' });
+  act({ missingAction : 'error' });
+  // actThrowing({ missingAction : 'throw' });
 
   /* - */
 
@@ -586,15 +586,17 @@ function selectCardinalSelectorOptionMissingAction( test )
     test.case = `${_.entity.exportStringSolo( env )}, /#1`;
     test.shouldThrowErrorSync( () =>
     {
+      debugger;
+      var src = {};
       var got = _.select
       ({
         src,
         selector : '/#1',
         set : {},
-        // setting : 1,
         action : _.selector.Action.set,
         missingAction : env.missingAction,
       });
+      debugger;
     });
 
     /* */
