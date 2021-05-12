@@ -852,8 +852,10 @@ function downSet()
       && it.key !== undefined
     )
     {
+      debugger;
       if( it.action === it.Action.del )
-      delete it.down.src[ it.key ];
+      // delete it.down.src[ it.key ];
+      it.down.srcDel( it.set, it.key, it.cardinal );
       else
       it.down.srcWriteDown( it.set, it.key, it.cardinal );
       // it.down.src[ it.key ] = it.set;
@@ -870,43 +872,57 @@ function downSet()
 
 /* xxx : merge src/dst writeDown? */
 
+function srcDel( e, k, c )
+{
+  let it = this;
+  let r;
+
+  r = _.entity.elementDel( it.src, k, e );
+
+  if( r === false )
+  {
+    it.errCantSetHandle();
+  }
+
+}
+
+//
+
+/* xxx : merge src/dst writeDown? */
+
 function srcWriteDown( e, k, c )
 {
   let it = this;
+  let r;
 
-  // if(  )
-  // if( it.selectorIsCardinal(  ) )
+  let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
+  if( selectorIsCardinal )
+  r = _.entity.elementWithCardinalSet( it.src, k, e );
+  else
+  r = _.entity.elementSet( it.src, k, e );
 
-  if( it._srcWriteDownMethod === null )
-  {
-    let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
-    if( selectorIsCardinal )
-    it._srcWriteDownMethod = _.entity.elementWithCardinalSet.functor.call( _.container, it.src );
-    else
-    it._srcWriteDownMethod = _.entity.elementSet.functor.call( _.container, it.src );
-  }
-
-  let r = it._srcWriteDownMethod( k, e );
-
-  if( r[ 2 ] === false )
+  if( r[ 1 ] === false )
   {
     it.errCantSetHandle();
   }
 
   // if( it._srcWriteDownMethod === null )
-  // it._srcWriteDownMethod = it.srcWriteDownMap;
+  // {
+  //   let selectorIsCardinal = _.numberIs( k ) && it.selectorIsCardinal( it.selector );
+  //   if( selectorIsCardinal )
+  //   it._srcWriteDownMethod = _.entity.elementWithCardinalSet.functor.call( _.container, it.src );
+  //   else
+  //   it._srcWriteDownMethod = _.entity.elementSet.functor.call( _.container, it.src );
+  // }
   //
-  // /* qqq : extend to been able to write into hash maps and other complex structures */
-  // it._srcWriteDownMethod( e, k );
-}
+  // let r = it._srcWriteDownMethod( k, e );
+  //
+  // if( r[ 2 ] === false )
+  // {
+  //   it.errCantSetHandle();
+  // }
 
-// //
-//
-// function srcWriteDownMap( e, k )
-// {
-//   let it = this;
-//   it.src[ k ] = e;
-// }
+}
 
 //
 
@@ -1439,6 +1455,7 @@ LookerExtension.visitDown = visitDown;
 LookerExtension.downSet = downSet;
 
 LookerExtension.srcWriteDown = srcWriteDown;
+LookerExtension.srcDel = srcDel;
 // LookerExtension.srcWriteDownMap = srcWriteDownMap;
 LookerExtension.dstWriteDown = dstWriteDown;
 LookerExtension.dstWriteDownLong = dstWriteDownLong; /* xxx : remove? */
@@ -1514,7 +1531,7 @@ Iteration.parsedSelector = null;
 Iteration.selectorType = null;
 Iteration.dstWritingDown = true;
 Iteration.dstWriteDownAct = null;
-Iteration._srcWriteDownMethod = null;
+// Iteration._srcWriteDownMethod = null;
 
 //
 

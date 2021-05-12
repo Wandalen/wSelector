@@ -541,10 +541,10 @@ function selectCardinalSelector( test )
 function selectCardinalSelectorOptionMissingAction( test )
 {
 
-  // act({ missingAction : 'ignore' });
-  // act({ missingAction : 'undefine' });
+  act({ missingAction : 'ignore' });
+  act({ missingAction : 'undefine' });
   act({ missingAction : 'error' });
-  // actThrowing({ missingAction : 'throw' });
+  actThrowing({ missingAction : 'throw' });
 
   /* - */
 
@@ -565,9 +565,11 @@ function selectCardinalSelectorOptionMissingAction( test )
       action : _.selector.Action.set,
       missingAction : env.missingAction,
     });
-    debugger;
     if( env.missingAction === 'error' )
-    test.true( _.errIs( got ) );
+    {
+      test.true( _.errIs( got ) );
+      test.identical( got.originalMessage, 'Cant set null' );
+    }
     else
     test.identical( got, undefined );
     test.identical( src, exp );
@@ -584,20 +586,24 @@ function selectCardinalSelectorOptionMissingAction( test )
     /* */
 
     test.case = `${_.entity.exportStringSolo( env )}, /#1`;
-    test.shouldThrowErrorSync( () =>
-    {
-      debugger;
-      var src = {};
-      var got = _.select
-      ({
-        src,
-        selector : '/#1',
-        set : {},
-        action : _.selector.Action.set,
-        missingAction : env.missingAction,
-      });
-      debugger;
-    });
+    test.shouldThrowErrorSync
+    (
+      () =>
+      {
+        debugger;
+        var src = {};
+        var got = _.select
+        ({
+          src,
+          selector : '/#1',
+          set : {},
+          action : _.selector.Action.set,
+          missingAction : env.missingAction,
+        });
+        debugger;
+      },
+      ( err ) => test.identical( err.originalMessage, 'Cant set null' )
+    );
 
     /* */
 
