@@ -434,8 +434,8 @@ function chooseEnd()
 
   _.assert( _.boolIs( it.exists ) );
 
-  if( it.exists === false )
-  debugger;
+  // if( it.exists === false )
+  // debugger;
   if( it.exists === false )
   if( it.action === it.Action.no || ( it.action === it.Action.set && it.selectorType !== 'terminal' ) )
   // if( it.action === it.Action.no || ( it.action === it.Action.set ) )
@@ -843,7 +843,7 @@ function downSet()
 
   if( !!it.action && it.selectorType === 'terminal' )
   {
-    _.debugger;
+    // _.debugger;
     /* qqq2 : implement and cover for all type of containers */
     if
     (
@@ -852,7 +852,7 @@ function downSet()
       && it.key !== undefined
     )
     {
-      debugger;
+      // debugger;
       if( it.action === it.Action.del )
       // delete it.down.src[ it.key ];
       it.down.srcDel( it.set, it.key, it.cardinal );
