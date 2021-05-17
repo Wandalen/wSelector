@@ -2,12 +2,9 @@ format: outwillfile-2.0
 root:
   - wSelector.out
 consistency:
-  ../.ex.will.yml: &ref_0
-    hash: 16181828af64a774835b93dd552206c5
-    size: 1830
-  ../.im.will.yml: &ref_1
-    hash: b276400f7ea3dede813c6c22313e0569
-    size: 5149
+  ../will.yml: &ref_0
+    hash: a64c381d4df9ef1976fc016333b1efea
+    size: 6747
 module:
   wSelector.out:
     about:
@@ -19,18 +16,18 @@ module:
         with the help of a short query string.
       enabled: 1
       version: 0.4.0
-      interpreters: &ref_2
+      license: MIT
+      npm.name: wselector
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: &ref_1
+        - wTools
+      contributors: &ref_2
+        - Kostiantyn Wandalen <wanalen@01.school>
+      interpreters: &ref_3
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
-        - wTools
-      license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: &ref_4
-        - Kostiantyn Wandalen <wanalen@01.school>
-      npm.name: wselector
-      npm.scripts: &ref_5
+      npm.scripts: &ref_4
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -45,15 +42,11 @@ module:
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.in:
         criterion:
           predefined: 1
@@ -176,15 +169,15 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wLooker:
+      wlooker:
         path: 'npm:///wlooker'
         autoExporting: 0
         enabled: 0
-      wReplicator:
+      wreplicator:
         path: 'npm:///wreplicator'
         autoExporting: 0
         enabled: 0
-      wPathTools:
+      wpathtools:
         path: 'npm:///wpathtools'
         autoExporting: 0
         enabled: 0
@@ -801,8 +794,7 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      ../will.yml: *ref_0
   ../:
     about:
       name: wSelector
@@ -813,26 +805,22 @@ module:
         with the help of a short query string.
       enabled: 1
       version: 0.4.0
-      interpreters: *ref_2
-      keywords: *ref_3
       license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: *ref_4
       npm.name: wselector
-      npm.scripts: *ref_5
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: *ref_1
+      contributors: *ref_2
+      interpreters: *ref_3
+      npm.scripts: *ref_4
     path:
       module.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
@@ -938,15 +926,15 @@ module:
         path: 'npm:///wTools'
         autoExporting: 0
         enabled: 0
-      wLooker:
+      wlooker:
         path: 'npm:///wlooker'
         autoExporting: 0
         enabled: 0
-      wReplicator:
+      wreplicator:
         path: 'npm:///wreplicator'
         autoExporting: 0
         enabled: 0
-      wPathTools:
+      wpathtools:
         path: 'npm:///wpathtools'
         autoExporting: 0
         enabled: 0
@@ -1499,9 +1487,6 @@ module:
           - 'build::release'
           - 'build::npm'
     consistency:
-      ../.ex.will.yml:
-        hash: 16181828af64a774835b93dd552206c5
-        size: 1830
-      ../.im.will.yml:
-        hash: b276400f7ea3dede813c6c22313e0569
-        size: 5149
+      ../will.yml:
+        hash: a64c381d4df9ef1976fc016333b1efea
+        size: 6747
