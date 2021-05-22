@@ -647,8 +647,9 @@ function errDoesNotExist()
   {
     return this.errMake
     (
-      `Cant select ${it.iterator.selector} from ${it.originalSrc}`,
-      `\n  because ${_.entity.exportStringDiagnosticShallow( it.path )} does not exist`,
+      `Cant select ${it.iterator.selector} from ${_.entity.exportStringDiagnosticShallow( it.originalSrc )}`,
+      `\n  because ${_.entity.exportStringDiagnosticShallow( it.originalSelector )} does not exist`,
+      `\n  fall at ${_.strQuote( it.path )}`,
     );
   }
 }
@@ -1474,7 +1475,7 @@ LookerExtension.downUp = downUp;
 LookerExtension.downDown = downDown;
 LookerExtension.downAscend = downAscend;
 
-// down
+// here
 
 LookerExtension.hereUp = hereUp;
 LookerExtension.hereDown = hereDown;
@@ -1505,7 +1506,6 @@ LookerExtension.ContainerIdToNameMap = ContainerIdToNameMap;
 LookerExtension.ContainerIdToAscendMap = ContainerIdToAscendMap;
 LookerExtension.ContainerIdToDstWriteDownMap = ContainerIdToDstWriteDownMap;
 LookerExtension.ContainerIdToMakeEmptyMap = ContainerIdToMakeEmptyMap;
-
 
 //
 
