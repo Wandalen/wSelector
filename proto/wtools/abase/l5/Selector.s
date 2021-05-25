@@ -280,11 +280,11 @@ function iterableEval()
 
   if( it.selectorType === 'down' )
   {
-    it.iterable = it.ContainerNameToIdMap.down;
+    it.iterable = it.ContainerType.down;
   }
   else if( it.selectorType === 'here' )
   {
-    it.iterable = it.ContainerNameToIdMap.here;
+    it.iterable = it.ContainerType.here;
   }
   else if( it.selectorType === 'terminal' )
   {
@@ -293,21 +293,22 @@ function iterableEval()
   else if( it.selectorType === 'glob' )
   {
 
+    /* xxx : custom? */
     if( _.longLike( it.src ) )
     {
-      it.iterable = it.ContainerNameToIdMap.countable;
+      it.iterable = it.ContainerType.countable;
     }
     else if( _.object.isBasic( it.src ) )
     {
-      it.iterable = it.ContainerNameToIdMap.aux;
+      it.iterable = it.ContainerType.aux;
     }
     else if( _.hashMapLike( it.src ) )
     {
-      it.iterable = it.ContainerNameToIdMap.hashMap;
+      it.iterable = it.ContainerType.hashMap;
     }
     else if( _.setLike( it.src ) )
     {
-      it.iterable = it.ContainerNameToIdMap.set;
+      it.iterable = it.ContainerType.set;
     }
     else
     {
@@ -317,7 +318,7 @@ function iterableEval()
   }
   else
   {
-    it.iterable = it.ContainerNameToIdMap.single;
+    it.iterable = it.ContainerType.single;
   }
 
   _.assert( it.iterable >= 0 );
@@ -373,14 +374,10 @@ function elementGet( e, k, c )
     return [ result[ 0 ], result[ 1 ], c, result[ 2 ] ];
   }
 
-  // if( c === null )
-  // c = _.container.cardinalWithKey( e, k );
-  // return result;
 }
 
 //
 
-// function chooseBegin( e, k, exists )
 function chooseBegin()
 {
   let it = this;
@@ -391,8 +388,8 @@ function chooseBegin()
 
   [ e, k, c, exists ] = Parent.chooseBegin.call( it, ... arguments );
 
-  _.assert( arguments.length === 4, 'Expects three argument' );
-  _.assert( !!it.down );
+  // _.assert( arguments.length === 4, 'Expects three argument' );
+  // _.assert( !!it.down );
 
   if( !it.fast )
   {
@@ -404,7 +401,6 @@ function chooseBegin()
 
 //
 
-// function chooseEnd( e, k, exists )
 function chooseEnd()
 {
   let it = this;
@@ -413,8 +409,8 @@ function chooseEnd()
   let c = arguments[ 2 ];
   let exists = arguments[ 3 ];
 
-  _.assert( arguments.length === 4 );
-  _.assert( _.boolIs( exists ) || exists === null );
+  // _.assert( arguments.length === 4 );
+  // _.assert( _.boolIs( exists ) || exists === null );
 
   it.exists = exists;
   it.selector = it.selectorArray[ it.level+1 ];
@@ -434,16 +430,16 @@ function chooseEnd()
 
   _.assert( _.boolIs( it.exists ) );
 
-  // if( it.exists === false )
-  // debugger;
   if( it.exists === false )
   if( it.action === it.Action.no || ( it.action === it.Action.set && it.selectorType !== 'terminal' ) )
-  // if( it.action === it.Action.no || ( it.action === it.Action.set ) )
   {
     it.errDoesNotExistHandle();
   }
 
-  return result;
+  it.srcChanged();
+  it.revisitedEval( it.originalSrc );
+
+  return [ e, k, c, exists ];
 }
 
 //
@@ -938,7 +934,7 @@ function dstWriteDown( eit )
   if( it.preservingIteration ) /* qqq : cover the option. seems it does not work in some cases */
   val = eit;
   return it.dstWriteDownAct( eit, val );
-  // return it.ContainerIdToDstWriteDownMap[ it.iterable ]( eit, val );
+  // return it.ContainerTypeToDstWriteDownMap[ it.iterable ]( eit, val );
 }
 
 //
@@ -1180,31 +1176,16 @@ function globUp()
 
   /* xxx : refactor */
 
-  let makeEmpty = it.ContainerIdToMakeEmptyMap[ it.iterable ];
+  let makeEmpty = it.ContainerTypeToMakeEmptyMap[ it.iterable ];
   if( makeEmpty )
   {
     it.dst = makeEmpty.call( it );
-    it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
+    it.dstWriteDownAct = it.ContainerTypeToDstWriteDownMap[ it.iterable ];
   }
   else
   {
     it.errDoesNotExistHandle();
   }
-
-  // if( it.iterable === it.ContainerNameToIdMap.countable )
-  // {
-  //   it.dst = [];
-  //   it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
-  // }
-  // else if( it.iterable === it.ContainerNameToIdMap.aux )
-  // {
-  //   it.dst = Object.create( null );
-  //   it.dstWriteDownAct = it.ContainerIdToDstWriteDownMap[ it.iterable ];
-  // }
-  // else /* qqq : not implemented for other structures, please implement */
-  // {
-  //   it.errDoesNotExistHandle();
-  // }
 
 }
 
@@ -1365,34 +1346,34 @@ function onSelectorUndecorateDoubleColon()
 // relations
 // --
 
-let last = _.looker.Looker.ContainerNameToIdMap.last;
+let last = _.looker.Looker.ContainerType.last;
 _.assert( last > 0 );
-let ContainerNameToIdMap =
+let ContainerType =
 {
-  ... _.looker.Looker.ContainerNameToIdMap,
+  ... _.looker.Looker.ContainerType,
   down : last+1,
   here : last+2,
   single : last+3,
   last : last+3,
 }
 
-let ContainerIdToNameMap =
-{
-  ... _.looker.Looker.ContainerIdToNameMap,
-  [ last+1 ] : 'down',
-  [ last+2 ] : 'here',
-  [ last+3 ] : 'single',
-}
+let ContainerTypeToName =
+[
+  ... _.looker.Looker.ContainerTypeToName,
+  'down',
+  'here',
+  'single',
+]
 
-let ContainerIdToAscendMap =
-{
-  ... _.looker.Looker.ContainerIdToAscendMap,
-  [ last+1 ] : downAscend,
-  [ last+2 ] : hereAscend,
-  [ last+3 ] : singleAscend,
-}
+let ContainerTypeToAscend =
+[
+  ... _.looker.Looker.ContainerTypeToAscend,
+  downAscend,
+  hereAscend,
+  singleAscend,
+]
 
-let ContainerIdToMakeEmptyMap =
+let ContainerTypeToMakeEmptyMap =
 {
   1 : makeEmptyLong,
   2 : makeEmptyAux,
@@ -1400,7 +1381,7 @@ let ContainerIdToMakeEmptyMap =
   4 : makeEmptySet,
 }
 
-let ContainerIdToDstWriteDownMap =
+let ContainerTypeToDstWriteDownMap =
 {
   1 : dstWriteDownLong,
   2 : dstWriteDownAux,
@@ -1501,11 +1482,11 @@ LookerExtension.globDown = globDown;
 
 LookerExtension.Action = Action;
 LookerExtension.cardinalDelimeter = '#';
-LookerExtension.ContainerNameToIdMap = ContainerNameToIdMap;
-LookerExtension.ContainerIdToNameMap = ContainerIdToNameMap;
-LookerExtension.ContainerIdToAscendMap = ContainerIdToAscendMap;
-LookerExtension.ContainerIdToDstWriteDownMap = ContainerIdToDstWriteDownMap;
-LookerExtension.ContainerIdToMakeEmptyMap = ContainerIdToMakeEmptyMap;
+LookerExtension.ContainerType = ContainerType;
+LookerExtension.ContainerTypeToName = ContainerTypeToName;
+LookerExtension.ContainerTypeToAscend = ContainerTypeToAscend;
+LookerExtension.ContainerTypeToDstWriteDownMap = ContainerTypeToDstWriteDownMap;
+LookerExtension.ContainerTypeToMakeEmptyMap = ContainerTypeToMakeEmptyMap;
 
 //
 

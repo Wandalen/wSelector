@@ -4534,7 +4534,7 @@ function selectGlobNonPrimitive( test )
 
   let iterator = { srcChanged }
   let Selector2 = _.selector.classDefine({ iterator });
-  test.true( _.looker.Looker.ContainerNameToIdMap.countable > 0 );
+  test.true( _.looker.Looker.ContainerType.countable > 0 );
   test.true( Selector2.iterableEval === _.selector.Selector.iterableEval );
   test.true( Selector2.Iterator.srcChanged === srcChanged );
   test.true( Selector2.srcChanged === srcChanged );
@@ -4663,11 +4663,11 @@ function selectGlobNonPrimitive( test )
 
     if( _.argumentsArray.like( it.src ) )
     {
-      it.iterable = _.looker.Looker.ContainerNameToIdMap.countable;
+      it.iterable = _.looker.Looker.ContainerType.countable;
     }
     else if( _.aux.is( it.src ) )
     {
-      it.iterable = _.looker.Looker.ContainerNameToIdMap.aux;
+      it.iterable = _.looker.Looker.ContainerType.aux;
     }
     else
     {
