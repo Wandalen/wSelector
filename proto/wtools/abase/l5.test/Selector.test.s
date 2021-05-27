@@ -36,9 +36,9 @@ test.case = '...' ...
 function select( test )
 {
 
-  test.open( 'trivial' );
-
   /* */
+
+  test.case = 'etc';
 
   var got = _.select( 'a', '' );
   test.identical( got, undefined );
@@ -149,7 +149,11 @@ function select( test )
 
   /* */
 
-  test.close( 'trivial' );
+  test.case = 'etc';
+
+  var files = __.select( [ { a : 1, b : 2 }, { a : 3, b : 4 } ], '*/a' );
+
+  /* */
 
 }
 
@@ -2187,7 +2191,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   var got = _.select
@@ -2197,7 +2201,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   var got = _.select
@@ -2206,7 +2210,7 @@ function selectMissing( test )
     selector : '*/x',
     missingAction : 'error',
   });
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   var got = _.select
@@ -2216,7 +2220,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   var src =
@@ -2232,7 +2236,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   var src =
@@ -2263,7 +2267,7 @@ function selectMissing( test )
     missingAction : 'error',
   });
 
-  test.true( got instanceof _.looker.LookingError );
+  test.true( got instanceof _.looker.SeekingError );
   console.log( got );
 
   /* */
@@ -4577,25 +4581,25 @@ function selectGlobNonPrimitive( test )
   (
     () =>
     {
-      let r = _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Looker : Selector2 });
+      let r = _.select({ src, selector : '**', onUpBegin, missingAction : 'throw', Seeker : Selector2 });
     }
   );
 
   test.case = 'should return undefined if continue set to false in onUpBegin';
   var src = new _.Logger();
   var exp = undefined;
-  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Looker : Selector2 });
+  var got = _.select({ src, selector : '**', onUpBegin, missingAction : 'undefine', Seeker : Selector2 });
   test.identical( got, exp );
 
   test.case = '**';
   var src = new _.Logger();
   var exp = undefined;
-  var got = _.select({ src, selector : '**', Looker : Selector2 });
+  var got = _.select({ src, selector : '**', Seeker : Selector2 });
   test.identical( got, exp );
 
   var src = new _.Logger({ name : 'logger' });
   var exp = undefined;
-  var got = _.select({ src, selector : '**/name', Looker : Selector2 });
+  var got = _.select({ src, selector : '**/name', Seeker : Selector2 });
   test.identical( got, exp );
 
   test.close( 'only maps' );

@@ -91,14 +91,14 @@ Action.last = 2;
 function head( routine, args )
 {
   _.assert( arguments.length === 2 );
-  let o = routine.defaults.Looker.optionsFromArguments( args );
-  o.Looker = o.Looker || routine.defaults;
+  let o = routine.defaults.Seeker.optionsFromArguments( args );
+  o.Seeker = o.Seeker || routine.defaults;
   _.assert( _.routineIs( routine ) || _.auxIs( routine ) );
   if( _.routineIs( routine ) ) /* zzz : remove "if" later */
   _.map.assertHasOnly( o, routine.defaults );
   else if( routine !== null )
   _.map.assertHasOnly( o, routine );
-  let it = o.Looker.optionsToIteration( null, o );
+  let it = o.Seeker.optionsToIteration( null, o );
   return it;
 }
 
@@ -129,7 +129,7 @@ function optionsToIteration( iterator, o )
   _.assert( it.absoluteLevel === null );
   it.absoluteLevel = 0;
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
-  _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
+  // _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
   return it;
 }
 
@@ -183,10 +183,10 @@ function reperformIt()
   if( args.length === 1 && !_.object.isBasic( args[ 0 ] ) )
   args = [ it.src, args[ 0 ] ];
   let o = Self.optionsFromArguments( args );
-  o.Looker = o.Looker || it.Looker || Self;
+  o.Seeker = o.Seeker || it.Seeker || Self;
 
   _.assert( _.mapIs( o ) );
-  _.map.assertHasOnly( o, { src : null, selector : null, Looker : null }, 'Implemented only for options::selector' );
+  _.map.assertHasOnly( o, { src : null, selector : null, Seeker : null }, 'Implemented only for options::selector' );
   _.assert( _.strIs( o.selector ) );
   _.assert( _.strIs( it2.iterator.selector ) );
 
@@ -220,7 +220,7 @@ function performBegin()
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( Object.hasOwnProperty.call( it.iterator, 'selector' ) );
-  _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
+  // _.assert( Object.hasOwnProperty.call( Object.getPrototypeOf( it ), 'selector' ) );
   _.assert( _.intIs( it.iterator.selector ) || _.strIs( it.iterator.selector ) );
   _.assert( !!it.upToken );
   _.assert( it.iterationProper( it ) );
@@ -1209,7 +1209,7 @@ function globDown()
     let currentSelector = it.selector;
     if( it.parsedSelector && it.parsedSelector.full )
     currentSelector = it.parsedSelector.full;
-    let err = _.looker.LookingError
+    let err = _.looker.SeekingError
     (
       `Select constraint "${ currentSelector }" failed with ${ length } elements`
       + `\nSelector "${ it.iterator.selector }"`
@@ -1526,7 +1526,7 @@ const Selector = _.looker.classDefine
   name : 'Equaler',
   parent : _.looker.Looker,
   prime : Prime,
-  looker : LookerExtension,
+  seeker : LookerExtension,
   iterator : Iterator,
   iteration : Iteration,
   iterationPreserve : IterationPreserve,
@@ -1563,7 +1563,7 @@ const selectIt = Selector.execIt;
 let selectSet = _.routine.uniteInheriting( select.head, select.body );
 
 var defaults = selectSet.defaults;
-defaults.Looker = defaults;
+defaults.Seeker = defaults;
 defaults.set = null;
 defaults.action = Action.set;
 
@@ -1605,7 +1605,7 @@ function selectUnique_body( o )
 }
 
 _.routine.extendInheriting( selectUnique_body, select.body );
-selectUnique_body.defaults.Looker = selectUnique_body.defaults;
+selectUnique_body.defaults.Seeker = selectUnique_body.defaults;
 let selectUnique = _.routine.uniteReplacing( select.head, selectUnique_body );
 
 //
@@ -1619,7 +1619,7 @@ let SelectorExtension =
 {
 
   name : 'selector',
-  Looker : Selector,
+  Seeker : Selector,
   Selector,
   Action,
 
