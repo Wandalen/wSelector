@@ -909,7 +909,6 @@ function selectCardinalSelectorOptionMissingAction( test )
     test.case = `${_.entity.exportStringSolo( env )}, /#1`;
     var exp = {};
     var src = {};
-    debugger;
     var got = _.select
     ({
       src,
@@ -943,7 +942,6 @@ function selectCardinalSelectorOptionMissingAction( test )
     (
       () =>
       {
-        debugger;
         var src = {};
         var got = _.select
         ({
@@ -953,7 +951,6 @@ function selectCardinalSelectorOptionMissingAction( test )
           action : _.selector.Action.set,
           missingAction : env.missingAction,
         });
-        debugger;
       },
       ( err ) => test.identical( err.originalMessage, 'Cant set null' )
     );
@@ -2552,7 +2549,6 @@ function selectSetBasic( test )
   var src = {};
   var exp = {};
 
-  _.debugger = 1;
   var got = _.select
   ({
     src,
@@ -4557,7 +4553,6 @@ function selectGlobNonPrimitive( test )
   test.case = 'eventHandlerAppend/name';
   var src = new _.Logger({ name : 'logger' });
   var exp = 'eventHandlerAppend';
-  _.debugger = 1;
   var got = _.select( src, 'eventHandlerAppend/name' );
   test.identical( got, exp );
   test.true( got === exp );
