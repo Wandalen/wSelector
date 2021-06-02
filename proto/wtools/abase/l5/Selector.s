@@ -874,7 +874,14 @@ function srcDel( e, k, c )
   let it = this;
   let r;
 
-  r = _.entity.elementDel( it.src, k, e );
+  // r = _.entity.elementDel( it.src, k, e ); /* Dmytro : element*Del accept only 2 arguments : src and key */
+
+  /* Dmytro : implementation that use flag `cardinal` */
+  // if( c )
+  // r = _.entity.elementWithCardinalDel( it.src, k );
+  // else
+  // r = _.entity.elementDel( it.src, k );
+  r = _.entity.elementDel( it.src, k );
 
   if( r === false )
   {
