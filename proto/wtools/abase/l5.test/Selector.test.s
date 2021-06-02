@@ -23,6 +23,8 @@ const __ = _globals_.testing.wTools;
 xxx : implement escaped selectors and test for it
 */
 
+/* xxx : qqq : make selector working with `!prototye` and `!constructor` */
+
 // --
 // tests
 // --

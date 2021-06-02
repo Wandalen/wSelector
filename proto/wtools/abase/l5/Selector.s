@@ -558,7 +558,7 @@ function globParse()
   let it = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( it.globing );
+  _.assert( !!it.globing );
 
   let regexp = /(.*){?\*=(\d*)}?(.*)/;
   let match = it.selector.match( regexp );
@@ -1150,7 +1150,7 @@ function globUp()
 {
   let it = this;
 
-  _.assert( it.globing );
+  _.assert( !!it.globing );
 
   /* qqq : teach it to parse more than single "*=" */
 
@@ -1201,7 +1201,7 @@ function globDown()
   if( it.parsedSelector.limit === undefined )
   return;
 
-  _.assert( it.globing );
+  _.assert( !!it.globing );
 
   let length = _.entity.lengthOf( it.dst );
   if( length !== it.parsedSelector.limit )
@@ -1645,8 +1645,8 @@ let ToolsSupplementation =
 
 const Self = Selector;
 _.props.extend( _, ToolsSupplementation );
-_.props.extend( _.selector, SelectorExtension );
-_.props.extend( _.selector.functor, FunctorExtension );
+/* _.props.extend */Object.assign( _.selector, SelectorExtension );
+/* _.props.extend */Object.assign( _.selector.functor, FunctorExtension );
 
 // --
 // export
