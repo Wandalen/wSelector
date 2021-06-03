@@ -144,10 +144,11 @@ function iteratorInitEnd( iterator )
   _.assert( _.strIs( iterator.selector ) );
   _.assert( _.strIs( iterator.downToken ) );
   _.assert( _.strIs( iterator.hereToken ) );
+  /* xxx : optimize */
   _.assert
   (
     _.longHas( [ 'undefine', 'ignore', 'throw', 'error' ], iterator.missingAction )
-    , `Unknown missing action ${iterator.missingAction}`
+    , () => `Unknown missing action ${iterator.missingAction}`
   );
   _.assert( iterator.it === undefined );
 
@@ -684,6 +685,7 @@ function errHandle( err )
     if( it.missingAction === 'throw' )
     {
       debugger; /* eslint-disable-line no-debugger */
+      // console.log( `errHandle.1 attended:${it.iterator.error.attended}` );
       throw it.iterator.error;
     }
   }

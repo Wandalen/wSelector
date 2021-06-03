@@ -4761,6 +4761,45 @@ function selectWithCallback( test )
 
 }
 
+//
+
+/* xxx : extend */
+function selectError( test )
+{
+  let context = this;
+  let visited = [];
+  let a = test.assetFor( false );
+
+  /* */
+
+  a.appStartNonThrowing({ execPath : a.program( noCardinal ) })
+  .then( ( op ) =>
+  {
+    test.notIdentical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, '- uncaught error -' ), 2 );
+    test.identical( _.strCount( op.output, 'Cant select #3 from {- Array with 2 elements -}' ), 1 );
+    return null;
+  });
+
+  /* */
+
+  return a.ready;
+
+  function noCardinal()
+  {
+    const _ = require( toolsPath );
+    _.include( 'wSelector' );
+    let got = _.select
+    ({
+      src : [ 0, 1 ],
+      selector : '#3',
+      missingAction : 'throw',
+    });
+    console.log( got );
+  }
+
+}
+
 // --
 // declare
 // --
@@ -4820,6 +4859,8 @@ const Proto =
     selectGlobNonPrimitive,
     selectWithAssert,
     selectWithCallback,
+
+    selectError,
 
   }
 
