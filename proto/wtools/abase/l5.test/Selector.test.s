@@ -4772,7 +4772,7 @@ function selectError( test )
 
   /* */
 
-  a.appStartNonThrowing({ execPath : a.program( noCardinal ) })
+  a.appStartNonThrowing({ execPath : a.program( noCardinal ).programPath })
   .then( ( op ) =>
   {
     test.notIdentical( op.exitCode, 0 );
