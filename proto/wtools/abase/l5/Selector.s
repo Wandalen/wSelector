@@ -361,6 +361,7 @@ function elementGet( e, k, c )
 
   _.assert( arguments.length === 3 );
 
+  _.debugger;
   let q = it.selectorCardinalParse( k );
   if( q )
   {
@@ -1374,9 +1375,9 @@ let ContainerTypeToName =
   'single',
 ]
 
-let ContainerTypeToAscend =
+let Ascend =
 [
-  ... _.looker.Looker.ContainerTypeToAscend,
+  ... _.looker.Looker.Ascend,
   downAscend,
   hereAscend,
   singleAscend,
@@ -1493,7 +1494,7 @@ LookerExtension.Action = Action;
 LookerExtension.cardinalDelimeter = '#';
 LookerExtension.ContainerType = ContainerType;
 LookerExtension.ContainerTypeToName = ContainerTypeToName;
-LookerExtension.ContainerTypeToAscend = ContainerTypeToAscend;
+LookerExtension.Ascend = Ascend;
 LookerExtension.ContainerTypeToDstWriteDownMap = ContainerTypeToDstWriteDownMap;
 LookerExtension.ContainerTypeToMakeEmptyMap = ContainerTypeToMakeEmptyMap;
 

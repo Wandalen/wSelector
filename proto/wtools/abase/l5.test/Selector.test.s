@@ -3608,7 +3608,7 @@ function selectFromArray( test )
 function selectFromObject( test )
 {
 
-  test.case = 'ket from uncountable object';
+  test.case = 'key from uncountable object';
   var src = __.diagnostic.objectMake({ countable : 0, elements : [ 'a', 'b' ] });
   var exp = [ 'a', 'b' ];
   var got = _.select( src, 'elements' );
