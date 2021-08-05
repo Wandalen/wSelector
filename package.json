@@ -1,6 +1,6 @@
 {
   "name": "wselector",
-  "version": "0.3.307",
+  "version": "0.3.308",
   "description": "Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "license": "MIT",
@@ -24,13 +24,13 @@
     "url": "https://github.com/Wandalen/wSelector/issues"
   },
   "dependencies": {
-    "wTools": "latest",
-    "wreplicator": "latest",
-    "wpathtools": "latest",
-    "wlooker": "latest"
+    "wTools": "delta",
+    "wreplicator": "delta",
+    "wpathtools": "delta",
+    "wlooker": "delta"
   },
   "devDependencies": {
-    "wTesting": "latest",
+    "wTesting": "delta",
     "eslint": "7.1.0"
   },
   "keywords": [
