@@ -3,8 +3,8 @@ root:
   - wSelector.out
 consistency:
   ../will.yml: &ref_0
-    hash: f6a57806040972613d30fb042b7603e6
-    size: 6606
+    hash: 06999299b0f7b22d21ae7a748b851773
+    size: 6614
 module:
   wSelector.out:
     about:
@@ -18,11 +18,11 @@ module:
       version: 0.4.0
       license: MIT
       npm.name: wselector
-      author: Kostiantyn Wandalen <wanalen@01.school>
+      author: Kostiantyn Wandalen <wandalen@obox.systems>
       keywords: &ref_1
         - wTools
       contributors: &ref_2
-        - Kostiantyn Wandalen <wanalen@01.school>
+        - Kostiantyn Wandalen <wandalen@obox.systems>
       interpreters: &ref_3
         - njs >= 10.0.0
         - chrome >= 60.0.0
@@ -798,7 +798,7 @@ module:
       version: 0.4.0
       license: MIT
       npm.name: wselector
-      author: Kostiantyn Wandalen <wanalen@01.school>
+      author: Kostiantyn Wandalen <wandalen@obox.systems>
       keywords: *ref_1
       contributors: *ref_2
       interpreters: *ref_3
@@ -1470,5 +1470,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: f6a57806040972613d30fb042b7603e6
-        size: 6606
+        hash: 06999299b0f7b22d21ae7a748b851773
+        size: 6614
