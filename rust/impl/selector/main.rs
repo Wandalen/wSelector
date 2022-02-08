@@ -212,7 +212,7 @@ fn set( path : PathBuf, query : &str, value_str : &str ) -> Result<(), Error>
           {
             *item = if already_inline
             {
-              Item::Value( Value::InlineTable(Default::default() ) )
+              Item::Value( Value::InlineTable( Default::default() ) )
             }
             else
             {
