@@ -1,0 +1,40 @@
+[package]
+name = "wselector"
+version = "0.1.0"
+edition = "2018"
+authors = ["Kostiantyn Wandalen <wandalen@obox.systems>", "Volodymyr M. <volodymyr.migdal@gmail.com>", "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>" ]
+license = "MIT"
+readme = "Readme.md"
+documentation = "https://docs.rs/wselector"
+repository = "https://github.com/wSelector"
+homepage = "https://github.com/wSelector"
+description = """
+Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.
+"""
+categories = [ "command-line-interface", "command-line-utilities" ]
+keywords = [ "wtools", "complex data structure" ]
+
+include = [
+  "/rust/impl/selector/main.rs",
+  "/Cargo.toml",
+  "/Readme.md",
+  "/License",
+]
+
+[[bin]]
+name = "selector"
+path = "rust/impl/selector/main.rs"
+
+[[test]]
+name = "wselector_test"
+path = "rust/test/selector/mod.rs"
+
+[dependencies]
+failure = "0.1"
+nom = "5.1"
+serde = "1.0"
+serde_json = "1.0"
+serde_yaml = "0.8"
+structopt = "0.3"
+toml_edit = "0.2"
+
