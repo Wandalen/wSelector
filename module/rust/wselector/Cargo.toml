@@ -15,7 +15,7 @@ categories = [ "command-line-interface", "command-line-utilities" ]
 keywords = [ "wtools", "complex data structure" ]
 
 include = [
-  "/rust/impl/selector/main.rs",
+  "/rust/impl/selector",
   "/Cargo.toml",
   "/Readme.md",
   "/License",
