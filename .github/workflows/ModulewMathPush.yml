@@ -1,0 +1,15 @@
+name : wselector
+
+on : push
+
+env :
+  CARGO_TERM_COLOR : always
+
+jobs :
+
+  test :
+    uses : Wandalen/wTools/.github/workflows/StandardRustPush.yml@master
+    with :
+      manifest_path : 'module/rust/wselector/Cargo.toml'
+      module_name : 'wselector'
+      commit_message : ${{ github.event.head_commit.message }}
