@@ -26,8 +26,8 @@ name = "selector"
 path = "rust/impl/selector/main.rs"
 
 [[test]]
-name = "wselector_test"
-path = "rust/test/selector/mod.rs"
+name = "wselector_trivial_sample"
+path = "rust/test/wselector_trivial_sample/mod.rs"
 
 [dependencies]
 failure = "0.1"
