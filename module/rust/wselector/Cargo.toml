@@ -14,6 +14,9 @@ Collection of cross-platform routines to select a sub-structure from a complex d
 categories = [ "command-line-interface", "command-line-utilities" ]
 keywords = [ "wtools", "query" ]
 
+[package.metadata.docs.rs]
+all-features = true
+
 include = [
   "/rust/impl/selector",
   "/Cargo.toml",
@@ -21,13 +24,27 @@ include = [
   "/License",
 ]
 
+[features]
+default = [ "use_std" ]
+full = [ "use_std", "use_alloc" ]
+use_std = []
+use_alloc = []
+
+[lib]
+name = "wselector"
+path = "rust/impl/selector/wselector_lib.rs"
+
 [[bin]]
 name = "selector"
-path = "rust/impl/selector/main.rs"
+path = "rust/impl/selector/wselector_entry.rs"
 
 [[test]]
+name = "wselector_test"
+path = "rust/test/selector/wselector_tests.rs"
+
+[[example]]
 name = "wselector_trivial_sample"
-path = "rust/test/wselector_trivial_sample/mod.rs"
+path = "sample/rust/wselector_trivial_sample/src/main.rs"
 
 [dependencies]
 failure = "0.1"
@@ -38,3 +55,5 @@ serde_yaml = "0.8"
 structopt = "0.3"
 toml_edit = "0.2"
 
+[dev-dependencies]
+test_tools = { version = "~0.1" }
