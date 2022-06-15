@@ -152,6 +152,7 @@ path:
         - release
       raw: compiled
       content: prime
+  npm.publish: 'module/js/{about::name}'
   npm.proto.entry:
     - proto/wtools/abase/l5/Selector.s
     - proto/node_modules/wselector
