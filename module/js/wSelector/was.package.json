@@ -1,6 +1,6 @@
 {
   "name": "wselector",
-  "version": "0.3.332",
+  "version": "0.3.333",
   "description": "Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
   "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
   "license": "MIT",
