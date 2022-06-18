@@ -3,8 +3,8 @@ root:
   - wSelector.out
 consistency:
   ../will.yml: &ref_0
-    hash: 06999299b0f7b22d21ae7a748b851773
-    size: 6614
+    hash: 2223ff71d4560fe4973881e5ba00b37a
+    size: 6655
 module:
   wSelector.out:
     about:
@@ -135,6 +135,8 @@ module:
           raw: compiled
           content: prime
         path: '{path::out.*=}/source/Index.s'
+      npm.publish:
+        path: '../module/js/{about::name}'
       npm.proto.entry:
         path:
           - ../proto/wtools/abase/l5/Selector.s
@@ -908,6 +910,8 @@ module:
           raw: compiled
           content: prime
         path: '{path::out.*=}/source/Index.s'
+      npm.publish:
+        path: 'module/js/{about::name}'
       npm.proto.entry:
         path:
           - proto/wtools/abase/l5/Selector.s
@@ -1470,5 +1474,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: 06999299b0f7b22d21ae7a748b851773
-        size: 6614
+        hash: 2223ff71d4560fe4973881e5ba00b37a
+        size: 6655
